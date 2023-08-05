@@ -48,7 +48,7 @@ cmake_minimum_required(VERSION 3.16)
 # globally add VKB_DEBUG for the debug build
 add_compile_definitions($<$<CONFIG:DEBUG>:VKB_DEBUG>)
 
-project(vulkan_samples)
+project(vkCompute)
 
 # create output folder
 file(MAKE_DIRECTORY output)
@@ -69,21 +69,18 @@ add_subdirectory(third_party)
 
 vkb__enable_testing()
 
-# Framework v2.0 components directory
-#add_subdirectory(components)
-#
-## Add vulkan framework
-#add_subdirectory(framework)
-#
-#if(VKB_BUILD_TESTS)
-#    # Add vulkan tests
+# Add vulkan framework
+add_subdirectory(framework)
+
+if(VKB_BUILD_TESTS)
+    # Add vulkan tests
 #    add_subdirectory(tests)
-#endif()
-#
-#if(VKB_BUILD_SAMPLES)
-#    # Add vulkan samples
+endif()
+
+if(VKB_BUILD_SAMPLES)
+    # Add vulkan samples
 #    add_subdirectory(samples)
-#endif()
-#
-## Add vulkan app (runs all samples)
+endif()
+
+# Add vulkan app (runs all samples)
 #add_subdirectory(app)
