@@ -1,19 +1,8 @@
-/* Copyright (c) 2019-2023, Arm Limited and Contributors
- *
- * SPDX-License-Identifier: Apache-2.0
- *
- * Licensed under the Apache License, Version 2.0 the "License";
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *     http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
+//  Copyright (c) 2023 Feng Yang
+//
+//  I am making my contributions/submissions to this project solely in my
+//  personal capacity and am not conveying any rights to any intellectual
+//  property of any third parties.
 
 #pragma once
 
@@ -25,46 +14,44 @@
 #include "platform/platform.h"
 #include "platform/window.h"
 
-namespace vox
-{
+namespace vox {
 /**
  * @brief Direct2Display window
  */
-class DirectWindow : public Window
-{
-  public:
-	DirectWindow(Platform *platform, const Window::Properties &properties);
+class DirectWindow : public Window {
+public:
+    DirectWindow(Platform *platform, const Window::Properties &properties);
 
-	virtual ~DirectWindow();
+    virtual ~DirectWindow();
 
-	virtual VkSurfaceKHR create_surface(Instance &instance) override;
+    virtual VkSurfaceKHR create_surface(Instance &instance) override;
 
-	virtual VkSurfaceKHR create_surface(VkInstance instance, VkPhysicalDevice physical_device) override;
+    virtual VkSurfaceKHR create_surface(VkInstance instance, VkPhysicalDevice physical_device) override;
 
-	virtual bool should_close() override;
+    virtual bool should_close() override;
 
-	virtual void process_events() override;
+    virtual void process_events() override;
 
-	virtual void close() override;
+    virtual void close() override;
 
-	virtual bool get_display_present_info(VkDisplayPresentInfoKHR *info,
-	                                      uint32_t src_width, uint32_t src_height) const override;
+    virtual bool get_display_present_info(VkDisplayPresentInfoKHR *info,
+                                          uint32_t src_width, uint32_t src_height) const override;
 
-	float get_dpi_factor() const override;
+    float get_dpi_factor() const override;
 
-	std::vector<const char *> get_required_surface_extensions() const override;
+    std::vector<const char *> get_required_surface_extensions() const override;
 
-  private:
-	void poll_terminal();
+private:
+    void poll_terminal();
 
-  private:
-	mutable bool   keep_running = true;
-	Platform      *platform     = nullptr;
-	float          dpi;
-	int            tty_fd;
-	struct termios termio;
-	struct termios termio_prev;
-	KeyCode        key_down = KeyCode::Unknown;
-	Extent         full_extent{};
+private:
+    mutable bool keep_running = true;
+    Platform *platform = nullptr;
+    float dpi;
+    int tty_fd;
+    struct termios termio;
+    struct termios termio_prev;
+    KeyCode key_down = KeyCode::Unknown;
+    Extent full_extent{};
 };
-}        // namespace vox
+}// namespace vox

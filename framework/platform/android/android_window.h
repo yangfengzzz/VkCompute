@@ -22,55 +22,53 @@
 #include "common/vk_common.h"
 #include "platform/window.h"
 
-namespace vox
-{
+namespace vox {
 class AndroidPlatform;
 
 /**
  * @brief Wrapper for a ANativeWindow, handles the window behaviour (including headless mode on Android)
  *        This class should not be responsible for destroying the underlying data it points to
  */
-class AndroidWindow : public Window
-{
-  public:
-	/**
+class AndroidWindow : public Window {
+public:
+    /**
 	 * @brief Constructor
 	 * @param platform The platform this window is created for
 	 * @param window A reference to the location of the Android native window
 	 * @param properties Window configuration
 	 */
-	AndroidWindow(AndroidPlatform *platform, ANativeWindow *&window, const Window::Properties &properties);
+    AndroidWindow(AndroidPlatform *platform, ANativeWindow *&window, const Window::Properties &properties);
 
-	virtual ~AndroidWindow() = default;
+    virtual ~AndroidWindow() = default;
 
-	/**
+    /**
 	 * @brief Creates a Vulkan surface to the native window
 	 *        If headless, this will return VK_NULL_HANDLE
 	 */
-	virtual VkSurfaceKHR create_surface(Instance &instance) override;
+    virtual VkSurfaceKHR create_surface(Instance &instance) override;
 
-	/**
+    /**
 	 * @brief Creates a Vulkan surface to the native window
 	 *        If headless, this will return nullptr
 	 */
-	virtual VkSurfaceKHR create_surface(VkInstance instance, VkPhysicalDevice physical_device) override;
+    virtual VkSurfaceKHR create_surface(VkInstance instance, VkPhysicalDevice physical_device) override;
 
-	virtual void process_events() override;
+    virtual void process_events() override;
 
-	virtual bool should_close() override;
+    virtual bool should_close() override;
 
-	virtual void close() override;
+    virtual void close() override;
 
-	virtual float get_dpi_factor() const override;
+    virtual float get_dpi_factor() const override;
 
-	std::vector<const char *> get_required_surface_extensions() const override;
+    std::vector<const char *> get_required_surface_extensions() const override;
 
-  private:
-	AndroidPlatform *platform;
+private:
+    AndroidPlatform *platform;
 
-	// Handle to the android window
-	ANativeWindow *&handle;
+    // Handle to the android window
+    ANativeWindow *&handle;
 
-	bool finish_called{false};
+    bool finish_called{false};
 };
-}        // namespace vox
+}// namespace vox

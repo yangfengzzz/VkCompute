@@ -1,19 +1,8 @@
-/* Copyright (c) 2019-2023, Arm Limited and Contributors
- *
- * SPDX-License-Identifier: Apache-2.0
- *
- * Licensed under the Apache License, Version 2.0 the "License";
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *     http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
+//  Copyright (c) 2023 Feng Yang
+//
+//  I am making my contributions/submissions to this project solely in my
+//  personal capacity and am not conveying any rights to any intellectual
+//  property of any third parties.
 
 #pragma once
 
@@ -24,8 +13,6 @@
 #include <sys/stat.h>
 #include <unordered_map>
 #include <vector>
-
-#include <json.hpp>
 
 namespace vox {
 namespace fs {
@@ -141,7 +128,6 @@ void write_temp(const std::vector<uint8_t> &data, const std::string &filename, c
  * @param components The number of bytes per element
  * @param row_stride The stride in bytes of a row of pixels
  */
-void write_image(const uint8_t *data, const std::string &filename, const uint32_t width, const uint32_t height,
-                 const uint32_t components, const uint32_t row_stride);
+void write_image(const uint8_t *data, const std::string &filename, const uint32_t width, const uint32_t height, const uint32_t components, const uint32_t row_stride);
 }
 }// namespace vox::fs

@@ -21,50 +21,48 @@
 
 #include "platform/platform.h"
 
-namespace vox
-{
-class AndroidPlatform : public Platform
-{
-  public:
-	AndroidPlatform(const PlatformContext &context);
+namespace vox {
+class AndroidPlatform : public Platform {
+public:
+    AndroidPlatform(const PlatformContext &context);
 
-	virtual ~AndroidPlatform() = default;
+    virtual ~AndroidPlatform() = default;
 
-	virtual ExitCode initialize(const std::vector<Plugin *> &plugins) override;
+    virtual ExitCode initialize(const std::vector<Plugin *> &plugins) override;
 
-	virtual void terminate(ExitCode code) override;
+    virtual void terminate(ExitCode code) override;
 
-	/**
+    /**
 	 * @brief Sends a notification in the task bar
 	 * @param message The message to display
 	 */
-	void send_notification(const std::string &message);
+    void send_notification(const std::string &message);
 
-	/**
+    /**
 	 * @brief Sends an error notification in the task bar
 	 * @param message The message to display
 	 */
-	void send_error_notification(const std::string &message);
+    void send_error_notification(const std::string &message);
 
-	android_app *get_android_app();
+    android_app *get_android_app();
 
-	GameActivity *get_activity();
+    GameActivity *get_activity();
 
-	void set_surface_ready();
+    void set_surface_ready();
 
-	void process_android_input_events(void);
+    void process_android_input_events(void);
 
-  private:
-	virtual void create_window(const Window::Properties &properties) override;
+private:
+    virtual void create_window(const Window::Properties &properties) override;
 
-  private:
-	android_app *app{nullptr};
+private:
+    android_app *app{nullptr};
 
-	std::string log_output;
+    std::string log_output;
 
-	virtual std::vector<spdlog::sink_ptr> get_platform_sinks() override;
+    virtual std::vector<spdlog::sink_ptr> get_platform_sinks() override;
 
-	bool surface_ready{false};
+    bool surface_ready{false};
 };
 
 /**
@@ -74,31 +72,26 @@ class AndroidPlatform : public Platform
  * @return true Events processed
  * @return false Program should close
  */
-inline bool process_android_events(android_app *app)
-{
-	android_poll_source *source;
+inline bool process_android_events(android_app *app) {
+    android_poll_source *source;
 
-	int ident;
-	int events;
+    int ident;
+    int events;
 
-	while ((ident = ALooper_pollAll(0, nullptr, &events,
-	                                (void **) &source)) >= 0)
-	{
-		if (source)
-		{
-			source->process(app, source);
-		}
+    while ((ident = ALooper_pollAll(0, nullptr, &events,
+                                    (void **)&source)) >= 0) {
+        if (source) {
+            source->process(app, source);
+        }
 
-		if (app->destroyRequested != 0)
-		{
-			return false;
-		}
-	}
-	if (app->userData)
-	{
-		auto platform = reinterpret_cast<AndroidPlatform *>(app->userData);
-		platform->process_android_input_events();
-	}
-	return true;
+        if (app->destroyRequested != 0) {
+            return false;
+        }
+    }
+    if (app->userData) {
+        auto platform = reinterpret_cast<AndroidPlatform *>(app->userData);
+        platform->process_android_input_events();
+    }
+    return true;
 }
-}        // namespace vox
+}// namespace vox
