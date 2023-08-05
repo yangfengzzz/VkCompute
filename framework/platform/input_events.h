@@ -20,7 +20,7 @@
 #include <cstddef>
 #include <cstdint>
 
-namespace vkb
+namespace vox
 {
 class Platform;
 
@@ -251,4 +251,4 @@ class TouchInputEvent : public InputEvent
 
 	float pos_y;
 };
-}        // namespace vkb
+}        // namespace vox

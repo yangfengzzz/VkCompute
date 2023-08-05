@@ -17,7 +17,7 @@
 
 #include "parser.h"
 
-namespace vkb
+namespace vox
 {
 Command::Command(const std::string &name, const std::string &help_line) :
     _name(name),
@@ -123,4 +123,4 @@ bool CommandParser::parse(CommandParserContext *context, const std::vector<Comma
 	return true;
 }
 
-}        // namespace vkb
+}        // namespace vox

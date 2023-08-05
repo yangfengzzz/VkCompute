@@ -22,7 +22,7 @@
 #include "platform/headless_window.h"
 #include "platform/unix/direct_window.h"
 
-namespace vkb
+namespace vox
 {
 namespace
 {
@@ -513,4 +513,4 @@ std::vector<const char *> DirectWindow::get_required_surface_extensions() const
 	return {VK_KHR_DISPLAY_EXTENSION_NAME};
 }
 
-}        // namespace vkb
+}        // namespace vox

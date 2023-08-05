@@ -23,7 +23,7 @@
 #include <typeindex>
 #include <vector>
 
-namespace vkb
+namespace vox
 {
 class Plugin;
 
@@ -321,4 +321,4 @@ inline bool CommandParser::convert_type(const std::vector<std::string> &values, 
 	return true;
 }
 
-}        // namespace vkb
+}        // namespace vox

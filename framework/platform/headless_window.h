@@ -19,7 +19,7 @@
 
 #include "platform/window.h"
 
-namespace vkb
+namespace vox
 {
 /**
  * @brief Surface-less implementation of a Window, for use in headless rendering
@@ -54,4 +54,4 @@ class HeadlessWindow : public Window
   private:
 	bool closed{false};
 };
-}        // namespace vkb
+}        // namespace vox

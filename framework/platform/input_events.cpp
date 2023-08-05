@@ -17,7 +17,7 @@
 
 #include "input_events.h"
 
-namespace vkb
+namespace vox
 {
 InputEvent::InputEvent(EventSource source) :
     source{source}
@@ -109,4 +109,4 @@ float TouchInputEvent::get_pos_y() const
 {
 	return pos_y;
 }
-}        // namespace vkb
+}        // namespace vox

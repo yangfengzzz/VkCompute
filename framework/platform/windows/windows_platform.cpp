@@ -32,7 +32,7 @@ VKBP_DISABLE_WARNINGS()
 #include <spdlog/spdlog.h>
 VKBP_ENABLE_WARNINGS()
 
-namespace vkb
+namespace vox
 {
 namespace
 {
@@ -111,7 +111,7 @@ WindowsPlatform::WindowsPlatform(const PlatformContext &context) :
 
 void WindowsPlatform::create_window(const Window::Properties &properties)
 {
-	if (properties.mode == vkb::Window::Mode::Headless)
+	if (properties.mode == vox::Window::Mode::Headless)
 	{
 		window = std::make_unique<HeadlessWindow>(properties);
 	}
@@ -120,4 +120,4 @@ void WindowsPlatform::create_window(const Window::Properties &properties)
 		window = std::make_unique<GlfwWindow>(this, properties);
 	}
 }
-}        // namespace vkb
+}        // namespace vox

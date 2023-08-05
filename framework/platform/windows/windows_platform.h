@@ -19,7 +19,7 @@
 
 #include "platform/platform.h"
 
-namespace vkb
+namespace vox
 {
 class WindowsPlatform : public Platform
 {
@@ -31,4 +31,4 @@ class WindowsPlatform : public Platform
   protected:
 	virtual void create_window(const Window::Properties &properties) override;
 };
-}        // namespace vkb
+}        // namespace vox

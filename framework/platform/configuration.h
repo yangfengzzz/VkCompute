@@ -25,7 +25,7 @@
 #include <unordered_map>
 #include <vector>
 
-namespace vkb
+namespace vox
 {
 class Setting
 {
@@ -139,4 +139,4 @@ class Configuration
 
 	ConfigMap::iterator current_configuration;
 };
-}        // namespace vkb
+}        // namespace vox

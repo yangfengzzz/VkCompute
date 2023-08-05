@@ -76,7 +76,6 @@ set(COMMON_FILES
     # Header Files
     common/vk_common.h
     common/vk_initializers.h
-    common/glm_common.h 
     common/resource_caching.h
     common/logging.h
     common/helpers.h
@@ -84,11 +83,7 @@ set(COMMON_FILES
     common/utils.h
     common/strings.h
     common/tags.h
-    common/hpp_error.h
     common/hpp_resource_caching.h
-    common/hpp_strings.h
-    common/hpp_utils.h
-    common/hpp_vk_common.h
     # Source Files
     common/error.cpp
     common/vk_common.cpp
@@ -385,7 +380,7 @@ set(LINUX_D2D_FILES
 
 #source_group("\\" FILES ${FRAMEWORK_FILES})
 source_group("common\\" FILES ${COMMON_FILES})
-source_group("platform\\" FILES ${PLATFORM_FILES})
+#source_group("platform\\" FILES ${PLATFORM_FILES})
 #source_group("platform\\" FILES ${GLFW_FILES})
 #source_group("platform\\parsers" FILES ${PARSER_FILES})
 #source_group("platform\\windows" FILES ${WINDOWS_FILES})
@@ -402,7 +397,7 @@ source_group("platform\\" FILES ${PLATFORM_FILES})
 #source_group("stats\\" FILES ${STATS_FILES})
 
 set(PROJECT_FILES
-    ${PLATFORM_FILES}
+#    ${PLATFORM_FILES}
 #    ${PARSER_FILES}
     ${COMMON_FILES}
 #    ${FRAMEWORK_FILES}
@@ -421,25 +416,25 @@ if(ANDROID)
     add_definitions(-DVULKAN_HPP_TYPESAFE_CONVERSION=1)
 endif()
 
-# Add files based on platform
-if(ANDROID)
-    list(APPEND PROJECT_FILES ${ANDROID_FILES})
-    message(STATUS "Android platform detected")
-else()
-    if(DIRECT_TO_DISPLAY)
-        list(APPEND PROJECT_FILES ${LINUX_D2D_FILES})
-        message(STATUS "Unix d2d platform detected")
-    else()
-        list(APPEND PROJECT_FILES ${GLFW_FILES})
-        if(WIN32)
-            list(APPEND PROJECT_FILES ${WINDOWS_FILES})
-            message(STATUS "Windows platform detected")
-        else()
-            list(APPEND PROJECT_FILES ${UNIX_FILES})
-            message(STATUS "Unix platform detected")
-        endif()
-    endif()
-endif()
+## Add files based on platform
+#if(ANDROID)
+#    list(APPEND PROJECT_FILES ${ANDROID_FILES})
+#    message(STATUS "Android platform detected")
+#else()
+#    if(DIRECT_TO_DISPLAY)
+#        list(APPEND PROJECT_FILES ${LINUX_D2D_FILES})
+#        message(STATUS "Unix d2d platform detected")
+#    else()
+#        list(APPEND PROJECT_FILES ${GLFW_FILES})
+#        if(WIN32)
+#            list(APPEND PROJECT_FILES ${WINDOWS_FILES})
+#            message(STATUS "Windows platform detected")
+#        else()
+#            list(APPEND PROJECT_FILES ${UNIX_FILES})
+#            message(STATUS "Unix platform detected")
+#        endif()
+#    endif()
+#endif()
 
 # mask out the min/max macros from minwindef.h
 if(MSVC)

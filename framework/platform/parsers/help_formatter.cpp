@@ -22,7 +22,7 @@
 #include "CLI11.h"
 #include "common/strings.h"
 
-namespace vkb
+namespace vox
 {
 const std::string SPACER = "  ";
 
@@ -141,4 +141,4 @@ const HelpFormatter::Meta *HelpFormatter::get_meta(const CLI::App *command) cons
 	auto it = _meta.find(command);
 	return it == _meta.end() ? nullptr : &it->second;
 }
-}        // namespace vkb
+}        // namespace vox

@@ -22,7 +22,7 @@
 #include "common/vk_common.h"
 #include "platform/window.h"
 
-namespace vkb
+namespace vox
 {
 class AndroidPlatform;
 
@@ -73,4 +73,4 @@ class AndroidWindow : public Window
 
 	bool finish_called{false};
 };
-}        // namespace vkb
+}        // namespace vox

@@ -19,7 +19,7 @@
 
 #include "platform/platform.h"
 
-namespace vkb
+namespace vox
 {
 enum UnixType
 {
@@ -40,4 +40,4 @@ class UnixPlatform : public Platform
   private:
 	UnixType type;
 };
-}        // namespace vkb
+}        // namespace vox

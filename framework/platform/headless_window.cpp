@@ -17,7 +17,7 @@
 
 #include "headless_window.h"
 
-namespace vkb
+namespace vox
 {
 HeadlessWindow::HeadlessWindow(const Window::Properties &properties) :
     Window(properties)
@@ -54,4 +54,4 @@ std::vector<const char *> HeadlessWindow::get_required_surface_extensions() cons
 {
 	return {};
 }
-}        // namespace vkb
+}        // namespace vox

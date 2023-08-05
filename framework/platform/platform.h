@@ -38,7 +38,7 @@
 #	undef Success
 #endif
 
-namespace vkb
+namespace vox
 {
 enum class ExitCode
 {
@@ -176,10 +176,10 @@ class Platform
 
 	std::vector<std::string> arguments;
 
-	// static so can be references from vkb::fs
+	// static so can be references from vox::fs
 	static std::string external_storage_directory;
 
-	// static so can be references from vkb::fs
+	// static so can be references from vox::fs
 	static std::string temp_directory;
 };
 
@@ -196,4 +196,4 @@ T *Platform::get_plugin() const
 	const auto plugins = plugins::with_tags<T>(active_plugins);
 	return dynamic_cast<T *>(plugins[0]);
 }
-}        // namespace vkb
+}        // namespace vox

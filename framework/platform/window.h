@@ -17,11 +17,10 @@
 
 #pragma once
 
-#include "common/optional.h"
 #include "common/vk_common.h"
 #include "core/instance.h"
 
-namespace vkb
+namespace vox
 {
 /**
  * @brief An interface class, declaring the behaviour of a Window
@@ -37,8 +36,8 @@ class Window
 
 	struct OptionalExtent
 	{
-		Optional<uint32_t> width;
-		Optional<uint32_t> height;
+		std::optional<uint32_t> width;
+		std::optional<uint32_t> height;
 	};
 
 	enum class Mode
@@ -59,10 +58,10 @@ class Window
 
 	struct OptionalProperties
 	{
-		Optional<std::string> title;
-		Optional<Mode>        mode;
-		Optional<bool>        resizable;
-		Optional<Vsync>       vsync;
+        std::optional<std::string> title;
+        std::optional<Mode>        mode;
+        std::optional<bool>        resizable;
+        std::optional<Vsync>       vsync;
 		OptionalExtent        extent;
 	};
 
@@ -157,4 +156,4 @@ class Window
   protected:
 	Properties properties;
 };
-}        // namespace vkb
+}        // namespace vox

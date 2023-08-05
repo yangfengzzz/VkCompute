@@ -23,7 +23,7 @@
 #include "platform/platform.h"
 #include "plugin.h"
 
-namespace vkb
+namespace vox
 {
 /**
  * @brief PluginBase is the base class that plugins inherit from. The class enforces the use of tags when creating new plugins.
@@ -79,4 +79,4 @@ const std::vector<Hook> &PluginBase<TAGS...>::get_hooks() const
 {
 	return hooks;
 }
-}        // namespace vkb
+}        // namespace vox

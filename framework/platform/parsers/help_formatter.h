@@ -21,7 +21,7 @@
 #include <unordered_map>
 
 #include <CLI/FormatterFwd.hpp>
-namespace vkb
+namespace vox
 {
 class HelpFormatter : public CLI::Formatter
 {
@@ -46,4 +46,4 @@ class HelpFormatter : public CLI::Formatter
 
 	const Meta *get_meta(const CLI::App *command) const;
 };
-}        // namespace vkb
+}        // namespace vox

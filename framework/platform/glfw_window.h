@@ -22,7 +22,7 @@
 
 struct GLFWwindow;
 
-namespace vkb
+namespace vox
 {
 class Platform;
 
@@ -55,4 +55,4 @@ class GlfwWindow : public Window
   private:
 	GLFWwindow *handle = nullptr;
 };
-}        // namespace vkb
+}        // namespace vox

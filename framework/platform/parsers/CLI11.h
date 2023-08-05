@@ -25,7 +25,7 @@
 #include "platform/parser.h"
 #include "platform/plugins/plugin.h"
 
-namespace vkb
+namespace vox
 {
 struct CLI11CommandContextState
 
@@ -90,4 +90,4 @@ class CLI11CommandParser : public CommandParser
 
 	bool cli11_parse(CLI::App *app);
 };
-}        // namespace vkb
+}        // namespace vox

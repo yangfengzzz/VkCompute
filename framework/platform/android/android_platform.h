@@ -21,7 +21,7 @@
 
 #include "platform/platform.h"
 
-namespace vkb
+namespace vox
 {
 class AndroidPlatform : public Platform
 {
@@ -101,4 +101,4 @@ inline bool process_android_events(android_app *app)
 	}
 	return true;
 }
-}        // namespace vkb
+}        // namespace vox

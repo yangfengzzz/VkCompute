@@ -31,7 +31,7 @@ VKBP_ENABLE_WARNINGS()
 
 #include "platform/platform.h"
 
-namespace vkb
+namespace vox
 {
 namespace
 {
@@ -413,4 +413,4 @@ std::vector<const char *> GlfwWindow::get_required_surface_extensions() const
 	return {names, names + glfw_extension_count};
 }
 
-}        // namespace vkb
+}        // namespace vox

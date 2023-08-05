@@ -20,7 +20,7 @@
 #include "common/logging.h"
 #include "common/strings.h"
 
-namespace vkb
+namespace vox
 {
 CLI11CommandContext::CLI11CommandContext(CLI::App *cli, const CLI11CommandContextState &state) :
     CommandParserContext(), cli11(cli), _state(state)
@@ -245,4 +245,4 @@ bool CLI11CommandParser::cli11_parse(CLI::App *app)
 
 	return true;
 }
-}        // namespace vkb
+}        // namespace vox

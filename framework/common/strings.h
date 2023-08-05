@@ -22,174 +22,172 @@
 #include <string>
 #include <unordered_map>
 #include <vector>
-
+#include <vulkan/vulkan.hpp>
 #include <volk.h>
 
-namespace vkb
-{
+namespace vox {
 enum class ShaderResourceType;
 
-namespace sg
-{
+namespace sg {
 enum class AlphaMode;
-}
+}// namespace sg
 
 std::vector<std::string> split(const std::string &str, const std::string &delimiter);
-std::string              join(const std::vector<std::string> &str, const std::string &separator);
+std::string join(const std::vector<std::string> &str, const std::string &separator);
 
 /**
- * @brief Helper function to convert a VkFormat enum to a string
+ * @brief Helper function to convert a vk::Format enum to a string
  * @param format Vulkan format to convert.
  * @return The string to return.
  */
-const std::string to_string(VkFormat format);
+const std::string to_string(vk::Format format);
 
 /**
- * @brief Helper function to convert a VkPresentModeKHR to a string
+ * @brief Helper function to convert a vk::PresentModeKHR to a string
  * @param present_mode Vulkan present mode to convert.
  * @return The string to return.
  */
-const std::string to_string(VkPresentModeKHR present_mode);
+const std::string to_string(vk::PresentModeKHR present_mode);
 
 /**
- * @brief Helper function to convert a VkResult enum to a string
+ * @brief Helper function to convert a vk::Result enum to a string
  * @param result Vulkan result to convert.
  * @return The string to return.
  */
-const std::string to_string(VkResult result);
+const std::string to_string(vk::Result result);
 
 /**
- * @brief Helper function to convert a VkPhysicalDeviceType enum to a string
+ * @brief Helper function to convert a vk::PhysicalDeviceType enum to a string
  * @param type Vulkan physical device type to convert.
  * @return The string to return.
  */
-const std::string to_string(VkPhysicalDeviceType type);
+const std::string to_string(vk::PhysicalDeviceType type);
 
 /**
- * @brief Helper function to convert a VkSurfaceTransformFlagBitsKHR flag to a string
+ * @brief Helper function to convert a vk::SurfaceTransformFlagBitsKHR flag to a string
  * @param transform_flag Vulkan surface transform flag bit to convert.
  * @return The string to return.
  */
-const std::string to_string(VkSurfaceTransformFlagBitsKHR transform_flag);
+const std::string to_string(vk::SurfaceTransformFlagBitsKHR transform_flag);
 
 /**
- * @brief Helper function to convert a VkSurfaceFormatKHR format to a string
+ * @brief Helper function to convert a vk::SurfaceFormatKHR format to a string
  * @param surface_format Vulkan surface format to convert.
  * @return The string to return.
  */
-const std::string to_string(VkSurfaceFormatKHR surface_format);
+const std::string to_string(vk::SurfaceFormatKHR surface_format);
 
 /**
- * @brief Helper function to convert a VkCompositeAlphaFlagBitsKHR flag to a string
+ * @brief Helper function to convert a vk::CompositeAlphaFlagBitsKHR flag to a string
  * @param composite_alpha Vulkan composite alpha flag bit to convert.
  * @return The string to return.
  */
-const std::string to_string(VkCompositeAlphaFlagBitsKHR composite_alpha);
+const std::string to_string(vk::CompositeAlphaFlagBitsKHR composite_alpha);
 
 /**
- * @brief Helper function to convert a VkImageUsageFlagBits flag to a string
+ * @brief Helper function to convert a vk::ImageUsageFlagBits flag to a string
  * @param image_usage Vulkan image usage flag bit to convert.
  * @return The string to return.
  */
-const std::string to_string(VkImageUsageFlagBits image_usage);
+const std::string to_string(vk::ImageUsageFlagBits image_usage);
 
 /**
- * @brief Helper function to convert a VkExtent2D flag to a string
+ * @brief Helper function to convert a vk::Extent2D flag to a string
  * @param format Vulkan format to convert.
  * @return The string to return.
  */
-std::string to_string(VkExtent2D format);
+std::string to_string(vk::Extent2D format);
 
 /**
- * @brief Helper function to convert VkSampleCountFlagBits to a string
+ * @brief Helper function to convert vk::SampleCountFlagBits to a string
  * @param flags Vulkan sample count flags to convert
  * @return const std::string 
  */
-const std::string to_string(VkSampleCountFlagBits flags);
+const std::string to_string(vk::SampleCountFlagBits flags);
 
 /**
- * @brief Helper function to convert VkImageTiling to a string 
- * @param tiling Vulkan VkImageTiling to convert
+ * @brief Helper function to convert vk::ImageTiling to a string 
+ * @param tiling Vulkan vk::ImageTiling to convert
  * @return The string to return 
  */
-const std::string to_string(VkImageTiling tiling);
+const std::string to_string(vk::ImageTiling tiling);
 
 /**
- * @brief Helper function to convert VkImageType to a string 
- * @param type Vulkan VkImageType to convert
+ * @brief Helper function to convert vk::ImageType to a string 
+ * @param type Vulkan vk::ImageType to convert
  * @return The string to return 
  */
-const std::string to_string(VkImageType type);
+const std::string to_string(vk::ImageType type);
 
 /**
- * @brief Helper function to convert VkBlendFactor to a string 
- * @param blend Vulkan VkBlendFactor to convert
+ * @brief Helper function to convert vk::BlendFactor to a string 
+ * @param blend Vulkan vk::BlendFactor to convert
  * @return The string to return 
  */
-const std::string to_string(VkBlendFactor blend);
+const std::string to_string(vk::BlendFactor blend);
 
 /**
- * @brief Helper function to convert VkVertexInputRate to a string 
- * @param rate Vulkan VkVertexInputRate to convert
+ * @brief Helper function to convert vk::VertexInputRate to a string 
+ * @param rate Vulkan vk::VertexInputRate to convert
  * @return The string to return 
  */
-const std::string to_string(VkVertexInputRate rate);
+const std::string to_string(vk::VertexInputRate rate);
 
 /**
- * @brief Helper function to convert VkBool32 to a string 
- * @param state Vulkan VkBool32 to convert
+ * @brief Helper function to convert vk::Bool32 to a string 
+ * @param state Vulkan vk::Bool32 to convert
  * @return The string to return 
  */
-const std::string to_string_vk_bool(VkBool32 state);
+const std::string to_string_vk_bool(vk::Bool32 state);
 
 /**
- * @brief Helper function to convert VkPrimitiveTopology to a string 
- * @param topology Vulkan VkPrimitiveTopology to convert
+ * @brief Helper function to convert vk::PrimitiveTopology to a string 
+ * @param topology Vulkan vk::PrimitiveTopology to convert
  * @return The string to return 
  */
-const std::string to_string(VkPrimitiveTopology topology);
+const std::string to_string(vk::PrimitiveTopology topology);
 
 /**
- * @brief Helper function to convert VkFrontFace to a string 
- * @param face Vulkan VkFrontFace to convert
+ * @brief Helper function to convert vk::FrontFace to a string 
+ * @param face Vulkan vk::FrontFace to convert
  * @return The string to return 
  */
-const std::string to_string(VkFrontFace face);
+const std::string to_string(vk::FrontFace face);
 
 /**
- * @brief Helper function to convert VkPolygonMode to a string 
- * @param mode Vulkan VkPolygonMode to convert
+ * @brief Helper function to convert vk::PolygonMode to a string 
+ * @param mode Vulkan vk::PolygonMode to convert
  * @return The string to return 
  */
-const std::string to_string(VkPolygonMode mode);
+const std::string to_string(vk::PolygonMode mode);
 
 /**
- * @brief Helper function to convert VkCompareOp to a string 
- * @param operation Vulkan VkCompareOp to convert
+ * @brief Helper function to convert vk::CompareOp to a string 
+ * @param operation Vulkan vk::CompareOp to convert
  * @return The string to return 
  */
-const std::string to_string(VkCompareOp operation);
+const std::string to_string(vk::CompareOp operation);
 
 /**
- * @brief Helper function to convert VkStencilOp to a string 
- * @param operation Vulkan VkStencilOp to convert
+ * @brief Helper function to convert vk::StencilOp to a string 
+ * @param operation Vulkan vk::StencilOp to convert
  * @return The string to return 
  */
-const std::string to_string(VkStencilOp operation);
+const std::string to_string(vk::StencilOp operation);
 
 /**
- * @brief Helper function to convert VkLogicOp to a string 
- * @param operation Vulkan VkLogicOp to convert
+ * @brief Helper function to convert vk::LogicOp to a string 
+ * @param operation Vulkan vk::LogicOp to convert
  * @return The string to return 
  */
-const std::string to_string(VkLogicOp operation);
+const std::string to_string(vk::LogicOp operation);
 
 /**
- * @brief Helper function to convert VkBlendOp to a string 
- * @param operation Vulkan VkBlendOp to convert
+ * @brief Helper function to convert vk::BlendOp to a string 
+ * @param operation Vulkan vk::BlendOp to convert
  * @return The string to return 
  */
-const std::string to_string(VkBlendOp operation);
+const std::string to_string(vk::BlendOp operation);
 
 /**
  * @brief Helper function to convert AlphaMode to a string 
@@ -218,67 +216,63 @@ const std::string to_string(ShaderResourceType type);
  * @param string_map A map of bitmask bits to the string that describe the Vulkan flag
  * @returns A string of the enabled bits in the bitmask
  */
-template <typename T>
-inline const std::string to_string(uint32_t bitmask, const std::map<T, const char *> string_map)
-{
-	std::stringstream result;
-	bool              append = false;
-	for (const auto &s : string_map)
-	{
-		if (bitmask & s.first)
-		{
-			if (append)
-			{
-				result << " / ";
-			}
-			result << s.second;
-			append = true;
-		}
-	}
-	return result.str();
+template<typename U, typename T>
+inline const std::string to_string(U bitmask, const std::map<T, const char *> string_map) {
+    std::stringstream result;
+    bool append = false;
+    for (const auto &s : string_map) {
+        if (bitmask & s.first) {
+            if (append) {
+                result << " / ";
+            }
+            result << s.second;
+            append = true;
+        }
+    }
+    return result.str();
 }
 
 /**
- * @brief Helper function to convert VkBufferUsageFlags to a string
+ * @brief Helper function to convert vk::BufferUsageFlags to a string
  * @param bitmask The buffer usage bitmask to convert to strings
  * @return The converted string to return
  */
-const std::string buffer_usage_to_string(VkBufferUsageFlags bitmask);
+const std::string buffer_usage_to_string(vk::BufferUsageFlags bitmask);
 
 /**
- * @brief Helper function to convert VkShaderStageFlags to a string
+ * @brief Helper function to convert vk::ShaderStageFlags to a string
  * @param bitmask The shader stage bitmask to convert
  * @return The converted string to return
  */
-const std::string shader_stage_to_string(VkShaderStageFlags bitmask);
+const std::string shader_stage_to_string(vk::ShaderStageFlags bitmask);
 
 /**
- * @brief Helper function to convert VkImageUsageFlags to a string
+ * @brief Helper function to convert vk::ImageUsageFlags to a string
  * @param bitmask The image usage bitmask to convert
  * @return The converted string to return
  */
-const std::string image_usage_to_string(VkImageUsageFlags bitmask);
+const std::string image_usage_to_string(vk::ImageUsageFlags bitmask);
 
 /**
- * @brief Helper function to convert VkImageAspectFlags to a string
+ * @brief Helper function to convert vk::ImageAspectFlags to a string
  * @param bitmask The image aspect bitmask to convert
  * @return The converted string to return
  */
-const std::string image_aspect_to_string(VkImageAspectFlags bitmask);
+const std::string image_aspect_to_string(vk::ImageAspectFlags bitmask);
 
 /**
- * @brief Helper function to convert VkCullModeFlags to a string
+ * @brief Helper function to convert vk::CullModeFlags to a string
  * @param bitmask The cull mode bitmask to convert
  * @return The converted string to return
  */
-const std::string cull_mode_to_string(VkCullModeFlags bitmask);
+const std::string cull_mode_to_string(vk::CullModeFlags bitmask);
 
 /**
- * @brief Helper function to convert VkColorComponentFlags to a string
+ * @brief Helper function to convert vk::ColorComponentFlags to a string
  * @param bitmask The color component bitmask to convert
  * @return The converted string to return
  */
-const std::string color_component_to_string(VkColorComponentFlags bitmask);
+const std::string color_component_to_string(vk::ColorComponentFlags bitmask);
 
 /**
  * @brief Helper function to split a single string into a vector of strings by a delimiter
@@ -287,4 +281,4 @@ const std::string color_component_to_string(VkColorComponentFlags bitmask);
  * @return The vector of tokenized strings
  */
 std::vector<std::string> split(const std::string &input, char delim);
-}        // namespace vkb
+}// namespace vox

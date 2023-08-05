@@ -25,7 +25,7 @@
 #include "platform/platform.h"
 #include "platform/window.h"
 
-namespace vkb
+namespace vox
 {
 /**
  * @brief Direct2Display window
@@ -67,4 +67,4 @@ class DirectWindow : public Window
 	KeyCode        key_down = KeyCode::Unknown;
 	Extent         full_extent{};
 };
-}        // namespace vkb
+}        // namespace vox

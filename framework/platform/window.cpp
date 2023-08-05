@@ -19,7 +19,7 @@
 
 #include "platform/platform.h"
 
-namespace vkb
+namespace vox
 {
 Window::Window(const Properties &properties) :
     properties{properties}
@@ -62,4 +62,4 @@ bool Window::get_display_present_info(VkDisplayPresentInfoKHR *info,
 	// Default is to not use the extra present info
 	return false;
 }
-}        // namespace vkb
+}        // namespace vox

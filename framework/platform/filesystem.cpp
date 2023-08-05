@@ -26,7 +26,7 @@ VKBP_ENABLE_WARNINGS()
 
 #include "platform/platform.h"
 
-namespace vkb
+namespace vox
 {
 namespace fs
 {
@@ -210,4 +210,4 @@ void write_image(const uint8_t *data, const std::string &filename, const uint32_
 }
 
 }        // namespace fs
-}        // namespace vkb
+}        // namespace vox

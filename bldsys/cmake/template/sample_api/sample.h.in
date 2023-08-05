@@ -31,7 +31,7 @@ class @SAMPLE_NAME@ : public ApiVulkanSample
 	// Override basic framework functionality
 	void build_command_buffers() override;
 	void render(float delta_time) override;
-	bool prepare(const vkb::ApplicationOptions &options) override;
+	bool prepare(const vox::ApplicationOptions &options) override;
 
   private:
 	// Sample specific data
@@ -39,4 +39,4 @@ class @SAMPLE_NAME@ : public ApiVulkanSample
 	VkPipelineLayout sample_pipeline_layout{};
 };
 
-std::unique_ptr<vkb::VulkanSample> create_@SAMPLE_NAME_FILE@();
+std::unique_ptr<vox::VulkanSample> create_@SAMPLE_NAME_FILE@();

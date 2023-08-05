@@ -27,27 +27,23 @@
 
 #include <json.hpp>
 
-namespace vkb
-{
-namespace fs
-{
-namespace path
-{
-enum Type
-{
-	// Relative paths
-	Assets,
-	Shaders,
-	Storage,
-	Screenshots,
-	Logs,
-	/* NewFolder */
-	TotalRelativePathTypes,
+namespace vox {
+namespace fs {
+namespace path {
+enum Type {
+    // Relative paths
+    Assets,
+    Shaders,
+    Storage,
+    Screenshots,
+    Logs,
+    /* NewFolder */
+    TotalRelativePathTypes,
 
-	// Special paths
-	ExternalStorage,
-	WorkingDir = ExternalStorage,
-	Temp
+    // Special paths
+    ExternalStorage,
+    WorkingDir = ExternalStorage,
+    Temp
 };
 
 extern const std::unordered_map<Type, std::string> relative_paths;
@@ -60,7 +56,7 @@ extern const std::unordered_map<Type, std::string> relative_paths;
  * @return Path to the directory of a certain type
  */
 const std::string get(const Type type, const std::string &file = "");
-}        // namespace path
+}// namespace path
 
 /**
  * @brief Helper to tell if a given path is a directory
@@ -145,6 +141,7 @@ void write_temp(const std::vector<uint8_t> &data, const std::string &filename, c
  * @param components The number of bytes per element
  * @param row_stride The stride in bytes of a row of pixels
  */
-void write_image(const uint8_t *data, const std::string &filename, const uint32_t width, const uint32_t height, const uint32_t components, const uint32_t row_stride);
-}        // namespace fs
-}        // namespace vkb
+void write_image(const uint8_t *data, const std::string &filename, const uint32_t width, const uint32_t height,
+                 const uint32_t components, const uint32_t row_stride);
+}
+}// namespace vox::fs

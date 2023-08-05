@@ -47,7 +47,7 @@ VKBP_ENABLE_WARNINGS()
 #	define VK_KHR_WAYLAND_SURFACE_EXTENSION_NAME "VK_KHR_wayland_surface"
 #endif
 
-namespace vkb
+namespace vox
 {
 
 namespace fs
@@ -68,7 +68,7 @@ UnixPlatform::UnixPlatform(const PlatformContext &context, const UnixType &type)
 
 void UnixPlatform::create_window(const Window::Properties &properties)
 {
-	if (properties.mode == vkb::Window::Mode::Headless)
+	if (properties.mode == vox::Window::Mode::Headless)
 	{
 		window = std::make_unique<HeadlessWindow>(properties);
 	}
@@ -77,4 +77,4 @@ void UnixPlatform::create_window(const Window::Properties &properties)
 		window = std::make_unique<GlfwWindow>(this, properties);
 	}
 }
-}        // namespace vkb
+}        // namespace vox

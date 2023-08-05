@@ -27,7 +27,7 @@ VKBP_ENABLE_WARNINGS()
 #include "platform/headless_window.h"
 #include "platform/unix/direct_window.h"
 
-namespace vkb
+namespace vox
 {
 namespace
 {
@@ -62,7 +62,7 @@ UnixD2DPlatform::UnixD2DPlatform(const PlatformContext &context) :
 
 void UnixD2DPlatform::create_window(const Window::Properties &properties)
 {
-	if (properties.mode == vkb::Window::Mode::Headless)
+	if (properties.mode == vox::Window::Mode::Headless)
 	{
 		window = std::make_unique<HeadlessWindow>(properties);
 	}
@@ -71,4 +71,4 @@ void UnixD2DPlatform::create_window(const Window::Properties &properties)
 		window = std::make_unique<DirectWindow>(this, properties);
 	}
 }
-}        // namespace vkb
+}        // namespace vox

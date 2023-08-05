@@ -17,7 +17,7 @@
 
 #include "configuration.h"
 
-namespace vkb
+namespace vox
 {
 BoolSetting::BoolSetting(bool &handle, bool value) :
     handle{handle},
@@ -103,4 +103,4 @@ void Configuration::insert_setting(uint32_t config_index, std::unique_ptr<Settin
 	configs[config_index][settings.back()->get_type()].push_back(settings.back().get());
 }
 
-}        // namespace vkb
+}        // namespace vox

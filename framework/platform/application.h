@@ -24,7 +24,7 @@
 #include "platform/input_events.h"
 #include "timer.h"
 
-namespace vkb
+namespace vox
 {
 class Window;
 
@@ -109,4 +109,4 @@ class Application
 
 	bool requested_close{false};
 };
-}        // namespace vkb
+}        // namespace vox

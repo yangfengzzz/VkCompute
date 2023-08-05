@@ -24,7 +24,7 @@
 #include "common/tags.h"
 #include "platform/parser.h"
 
-namespace vkb
+namespace vox
 {
 class Platform;
 class RenderContext;
@@ -35,7 +35,7 @@ class Plugin;
  * 	      and which will not without directly specifying an exclusion or inclusion list. Tags are struct types so that they can
  * 		  be used in the tagging system (See plugin implementation).
  *		  
- * Entrypoint - An entrypoint is a starting point for the application that will load a vkb::Application (see start_app)
+ * Entrypoint - An entrypoint is a starting point for the application that will load a vox::Application (see start_app)
  * FullControl - The plugin wants full control over how the application executes. Stopping plugins will be ignored (see batch_mode)
  * Stopping - The plugin will stop the app through its own mechanism (see stop_after)	
  * Passive - These plugins provide non intrusive behaviour (see fps_logger)
@@ -290,4 +290,4 @@ const std::vector<Plugin *> without_tags(const std::vector<Plugin *> &domain = {
 	return compatable;
 }
 }        // namespace plugins
-}        // namespace vkb
+}        // namespace vox

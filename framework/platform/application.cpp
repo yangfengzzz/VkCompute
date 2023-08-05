@@ -20,7 +20,7 @@
 #include "common/logging.h"
 #include "platform/window.h"
 
-namespace vkb
+namespace vox
 {
 Application::Application() :
     name{"Sample Name"}
@@ -74,4 +74,4 @@ DebugInfo &Application::get_debug_info()
 {
 	return debug_info;
 }
-}        // namespace vkb
+}        // namespace vox

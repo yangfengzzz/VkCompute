@@ -21,14 +21,14 @@
 #include "scene_graph/components/camera.h"
 #include "vulkan_sample.h"
 
-class @SAMPLE_NAME@ : public vkb::VulkanSample
+class @SAMPLE_NAME@ : public vox::VulkanSample
 {
   public:
 	@SAMPLE_NAME@();
 
-	virtual bool prepare(const vkb::ApplicationOptions &options) override;
+	virtual bool prepare(const vox::ApplicationOptions &options) override;
 
 	virtual ~@SAMPLE_NAME@() = default;
 };
 
-std::unique_ptr<vkb::VulkanSample> create_@SAMPLE_NAME_FILE@();
+std::unique_ptr<vox::VulkanSample> create_@SAMPLE_NAME_FILE@();

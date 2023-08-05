@@ -19,7 +19,7 @@
 
 #include "platform/android/android_platform.h"
 
-namespace vkb
+namespace vox
 {
 AndroidWindow::AndroidWindow(AndroidPlatform *platform, ANativeWindow *&window, const Window::Properties &properties) :
     Window(properties),
@@ -76,4 +76,4 @@ std::vector<const char *> AndroidWindow::get_required_surface_extensions() const
 {
 	return {VK_KHR_ANDROID_SURFACE_EXTENSION_NAME};
 }
-}        // namespace vkb
+}        // namespace vox

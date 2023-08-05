@@ -29,7 +29,7 @@
 {
 }
 
-bool @SAMPLE_NAME@::prepare(const vkb::ApplicationOptions &options)
+bool @SAMPLE_NAME@::prepare(const vox::ApplicationOptions &options)
 {
 	if (!VulkanSample::prepare(options))
 	{
@@ -40,25 +40,25 @@ bool @SAMPLE_NAME@::prepare(const vkb::ApplicationOptions &options)
 	load_scene("scenes/sponza/Sponza01.gltf");
 
 	// Attach a move script to the camera component in the scene
-	auto &camera_node = vkb::add_free_camera(*scene, "main_camera", get_render_context().get_surface_extent());
-	auto camera       = &camera_node.get_component<vkb::sg::Camera>();
+	auto &camera_node = vox::add_free_camera(*scene, "main_camera", get_render_context().get_surface_extent());
+	auto camera       = &camera_node.get_component<vox::sg::Camera>();
 
 	// Example Scene Render Pipeline
-	vkb::ShaderSource vert_shader("base.vert");
-	vkb::ShaderSource frag_shader("base.frag");
-	auto              scene_subpass   = std::make_unique<vkb::ForwardSubpass>(get_render_context(), std::move(vert_shader), std::move(frag_shader), *scene, *camera);
-	auto              render_pipeline = vkb::RenderPipeline();
+	vox::ShaderSource vert_shader("base.vert");
+	vox::ShaderSource frag_shader("base.frag");
+	auto              scene_subpass   = std::make_unique<vox::ForwardSubpass>(get_render_context(), std::move(vert_shader), std::move(frag_shader), *scene, *camera);
+	auto              render_pipeline = vox::RenderPipeline();
 	render_pipeline.add_subpass(std::move(scene_subpass));
 	set_render_pipeline(std::move(render_pipeline));
 
 	// Add a GUI with the stats you want to monitor
 	stats->request_stats({/*stats you require*/});
-	gui = std::make_unique<vkb::Gui>(*this, *window, stats.get());
+	gui = std::make_unique<vox::Gui>(*this, *window, stats.get());
 
 	return true;
 }
 
-std::unique_ptr<vkb::VulkanSample> create_@SAMPLE_NAME_FILE@()
+std::unique_ptr<vox::VulkanSample> create_@SAMPLE_NAME_FILE@()
 {
 	return std::make_unique<@SAMPLE_NAME@>();
 }

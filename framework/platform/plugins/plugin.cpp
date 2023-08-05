@@ -17,7 +17,7 @@
 #include "plugin.h"
 #include "platform/platform.h"
 
-namespace vkb
+namespace vox
 {
 std::vector<Plugin *> associate_plugins(const std::vector<Plugin *> &plugins)
 {
@@ -100,4 +100,4 @@ const std::vector<Plugin *> &Plugin::get_inclusions() const
 {
 	return inclusions;
 }
-}        // namespace vkb
+}        // namespace vox

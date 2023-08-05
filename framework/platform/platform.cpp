@@ -41,7 +41,7 @@ namespace plugins
 class BenchmarkMode;
 }
 
-namespace vkb
+namespace vox
 {
 const uint32_t Platform::MIN_WINDOW_WIDTH  = 420;
 const uint32_t Platform::MIN_WINDOW_HEIGHT = 320;
@@ -211,7 +211,7 @@ void Platform::update()
 		{
 			if (app->has_render_context())
 			{
-				on_post_draw(reinterpret_cast<vkb::RenderContext &>(app->get_render_context()));
+				on_post_draw(reinterpret_cast<vox::RenderContext &>(app->get_render_context()));
 			}
 		}
 	}
@@ -450,4 +450,4 @@ void Platform::on_platform_close()
 
 #undef HOOK
 
-}        // namespace vkb
+}        // namespace vox
