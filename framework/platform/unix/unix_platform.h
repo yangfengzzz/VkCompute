@@ -16,7 +16,7 @@ enum UnixType {
 
 class UnixPlatform : public Platform {
 public:
-    UnixPlatform(const PlatformContext &context, const UnixType &type);
+    UnixPlatform(const UnixType &type);
 
     virtual ~UnixPlatform() = default;
 

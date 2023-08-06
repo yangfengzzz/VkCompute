@@ -10,17 +10,11 @@
 #include <string>
 #include <vector>
 
-#include <core/platform/context.hpp>
-
-#include "apps.h"
 #include "common/utils.h"
 #include "common/vk_common.h"
-#include "platform/application.h"
-#include "platform/filesystem.h"
-#include "platform/parser.h"
-#include "platform/plugins/plugin.h"
 #include "platform/window.h"
-#include "rendering/render_context.h"
+#include "platform/input_events.h"
+#include "../timer.h"
 
 #if defined(VK_USE_PLATFORM_XLIB_KHR)
 #undef Success
@@ -36,7 +30,7 @@ enum class ExitCode {
 
 class Platform {
 public:
-    Platform(const PlatformContext &context);
+    Platform() = default;
 
     virtual ~Platform() = default;
 
@@ -45,7 +39,9 @@ public:
 	 * @param plugins plugins available to the platform
 	 * @return An exit code representing the outcome of initialization
 	 */
-    virtual ExitCode initialize(const std::vector<Plugin *> &plugins);
+    virtual ExitCode initialize(std::function<void(float)> update_callback,
+                                std::function<void(uint32_t, uint32_t)> resize_callback = {},
+                                std::function<void(const InputEvent &)> event_callback = {});
 
     /**
 	 * @brief Handles the main loop of the platform
@@ -70,43 +66,14 @@ public:
 	 */
     virtual void close();
 
-    /**
-	 * @brief Returns the working directory of the application set by the platform
-	 * @returns The path to the working directory
-	 */
-    static const std::string &get_external_storage_directory();
-
-    /**
-	 * @brief Returns the suitable directory for temporary files from the environment variables set in the system
-	 * @returns The path to the temp folder on the system
-	 */
-    static const std::string &get_temp_directory();
+public:
+    Window &get_window();
 
     virtual void resize(uint32_t width, uint32_t height);
 
     virtual void input_event(const InputEvent &input_event);
 
-    Window &get_window();
-
-    Application &get_app() const;
-
-    Application &get_app();
-
-    static void set_external_storage_directory(const std::string &dir);
-
-    template<class T>
-    T *get_plugin() const;
-
-    template<class T>
-    bool using_plugin() const;
-
     void set_focus(bool focused);
-
-    void request_application(const apps::AppInfo *app);
-
-    bool app_requested();
-
-    bool start_app();
 
     void force_simulation_fps(float fps);
 
@@ -114,21 +81,11 @@ public:
 
     void set_window_properties(const Window::OptionalProperties &properties);
 
-    void on_post_draw(RenderContext &context);
-
     static const uint32_t MIN_WINDOW_WIDTH;
     static const uint32_t MIN_WINDOW_HEIGHT;
 
 protected:
-    std::unique_ptr<CommandParser> parser;
-
-    std::vector<Plugin *> active_plugins;
-
-    std::unordered_map<Hook, std::vector<Plugin *>> hooks;
-
     std::unique_ptr<Window> window{nullptr};
-
-    std::unique_ptr<Application> active_app{nullptr};
 
     virtual std::vector<spdlog::sink_ptr> get_platform_sinks();
 
@@ -139,12 +96,6 @@ protected:
 	 */
     virtual void create_window(const Window::Properties &properties) = 0;
 
-    void on_update(float delta_time);
-    void on_app_error(const std::string &app_id);
-    void on_app_start(const std::string &app_id);
-    void on_app_close(const std::string &app_id);
-    void on_platform_close();
-
     Window::Properties window_properties; /* Source of truth for window state */
     bool fixed_simulation_fps{false};     /* Delta time should be fixed with a fabricated value */
     float simulation_frame_time = 0.016f; /* A fabricated delta time */
@@ -152,31 +103,12 @@ protected:
     bool focused{true};                   /* App is currently in focus at an operating system level */
     bool close_requested{false};          /* Close requested */
 
+    std::function<void(float)> update_callback;
+    std::function<void(uint32_t, uint32_t)> resize_callback;
+    std::function<void(const InputEvent &)> event_callback;
+
 private:
     Timer timer;
-
-    const apps::AppInfo *requested_app{nullptr};
-
-    std::vector<Plugin *> plugins;
-
-    std::vector<std::string> arguments;
-
-    // static so can be references from vox::fs
-    static std::string external_storage_directory;
-
-    // static so can be references from vox::fs
-    static std::string temp_directory;
 };
 
-template<class T>
-bool Platform::using_plugin() const {
-    return !plugins::with_tags<T>(active_plugins).empty();
-}
-
-template<class T>
-T *Platform::get_plugin() const {
-    assert(using_plugin<T>() && "Plugin is not enabled but was requested");
-    const auto plugins = plugins::with_tags<T>(active_plugins);
-    return dynamic_cast<T *>(plugins[0]);
-}
 }// namespace vox

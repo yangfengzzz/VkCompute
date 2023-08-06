@@ -302,10 +302,8 @@ void create_directory(const std::string &path) {
 }
 }// namespace fs
 
-AndroidPlatform::AndroidPlatform(const PlatformContext &context) : Platform{context} {
-    if (auto *android = dynamic_cast<const AndroidPlatformContext *>(&context)) {
-        app = android->app;
-    }
+AndroidPlatform::AndroidPlatform(android_app *app) : Platform{} {
+    this->app = app;
 }
 
 ExitCode AndroidPlatform::initialize(const std::vector<Plugin *> &plugins) {

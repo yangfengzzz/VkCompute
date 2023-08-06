@@ -11,7 +11,7 @@
 namespace vox {
 class WindowsPlatform : public Platform {
 public:
-    WindowsPlatform(const PlatformContext &context);
+    WindowsPlatform();
 
     virtual ~WindowsPlatform() = default;
 

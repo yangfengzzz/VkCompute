@@ -15,8 +15,7 @@ VKBP_ENABLE_WARNINGS()
 
 //#include "platform/platform.h"
 
-namespace vox {
-namespace fs {
+namespace vox::fs {
 namespace path {
 const std::unordered_map<Type, std::string> relative_paths = {
     {Type::Assets, "assets/"},
@@ -58,7 +57,7 @@ const std::unordered_map<Type, std::string> relative_paths = {
 }// namespace path
 
 bool is_directory(const std::string &path) {
-    struct stat info;
+    struct stat info {};
     if (stat(path.c_str(), &info) != 0) {
         return false;
     } else if (info.st_mode & S_IFDIR) {
@@ -162,5 +161,4 @@ void write_image(const uint8_t *data, const std::string &filename, const uint32_
     stbi_write_png((path::get(path::Type::Screenshots) + filename + ".png").c_str(), width, height, components, data, row_stride);
 }
 
-}
 }// namespace vox::fs

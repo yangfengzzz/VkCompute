@@ -48,7 +48,7 @@ public:
     };
 
     struct Properties {
-        std::string title = "";
+        std::string title;
         Mode mode = Mode::Default;
         bool resizable = true;
         Vsync vsync = Vsync::Default;
@@ -59,7 +59,7 @@ public:
 	 * @brief Constructs a Window
 	 * @param properties The preferred configuration of the window
 	 */
-    Window(const Properties &properties);
+    explicit Window(Properties properties);
 
     virtual ~Window() = default;
 
@@ -96,12 +96,12 @@ public:
     /**
 	 * @return The dot-per-inch scale factor
 	 */
-    virtual float get_dpi_factor() const = 0;
+    [[nodiscard]] virtual float get_dpi_factor() const = 0;
 
     /**
 	 * @return The scale factor for systems with heterogeneous window and pixel coordinates
 	 */
-    virtual float get_content_scale_factor() const;
+    [[nodiscard]] virtual float get_content_scale_factor() const;
 
     /**
 	 * @brief Attempt to resize the window - not guaranteed to change
@@ -123,13 +123,13 @@ public:
     virtual bool get_display_present_info(VkDisplayPresentInfoKHR *info,
                                           uint32_t src_width, uint32_t src_height) const;
 
-    virtual std::vector<const char *> get_required_surface_extensions() const = 0;
+    [[nodiscard]] virtual std::vector<const char *> get_required_surface_extensions() const = 0;
 
-    const Extent &get_extent() const;
+    [[nodiscard]] const Extent &get_extent() const;
 
-    Mode get_window_mode() const;
+    [[nodiscard]] Mode get_window_mode() const;
 
-    inline const Properties &get_properties() const {
+    [[nodiscard]] inline const Properties &get_properties() const {
         return properties;
     }
 

@@ -24,7 +24,7 @@
 namespace vox {
 class AndroidPlatform : public Platform {
 public:
-    AndroidPlatform(const PlatformContext &context);
+    AndroidPlatform(android_app *app);
 
     virtual ~AndroidPlatform() = default;
 

@@ -11,7 +11,7 @@
 namespace vox {
 class UnixD2DPlatform : public Platform {
 public:
-    UnixD2DPlatform(const PlatformContext &context);
+    UnixD2DPlatform();
 
     virtual ~UnixD2DPlatform() = default;
 

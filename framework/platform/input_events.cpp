@@ -27,11 +27,12 @@ KeyAction KeyInputEvent::get_action() const {
     return action;
 }
 
-MouseButtonInputEvent::MouseButtonInputEvent(MouseButton button, MouseAction action, float pos_x, float pos_y) : InputEvent{EventSource::Mouse},
-                                                                                                                 button{button},
-                                                                                                                 action{action},
-                                                                                                                 pos_x{pos_x},
-                                                                                                                 pos_y{pos_y} {
+MouseButtonInputEvent::MouseButtonInputEvent(MouseButton button, MouseAction action,
+                                             float pos_x, float pos_y) : InputEvent{EventSource::Mouse},
+                                                                         button{button},
+                                                                         action{action},
+                                                                         pos_x{pos_x},
+                                                                         pos_y{pos_y} {
 }
 
 MouseButton MouseButtonInputEvent::get_button() const {
@@ -50,12 +51,13 @@ float MouseButtonInputEvent::get_pos_y() const {
     return pos_y;
 }
 
-TouchInputEvent::TouchInputEvent(int32_t pointer_id, std::size_t touch_points, TouchAction action, float pos_x, float pos_y) : InputEvent{EventSource::Touchscreen},
-                                                                                                                               action{action},
-                                                                                                                               pointer_id{pointer_id},
-                                                                                                                               touch_points{touch_points},
-                                                                                                                               pos_x{pos_x},
-                                                                                                                               pos_y{pos_y} {
+TouchInputEvent::TouchInputEvent(int32_t pointer_id, std::size_t touch_points, TouchAction action,
+                                 float pos_x, float pos_y) : InputEvent{EventSource::Touchscreen},
+                                                             action{action},
+                                                             pointer_id{pointer_id},
+                                                             touch_points{touch_points},
+                                                             pos_x{pos_x},
+                                                             pos_y{pos_y} {
 }
 
 TouchAction TouchInputEvent::get_action() const {

@@ -251,27 +251,18 @@ set(CORE_FILES
 
 set(PLATFORM_FILES
         # Header Files
-        #        platform/application.h
-        #        platform/platform.h
+        platform/platform.h
         platform/window.h
         platform/filesystem.h
         platform/input_events.h
-        platform/configuration.h
-        platform/parser.h
         platform/headless_window.h
-        #        platform/plugins/plugin.h
-        #        platform/plugins/plugin_base.h
 
         # Source Files
         platform/headless_window.cpp
-        #        platform/application.cpp
-        #        platform/platform.cpp
+        platform/platform.cpp
         platform/window.cpp
         platform/filesystem.cpp
         platform/input_events.cpp
-        platform/configuration.cpp
-        platform/parser.cpp
-        #        platform/plugins/plugin.cpp
         )
 
 set(GLFW_FILES
@@ -323,10 +314,10 @@ source_group("common\\" FILES ${COMMON_FILES})
 source_group("platform\\" FILES ${PLATFORM_FILES})
 #source_group("platform\\" FILES ${GLFW_FILES})
 #source_group("platform\\parsers" FILES ${PARSER_FILES})
-#source_group("platform\\windows" FILES ${WINDOWS_FILES})
-#source_group("platform\\android" FILES ${ANDROID_FILES})
-#source_group("platform\\unix" FILES ${UNIX_FILES})
-#source_group("platform\\unix" FILES ${LINUX_D2D_FILES})
+source_group("platform\\windows" FILES ${WINDOWS_FILES})
+source_group("platform\\android" FILES ${ANDROID_FILES})
+source_group("platform\\unix" FILES ${UNIX_FILES})
+source_group("platform\\unix" FILES ${LINUX_D2D_FILES})
 #source_group("core\\" FILES ${CORE_FILES})
 #source_group("geometry\\" FILES ${GEOMETRY_FILES})
 source_group("rendering\\" FILES ${RENDERING_FILES})
@@ -351,25 +342,25 @@ set(PROJECT_FILES
         #    ${STATS_FILES}
         )
 
-## Add files based on platform
-#if(ANDROID)
-#    list(APPEND PROJECT_FILES ${ANDROID_FILES})
-#    message(STATUS "Android platform detected")
-#else()
-#    if(DIRECT_TO_DISPLAY)
-#        list(APPEND PROJECT_FILES ${LINUX_D2D_FILES})
-#        message(STATUS "Unix d2d platform detected")
-#    else()
-#        list(APPEND PROJECT_FILES ${GLFW_FILES})
-#        if(WIN32)
-#            list(APPEND PROJECT_FILES ${WINDOWS_FILES})
-#            message(STATUS "Windows platform detected")
-#        else()
-#            list(APPEND PROJECT_FILES ${UNIX_FILES})
-#            message(STATUS "Unix platform detected")
-#        endif()
-#    endif()
-#endif()
+# Add files based on platform
+if (ANDROID)
+    list(APPEND PROJECT_FILES ${ANDROID_FILES})
+    message(STATUS "Android platform detected")
+else ()
+    if (DIRECT_TO_DISPLAY)
+        list(APPEND PROJECT_FILES ${LINUX_D2D_FILES})
+        message(STATUS "Unix d2d platform detected")
+    else ()
+        list(APPEND PROJECT_FILES ${GLFW_FILES})
+        if (WIN32)
+            list(APPEND PROJECT_FILES ${WINDOWS_FILES})
+            message(STATUS "Windows platform detected")
+        else ()
+            list(APPEND PROJECT_FILES ${UNIX_FILES})
+            message(STATUS "Unix platform detected")
+        endif ()
+    endif ()
+endif ()
 
 # mask out the min/max macros from minwindef.h
 if (MSVC)

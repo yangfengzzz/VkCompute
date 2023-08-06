@@ -80,7 +80,7 @@ void create_directory(const std::string &path) {
 }
 }// namespace fs
 
-WindowsPlatform::WindowsPlatform(const PlatformContext &context) : Platform(context) {
+WindowsPlatform::WindowsPlatform() : Platform() {
 }
 
 void WindowsPlatform::create_window(const Window::Properties &properties) {

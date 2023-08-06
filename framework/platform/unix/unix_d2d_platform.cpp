@@ -37,7 +37,7 @@ void create_directory(const std::string &path) {
 }
 }// namespace fs
 
-UnixD2DPlatform::UnixD2DPlatform(const PlatformContext &context) : Platform{context} {
+UnixD2DPlatform::UnixD2DPlatform() : Platform{} {
 }
 
 void UnixD2DPlatform::create_window(const Window::Properties &properties) {
