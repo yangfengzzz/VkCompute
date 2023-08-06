@@ -14,9 +14,8 @@
 
 namespace vox {
 class Device;
-
-namespace core {
 class ImageView;
+
 class Image : public VulkanResource<VkImage, VK_OBJECT_TYPE_IMAGE, const Device> {
 public:
     Image(Device const &device,
@@ -107,5 +106,5 @@ private:
     /// Whether it was mapped with vmaMapMemory
     bool mapped{false};
 };
-}// namespace core
+
 }// namespace vox

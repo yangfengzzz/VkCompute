@@ -45,11 +45,13 @@ inline void set_structure_type(VkSubpassDescription2KHR &description) {
     description.sType = VK_STRUCTURE_TYPE_SUBPASS_DESCRIPTION_2_KHR;
 }
 
-inline void set_pointer_next(VkSubpassDescription &subpass_description, VkSubpassDescriptionDepthStencilResolveKHR &depth_resolve, VkAttachmentReference &depth_resolve_attachment) {
+inline void set_pointer_next(VkSubpassDescription &subpass_description, VkSubpassDescriptionDepthStencilResolveKHR &depth_resolve,
+                             VkAttachmentReference &depth_resolve_attachment) {
     // VkSubpassDescription cannot have pNext point to a VkSubpassDescriptionDepthStencilResolveKHR containing a VkAttachmentReference
 }
 
-inline void set_pointer_next(VkSubpassDescription2KHR &subpass_description, VkSubpassDescriptionDepthStencilResolveKHR &depth_resolve, VkAttachmentReference2KHR &depth_resolve_attachment) {
+inline void set_pointer_next(VkSubpassDescription2KHR &subpass_description, VkSubpassDescriptionDepthStencilResolveKHR &depth_resolve,
+                             VkAttachmentReference2KHR &depth_resolve_attachment) {
     depth_resolve.pDepthStencilResolveAttachment = &depth_resolve_attachment;
     subpass_description.pNext = &depth_resolve;
 }
@@ -346,7 +348,8 @@ void RenderPass::create_renderpass(const std::vector<Attachment> &attachments, c
         subpass_description.pColorAttachments = color_attachments[0].data();
 
         if (default_depth_stencil_attachment != VK_ATTACHMENT_UNUSED) {
-            depth_stencil_attachments[0].push_back(get_attachment_reference<T_AttachmentReference>(default_depth_stencil_attachment, VK_IMAGE_LAYOUT_DEPTH_STENCIL_ATTACHMENT_OPTIMAL));
+            depth_stencil_attachments[0].push_back(get_attachment_reference<T_AttachmentReference>(default_depth_stencil_attachment,
+                                                                                                   VK_IMAGE_LAYOUT_DEPTH_STENCIL_ATTACHMENT_OPTIMAL));
 
             subpass_description.pDepthStencilAttachment = depth_stencil_attachments[0].data();
         }
@@ -383,19 +386,23 @@ void RenderPass::create_renderpass(const std::vector<Attachment> &attachments, c
     }
 }
 
-RenderPass::RenderPass(Device &device, const std::vector<Attachment> &attachments, const std::vector<LoadStoreInfo> &load_store_infos, const std::vector<SubpassInfo> &subpasses) : VulkanResource{VK_NULL_HANDLE, &device},
-                                                                                                                                                                                    subpass_count{std::max<size_t>(1, subpasses.size())},// At least 1 subpass
-                                                                                                                                                                                    color_output_count{} {
+RenderPass::RenderPass(Device &device, const std::vector<Attachment> &attachments,
+                       const std::vector<LoadStoreInfo> &load_store_infos,
+                       const std::vector<SubpassInfo> &subpasses) : VulkanResource{VK_NULL_HANDLE, &device},
+                                                                    subpass_count{std::max<size_t>(1, subpasses.size())},// At least 1 subpass
+                                                                    color_output_count{} {
     if (device.is_enabled(VK_KHR_CREATE_RENDERPASS_2_EXTENSION_NAME)) {
-        create_renderpass<VkSubpassDescription2KHR, VkAttachmentDescription2KHR, VkAttachmentReference2KHR, VkSubpassDependency2KHR, VkRenderPassCreateInfo2KHR>(attachments, load_store_infos, subpasses);
+        create_renderpass<VkSubpassDescription2KHR, VkAttachmentDescription2KHR, VkAttachmentReference2KHR,
+                          VkSubpassDependency2KHR, VkRenderPassCreateInfo2KHR>(attachments, load_store_infos, subpasses);
     } else {
-        create_renderpass<VkSubpassDescription, VkAttachmentDescription, VkAttachmentReference, VkSubpassDependency, VkRenderPassCreateInfo>(attachments, load_store_infos, subpasses);
+        create_renderpass<VkSubpassDescription, VkAttachmentDescription, VkAttachmentReference,
+                          VkSubpassDependency, VkRenderPassCreateInfo>(attachments, load_store_infos, subpasses);
     }
 }
 
-RenderPass::RenderPass(RenderPass &&other) : VulkanResource{std::move(other)},
-                                             subpass_count{other.subpass_count},
-                                             color_output_count{other.color_output_count} {
+RenderPass::RenderPass(RenderPass &&other) noexcept : VulkanResource{std::move(other)},
+                                                      subpass_count{other.subpass_count},
+                                                      color_output_count{other.color_output_count} {
     other.handle = VK_NULL_HANDLE;
 }
 
@@ -406,11 +413,11 @@ RenderPass::~RenderPass() {
     }
 }
 
-const uint32_t RenderPass::get_color_output_count(uint32_t subpass_index) const {
+uint32_t RenderPass::get_color_output_count(uint32_t subpass_index) const {
     return color_output_count[subpass_index];
 }
 
-const VkExtent2D RenderPass::get_render_area_granularity() const {
+VkExtent2D RenderPass::get_render_area_granularity() const {
     VkExtent2D render_area_granularity = {};
     vkGetRenderAreaGranularity(device->get_handle(), get_handle(), &render_area_granularity);
 

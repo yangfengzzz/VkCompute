@@ -16,36 +16,28 @@ inline VkDescriptorType find_descriptor_type(ShaderResourceType resource_type, b
     switch (resource_type) {
         case ShaderResourceType::InputAttachment:
             return VK_DESCRIPTOR_TYPE_INPUT_ATTACHMENT;
-            break;
         case ShaderResourceType::Image:
             return VK_DESCRIPTOR_TYPE_SAMPLED_IMAGE;
-            break;
         case ShaderResourceType::ImageSampler:
             return VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER;
-            break;
         case ShaderResourceType::ImageStorage:
             return VK_DESCRIPTOR_TYPE_STORAGE_IMAGE;
-            break;
         case ShaderResourceType::Sampler:
             return VK_DESCRIPTOR_TYPE_SAMPLER;
-            break;
         case ShaderResourceType::BufferUniform:
             if (dynamic) {
                 return VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER_DYNAMIC;
             } else {
                 return VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER;
             }
-            break;
         case ShaderResourceType::BufferStorage:
             if (dynamic) {
                 return VK_DESCRIPTOR_TYPE_STORAGE_BUFFER_DYNAMIC;
             } else {
                 return VK_DESCRIPTOR_TYPE_STORAGE_BUFFER;
             }
-            break;
         default:
             throw std::runtime_error("No conversion possible for the shader resource type.");
-            break;
     }
 }
 
@@ -61,7 +53,7 @@ inline bool validate_flags(const PhysicalDevice &gpu, const std::vector<VkDescri
 
     // Binding count has to equal flag count as its a 1:1 mapping
     if (bindings.size() != flags.size()) {
-        LOGE("Binding count has to be equal to flag count.");
+        LOGE("Binding count has to be equal to flag count.")
         return false;
     }
 
@@ -152,15 +144,15 @@ DescriptorSetLayout::DescriptorSetLayout(Device &device,
     }
 }
 
-DescriptorSetLayout::DescriptorSetLayout(DescriptorSetLayout &&other) : device{other.device},
-                                                                        shader_modules{other.shader_modules},
-                                                                        handle{other.handle},
-                                                                        set_index{other.set_index},
-                                                                        bindings{std::move(other.bindings)},
-                                                                        binding_flags{std::move(other.binding_flags)},
-                                                                        bindings_lookup{std::move(other.bindings_lookup)},
-                                                                        binding_flags_lookup{std::move(other.binding_flags_lookup)},
-                                                                        resources_lookup{std::move(other.resources_lookup)} {
+DescriptorSetLayout::DescriptorSetLayout(DescriptorSetLayout &&other) noexcept : device{other.device},
+                                                                                 shader_modules{other.shader_modules},
+                                                                                 handle{other.handle},
+                                                                                 set_index{other.set_index},
+                                                                                 bindings{std::move(other.bindings)},
+                                                                                 binding_flags{std::move(other.binding_flags)},
+                                                                                 bindings_lookup{std::move(other.bindings_lookup)},
+                                                                                 binding_flags_lookup{std::move(other.binding_flags_lookup)},
+                                                                                 resources_lookup{std::move(other.resources_lookup)} {
     other.handle = VK_NULL_HANDLE;
 }
 
@@ -175,7 +167,7 @@ VkDescriptorSetLayout DescriptorSetLayout::get_handle() const {
     return handle;
 }
 
-const uint32_t DescriptorSetLayout::get_index() const {
+uint32_t DescriptorSetLayout::get_index() const {
     return set_index;
 }
 

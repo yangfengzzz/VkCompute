@@ -20,15 +20,15 @@ namespace vox {
 struct ResourceInfo {
     bool dirty{false};
 
-    const core::Buffer *buffer{nullptr};
+    const Buffer *buffer{nullptr};
 
     VkDeviceSize offset{0};
 
     VkDeviceSize range{0};
 
-    const core::ImageView *image_view{nullptr};
+    const ImageView *image_view{nullptr};
 
-    const core::Sampler *sampler{nullptr};
+    const Sampler *sampler{nullptr};
 };
 
 /**
@@ -47,13 +47,13 @@ public:
 
     void clear_dirty(uint32_t binding, uint32_t array_element);
 
-    void bind_buffer(const core::Buffer &buffer, VkDeviceSize offset, VkDeviceSize range, uint32_t binding, uint32_t array_element);
+    void bind_buffer(const Buffer &buffer, VkDeviceSize offset, VkDeviceSize range, uint32_t binding, uint32_t array_element);
 
-    void bind_image(const core::ImageView &image_view, const core::Sampler &sampler, uint32_t binding, uint32_t array_element);
+    void bind_image(const ImageView &image_view, const Sampler &sampler, uint32_t binding, uint32_t array_element);
 
-    void bind_image(const core::ImageView &image_view, uint32_t binding, uint32_t array_element);
+    void bind_image(const ImageView &image_view, uint32_t binding, uint32_t array_element);
 
-    void bind_input(const core::ImageView &image_view, uint32_t binding, uint32_t array_element);
+    void bind_input(const ImageView &image_view, uint32_t binding, uint32_t array_element);
 
     const BindingMap<ResourceInfo> &get_resource_bindings() const;
 
@@ -79,13 +79,17 @@ public:
 
     void clear_dirty(uint32_t set);
 
-    void bind_buffer(const core::Buffer &buffer, VkDeviceSize offset, VkDeviceSize range, uint32_t set, uint32_t binding, uint32_t array_element);
+    void bind_buffer(const Buffer &buffer, VkDeviceSize offset, VkDeviceSize range,
+                     uint32_t set, uint32_t binding, uint32_t array_element);
 
-    void bind_image(const core::ImageView &image_view, const core::Sampler &sampler, uint32_t set, uint32_t binding, uint32_t array_element);
+    void bind_image(const ImageView &image_view, const Sampler &sampler,
+                    uint32_t set, uint32_t binding, uint32_t array_element);
 
-    void bind_image(const core::ImageView &image_view, uint32_t set, uint32_t binding, uint32_t array_element);
+    void bind_image(const ImageView &image_view,
+                    uint32_t set, uint32_t binding, uint32_t array_element);
 
-    void bind_input(const core::ImageView &image_view, uint32_t set, uint32_t binding, uint32_t array_element);
+    void bind_input(const ImageView &image_view,
+                    uint32_t set, uint32_t binding, uint32_t array_element);
 
     const std::unordered_map<uint32_t, ResourceSet> &get_resource_sets();
 

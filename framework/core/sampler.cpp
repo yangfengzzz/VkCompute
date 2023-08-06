@@ -9,12 +9,11 @@
 #include "device.h"
 
 namespace vox {
-namespace core {
 Sampler::Sampler(Device const &d, const VkSamplerCreateInfo &info) : VulkanResource{VK_NULL_HANDLE, &d} {
     VK_CHECK(vkCreateSampler(device->get_handle(), &info, nullptr, &handle));
 }
 
-Sampler::Sampler(Sampler &&other) : VulkanResource{std::move(other)} {
+Sampler::Sampler(Sampler &&other) noexcept : VulkanResource{std::move(other)} {
 }
 
 Sampler::~Sampler() {
@@ -23,5 +22,4 @@ Sampler::~Sampler() {
     }
 }
 
-}
-}// namespace vox::core
+}// namespace vox

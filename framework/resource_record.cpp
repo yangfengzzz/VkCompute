@@ -44,7 +44,8 @@ const std::ostringstream &ResourceRecord::get_stream() {
     return stream;
 }
 
-size_t ResourceRecord::register_shader_module(VkShaderStageFlagBits stage, const ShaderSource &glsl_source, const std::string &entry_point, const ShaderVariant &shader_variant) {
+size_t ResourceRecord::register_shader_module(VkShaderStageFlagBits stage, const ShaderSource &glsl_source,
+                                              const std::string &entry_point, const ShaderVariant &shader_variant) {
     shader_module_indices.push_back(shader_module_indices.size());
 
     write(stream, ResourceType::ShaderModule, stage, glsl_source.get_source(), entry_point, shader_variant.get_preamble());
@@ -68,7 +69,9 @@ size_t ResourceRecord::register_pipeline_layout(const std::vector<ShaderModule *
     return pipeline_layout_indices.back();
 }
 
-size_t ResourceRecord::register_render_pass(const std::vector<Attachment> &attachments, const std::vector<LoadStoreInfo> &load_store_infos, const std::vector<SubpassInfo> &subpasses) {
+size_t ResourceRecord::register_render_pass(const std::vector<Attachment> &attachments,
+                                            const std::vector<LoadStoreInfo> &load_store_infos,
+                                            const std::vector<SubpassInfo> &subpasses) {
     render_pass_indices.push_back(render_pass_indices.size());
 
     write(stream,

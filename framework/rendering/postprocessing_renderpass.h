@@ -30,14 +30,14 @@ struct PairHasher {
 using AttachmentMap = std::unordered_map<std::string, uint32_t>;
 
 /**
- * @brief Maps in-shader binding names to the core::SampledImage to bind.
+ * @brief Maps in-shader binding names to the SampledImage to bind.
  */
-using SampledMap = std::unordered_map<std::string, core::SampledImage>;
+using SampledMap = std::unordered_map<std::string, SampledImage>;
 
 /**
- * @brief Maps in-shader binding names to the core::ImageView to bind for storage images.
+ * @brief Maps in-shader binding names to the ImageView to bind for storage images.
  */
-using StorageImageMap = std::unordered_map<std::string, const core::ImageView *>;
+using StorageImageMap = std::unordered_map<std::string, const ImageView *>;
 
 /**
  * @brief A list of indices into a RenderTarget's attachments.
@@ -76,7 +76,7 @@ public:
     }
 
     /**
-	 * @brief Maps the names of samplers in the shader to vox::core::SampledImage.
+	 * @brief Maps the names of samplers in the shader to vox::SampledImage.
 	 *        These are given as samplers to the subpass, at set 0; they are bound automatically according to their name.
 	 * @remarks PostProcessingPipeline::get_sampler() is used as the default sampler if none is specified.
 	 *          The RenderTarget for the current PostProcessingSubpass is used if none is specified for attachment images.
@@ -86,7 +86,7 @@ public:
     }
 
     /**
-	 * @brief Maps the names of storage images in the shader to vox::core::ImageView.
+	 * @brief Maps the names of storage images in the shader to vox::ImageView.
 	 *        These are given as image2D[Array] to the subpass, at set 0; they are bound automatically according to their name.
 	 */
     inline const StorageImageMap &get_storage_images() const {
@@ -125,15 +125,15 @@ public:
 
     /**
 	 * @brief Changes (or adds) the sampled image at name for this step.
-	 * @remarks If no RenderTarget is specifically set for the core::SampledImage,
+	 * @remarks If no RenderTarget is specifically set for the SampledImage,
 	 *          it will default to sample in the RenderTarget currently bound for drawing in the parent PostProcessingRenderpass.
 	 */
-    PostProcessingSubpass &bind_sampled_image(const std::string &name, core::SampledImage &&new_image);
+    PostProcessingSubpass &bind_sampled_image(const std::string &name, SampledImage &&new_image);
 
     /**
 	 * @brief Changes (or adds) the storage image at name for this step.
 	 */
-    PostProcessingSubpass &bind_storage_image(const std::string &name, const core::ImageView &new_image);
+    PostProcessingSubpass &bind_storage_image(const std::string &name, const ImageView &new_image);
 
     /**
 	 * @brief Removes the sampled image at name for this step.
@@ -198,7 +198,7 @@ class PostProcessingRenderPass : public PostProcessingPass<PostProcessingRenderP
 public:
     friend class PostProcessingSubpass;
 
-    PostProcessingRenderPass(PostProcessingPipeline *parent, std::unique_ptr<core::Sampler> &&default_sampler = nullptr);
+    PostProcessingRenderPass(PostProcessingPipeline *parent, std::unique_ptr<Sampler> &&default_sampler = nullptr);
 
     PostProcessingRenderPass(const PostProcessingRenderPass &to_copy) = delete;
     PostProcessingRenderPass &operator=(const PostProcessingRenderPass &to_copy) = delete;
@@ -287,7 +287,7 @@ private:
     BarrierInfo get_dst_barrier_info() const override;
 
     RenderPipeline pipeline{};
-    std::unique_ptr<core::Sampler> default_sampler{};
+    std::unique_ptr<Sampler> default_sampler{};
     RenderTarget *draw_render_target{nullptr};
     std::vector<LoadStoreInfo> load_stores{};
     bool load_stores_dirty{true};

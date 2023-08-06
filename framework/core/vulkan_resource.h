@@ -14,7 +14,6 @@
 namespace vox {
 class Device;
 
-namespace core {
 namespace detail {
 void set_debug_name(const Device *device, VkObjectType object_type, uint64_t handle, const char *debug_name);
 }// namespace detail
@@ -26,19 +25,19 @@ void set_debug_name(const Device *device, VkObjectType object_type, uint64_t han
 template<typename THandle, VkObjectType OBJECT_TYPE, typename Device = vox::Device>
 class VulkanResource {
 public:
-    VulkanResource(THandle handle = VK_NULL_HANDLE, Device *device = nullptr) : handle{handle}, device{device} {
+    explicit VulkanResource(THandle handle = VK_NULL_HANDLE, Device *device = nullptr) : handle{handle}, device{device} {
     }
 
     VulkanResource(const VulkanResource &) = delete;
     VulkanResource &operator=(const VulkanResource &) = delete;
 
-    VulkanResource(VulkanResource &&other) : handle{other.handle}, device{other.device} {
+    VulkanResource(VulkanResource &&other) noexcept : handle{other.handle}, device{other.device} {
         set_debug_name(other.debug_name);
 
         other.handle = VK_NULL_HANDLE;
     }
 
-    VulkanResource &operator=(VulkanResource &&other) {
+    VulkanResource &operator=(VulkanResource &&other) noexcept {
         handle = other.handle;
         device = other.device;
         set_debug_name(other.debug_name);
@@ -50,7 +49,7 @@ public:
 
     virtual ~VulkanResource() = default;
 
-    inline VkObjectType get_object_type() const {
+    [[nodiscard]] inline VkObjectType get_object_type() const {
         return OBJECT_TYPE;
     }
 
@@ -63,7 +62,7 @@ public:
         return handle;
     }
 
-    inline const uint64_t get_handle_u64() const {
+    [[nodiscard]] inline uint64_t get_handle_u64() const {
         // See https://github.com/KhronosGroup/Vulkan-Docs/issues/368 .
         // Dispatchable and non-dispatchable handle types are *not* necessarily binary-compatible!
         // Non-dispatchable handles _might_ be only 32-bit long. This is because, on 32-bit machines, they might be a typedef to a 32-bit pointer.
@@ -72,7 +71,7 @@ public:
         return static_cast<uint64_t>(reinterpret_cast<UintHandle>(handle));
     }
 
-    inline const std::string &get_debug_name() const {
+    [[nodiscard]] inline const std::string &get_debug_name() const {
         return debug_name;
     }
 
@@ -87,5 +86,4 @@ protected:
     std::string debug_name;
 };
 
-}// namespace core
 }// namespace vox

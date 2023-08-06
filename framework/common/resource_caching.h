@@ -250,7 +250,7 @@ struct hash<VkWriteDescriptorSet> {
             default:
                 // Not implemented
                 break;
-        };
+        }
 
         return result;
     }
@@ -626,7 +626,7 @@ T &request_resource(Device &device, ResourceRecord *recorder, std::unordered_map
     const char *res_type = typeid(T).name();
     size_t res_id = resources.size();
 
-    LOGD("Building #{} cache object ({})", res_id, res_type);
+    LOGD("Building #{} cache object ({})", res_id, res_type)
 
 // Only error handle in release
 #ifndef DEBUG

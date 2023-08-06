@@ -10,10 +10,12 @@
 #include "rendering/render_frame.h"
 
 namespace vox {
-CommandPool::CommandPool(Device &d, uint32_t queue_family_index, RenderFrame *render_frame, size_t thread_index, CommandBuffer::ResetMode reset_mode) : device{d},
-                                                                                                                                                        render_frame{render_frame},
-                                                                                                                                                        thread_index{thread_index},
-                                                                                                                                                        reset_mode{reset_mode} {
+CommandPool::CommandPool(Device &d, uint32_t queue_family_index,
+                         RenderFrame *render_frame, size_t thread_index,
+                         CommandBuffer::ResetMode reset_mode) : device{d},
+                                                                render_frame{render_frame},
+                                                                thread_index{thread_index},
+                                                                reset_mode{reset_mode} {
     VkCommandPoolCreateFlags flags;
     switch (reset_mode) {
         case CommandBuffer::ResetMode::ResetIndividually:
@@ -48,16 +50,16 @@ CommandPool::~CommandPool() {
     }
 }
 
-CommandPool::CommandPool(CommandPool &&other) : device{other.device},
-                                                handle{other.handle},
-                                                queue_family_index{other.queue_family_index},
-                                                primary_command_buffers{std::move(other.primary_command_buffers)},
-                                                active_primary_command_buffer_count{other.active_primary_command_buffer_count},
-                                                secondary_command_buffers{std::move(other.secondary_command_buffers)},
-                                                active_secondary_command_buffer_count{other.active_secondary_command_buffer_count},
-                                                render_frame{other.render_frame},
-                                                thread_index{other.thread_index},
-                                                reset_mode{other.reset_mode} {
+CommandPool::CommandPool(CommandPool &&other) noexcept : device{other.device},
+                                                         handle{other.handle},
+                                                         queue_family_index{other.queue_family_index},
+                                                         primary_command_buffers{std::move(other.primary_command_buffers)},
+                                                         active_primary_command_buffer_count{other.active_primary_command_buffer_count},
+                                                         secondary_command_buffers{std::move(other.secondary_command_buffers)},
+                                                         active_secondary_command_buffer_count{other.active_secondary_command_buffer_count},
+                                                         render_frame{other.render_frame},
+                                                         thread_index{other.thread_index},
+                                                         reset_mode{other.reset_mode} {
     other.handle = VK_NULL_HANDLE;
 
     other.queue_family_index = 0;
@@ -173,7 +175,7 @@ CommandBuffer &CommandPool::request_command_buffer(VkCommandBufferLevel level) {
     }
 }
 
-CommandBuffer::ResetMode const CommandPool::get_reset_mode() const {
+CommandBuffer::ResetMode CommandPool::get_reset_mode() const {
     return reset_mode;
 }
 }// namespace vox

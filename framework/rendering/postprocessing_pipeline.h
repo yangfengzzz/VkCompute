@@ -66,14 +66,14 @@ public:
     /**
 	 * @brief Returns the current render context.
 	 */
-    inline RenderContext &get_render_context() const {
+    [[nodiscard]] inline RenderContext &get_render_context() const {
         return *render_context;
     }
 
     /**
 	 * @brief Returns the index of the currently-being-drawn pass.
 	 */
-    inline size_t get_current_pass_index() const {
+    [[nodiscard]] inline size_t get_current_pass_index() const {
         return current_pass_index;
     }
 

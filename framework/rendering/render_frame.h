@@ -175,6 +175,8 @@ private:
 
     std::map<VkBufferUsageFlags, std::vector<std::pair<BufferPool, BufferBlock *>>> buffer_pools;
 
-    static std::vector<uint32_t> collect_bindings_to_update(const DescriptorSetLayout &descriptor_set_layout, const BindingMap<VkDescriptorBufferInfo> &buffer_infos, const BindingMap<VkDescriptorImageInfo> &image_infos);
+    static std::vector<uint32_t> collect_bindings_to_update(const DescriptorSetLayout &descriptor_set_layout,
+                                                            const BindingMap<VkDescriptorBufferInfo> &buffer_infos,
+                                                            const BindingMap<VkDescriptorImageInfo> &image_infos);
 };
 }// namespace vox

@@ -7,14 +7,14 @@
 #include "render_frame.h"
 
 #include "common/logging.h"
-#include "common/utils.h"
 
 namespace vox {
-RenderFrame::RenderFrame(Device &device, std::unique_ptr<RenderTarget> &&render_target, size_t thread_count) : device{device},
-                                                                                                               fence_pool{device},
-                                                                                                               semaphore_pool{device},
-                                                                                                               swapchain_render_target{std::move(render_target)},
-                                                                                                               thread_count{thread_count} {
+RenderFrame::RenderFrame(Device &device, std::unique_ptr<RenderTarget> &&render_target,
+                         size_t thread_count) : device{device},
+                                                fence_pool{device},
+                                                semaphore_pool{device},
+                                                swapchain_render_target{std::move(render_target)},
+                                                thread_count{thread_count} {
     for (auto &usage_it : supported_usage_map) {
         std::vector<std::pair<BufferPool, BufferBlock *>> usage_buffer_pools;
         for (size_t i = 0; i < thread_count; ++i) {
@@ -98,7 +98,9 @@ std::vector<std::unique_ptr<CommandPool>> &RenderFrame::get_command_pools(const 
     return command_pool_it->second;
 }
 
-std::vector<uint32_t> RenderFrame::collect_bindings_to_update(const DescriptorSetLayout &descriptor_set_layout, const BindingMap<VkDescriptorBufferInfo> &buffer_infos, const BindingMap<VkDescriptorImageInfo> &image_infos) {
+std::vector<uint32_t> RenderFrame::collect_bindings_to_update(const DescriptorSetLayout &descriptor_set_layout,
+                                                              const BindingMap<VkDescriptorBufferInfo> &buffer_infos,
+                                                              const BindingMap<VkDescriptorImageInfo> &image_infos) {
     std::vector<uint32_t> bindings_to_update;
 
     bindings_to_update.reserve(buffer_infos.size() + image_infos.size());
@@ -149,7 +151,8 @@ const RenderTarget &RenderFrame::get_render_target_const() const {
     return *swapchain_render_target;
 }
 
-CommandBuffer &RenderFrame::request_command_buffer(const Queue &queue, CommandBuffer::ResetMode reset_mode, VkCommandBufferLevel level, size_t thread_index) {
+CommandBuffer &RenderFrame::request_command_buffer(const Queue &queue, CommandBuffer::ResetMode reset_mode,
+                                                   VkCommandBufferLevel level, size_t thread_index) {
     assert(thread_index < thread_count && "Thread index is out of bounds");
 
     auto &command_pools = get_command_pools(queue, reset_mode);
@@ -159,7 +162,8 @@ CommandBuffer &RenderFrame::request_command_buffer(const Queue &queue, CommandBu
     return (*command_pool_it)->request_command_buffer(level);
 }
 
-VkDescriptorSet RenderFrame::request_descriptor_set(const DescriptorSetLayout &descriptor_set_layout, const BindingMap<VkDescriptorBufferInfo> &buffer_infos, const BindingMap<VkDescriptorImageInfo> &image_infos, bool update_after_bind, size_t thread_index) {
+VkDescriptorSet RenderFrame::request_descriptor_set(const DescriptorSetLayout &descriptor_set_layout,
+                                                    const BindingMap<VkDescriptorBufferInfo> &buffer_infos, const BindingMap<VkDescriptorImageInfo> &image_infos, bool update_after_bind, size_t thread_index) {
     assert(thread_index < thread_count && "Thread index is out of bounds");
 
     assert(thread_index < descriptor_pools.size());
@@ -219,7 +223,7 @@ BufferAllocation RenderFrame::allocate_buffer(const VkBufferUsageFlags usage, co
     // Find a pool for this usage
     auto buffer_pool_it = buffer_pools.find(usage);
     if (buffer_pool_it == buffer_pools.end()) {
-        LOGE("No buffer pool for buffer usage {}", usage);
+        LOGE("No buffer pool for buffer usage {}", usage)
         return BufferAllocation{};
     }
 

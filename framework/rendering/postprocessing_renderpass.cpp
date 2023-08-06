@@ -48,7 +48,7 @@ void PostProcessingSubpass::unbind_sampled_image(const std::string &name) {
     sampled_images.erase(name);
 }
 
-PostProcessingSubpass &PostProcessingSubpass::bind_sampled_image(const std::string &name, core::SampledImage &&new_image) {
+PostProcessingSubpass &PostProcessingSubpass::bind_sampled_image(const std::string &name, SampledImage &&new_image) {
     auto it = sampled_images.find(name);
     if (it != sampled_images.end()) {
         it->second = std::move(new_image);
@@ -60,7 +60,7 @@ PostProcessingSubpass &PostProcessingSubpass::bind_sampled_image(const std::stri
     return *this;
 }
 
-PostProcessingSubpass &PostProcessingSubpass::bind_storage_image(const std::string &name, const core::ImageView &new_image) {
+PostProcessingSubpass &PostProcessingSubpass::bind_storage_image(const std::string &name, const ImageView &new_image) {
     auto it = storage_images.find(name);
     if (it != storage_images.end()) {
         it->second = &new_image;
@@ -107,7 +107,6 @@ void PostProcessingSubpass::draw(CommandBuffer &command_buffer) {
 
     auto &render_target = *parent->draw_render_target;
     const auto &target_views = render_target.get_views();
-    const uint32_t n_input_attachments = static_cast<uint32_t>(get_input_attachments().size());
 
     if (parent->uniform_buffer_alloc != nullptr) {
         // Bind buffer to set = 0, binding = 0
@@ -153,8 +152,8 @@ void PostProcessingSubpass::default_draw_func(vox::CommandBuffer &command_buffer
     command_buffer.draw(3, 1, 0, 0);
 }
 
-PostProcessingRenderPass::PostProcessingRenderPass(PostProcessingPipeline *parent, std::unique_ptr<core::Sampler> &&default_sampler) : PostProcessingPass{parent},
-                                                                                                                                       default_sampler{std::move(default_sampler)} {
+PostProcessingRenderPass::PostProcessingRenderPass(PostProcessingPipeline *parent, std::unique_ptr<Sampler> &&default_sampler) : PostProcessingPass{parent},
+                                                                                                                                 default_sampler{std::move(default_sampler)} {
     if (this->default_sampler == nullptr) {
         // Setup a sane default sampler if none was passed
         VkSamplerCreateInfo sampler_info{VK_STRUCTURE_TYPE_SAMPLER_CREATE_INFO};
@@ -172,7 +171,7 @@ PostProcessingRenderPass::PostProcessingRenderPass(PostProcessingPipeline *paren
         sampler_info.maxAnisotropy = 0.0f;
         sampler_info.borderColor = VK_BORDER_COLOR_FLOAT_OPAQUE_WHITE;
 
-        this->default_sampler = std::make_unique<vox::core::Sampler>(get_render_context().get_device(), sampler_info);
+        this->default_sampler = std::make_unique<vox::Sampler>(get_render_context().get_device(), sampler_info);
     }
 }
 

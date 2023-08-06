@@ -9,7 +9,6 @@
 #include "device.h"
 
 namespace vox {
-namespace core {
 AccelerationStructure::AccelerationStructure(Device &device,
                                              VkAccelerationStructureTypeKHR type) : device{device},
                                                                                     type{type} {
@@ -21,9 +20,9 @@ AccelerationStructure::~AccelerationStructure() {
     }
 }
 
-uint64_t AccelerationStructure::add_triangle_geometry(std::unique_ptr<vox::core::Buffer> &vertex_buffer,
-                                                      std::unique_ptr<vox::core::Buffer> &index_buffer,
-                                                      std::unique_ptr<vox::core::Buffer> &transform_buffer,
+uint64_t AccelerationStructure::add_triangle_geometry(std::unique_ptr<vox::Buffer> &vertex_buffer,
+                                                      std::unique_ptr<vox::Buffer> &index_buffer,
+                                                      std::unique_ptr<vox::Buffer> &transform_buffer,
                                                       uint32_t triangle_count, uint32_t max_vertex,
                                                       VkDeviceSize vertex_stride, uint32_t transform_offset,
                                                       VkFormat vertex_format, VkGeometryFlagsKHR flags,
@@ -49,9 +48,9 @@ uint64_t AccelerationStructure::add_triangle_geometry(std::unique_ptr<vox::core:
 }
 
 void AccelerationStructure::update_triangle_geometry(uint64_t triangleUUID,
-                                                     std::unique_ptr<vox::core::Buffer> &vertex_buffer,
-                                                     std::unique_ptr<vox::core::Buffer> &index_buffer,
-                                                     std::unique_ptr<vox::core::Buffer> &transform_buffer,
+                                                     std::unique_ptr<vox::Buffer> &vertex_buffer,
+                                                     std::unique_ptr<vox::Buffer> &index_buffer,
+                                                     std::unique_ptr<vox::Buffer> &transform_buffer,
                                                      uint32_t triangle_count, uint32_t max_vertex,
                                                      VkDeviceSize vertex_stride, uint32_t transform_offset,
                                                      VkFormat vertex_format, VkGeometryFlagsKHR flags,
@@ -75,7 +74,7 @@ void AccelerationStructure::update_triangle_geometry(uint64_t triangleUUID,
     geometries[triangleUUID].updated = true;
 }
 
-uint64_t AccelerationStructure::add_instance_geometry(std::unique_ptr<vox::core::Buffer> &instance_buffer, uint32_t instance_count, uint32_t transform_offset, VkGeometryFlagsKHR flags) {
+uint64_t AccelerationStructure::add_instance_geometry(std::unique_ptr<vox::Buffer> &instance_buffer, uint32_t instance_count, uint32_t transform_offset, VkGeometryFlagsKHR flags) {
     VkAccelerationStructureGeometryKHR geometry{};
     geometry.sType = VK_STRUCTURE_TYPE_ACCELERATION_STRUCTURE_GEOMETRY_KHR;
     geometry.geometryType = VK_GEOMETRY_TYPE_INSTANCES_KHR;
@@ -90,7 +89,7 @@ uint64_t AccelerationStructure::add_instance_geometry(std::unique_ptr<vox::core:
 }
 
 void AccelerationStructure::update_instance_geometry(uint64_t instance_UID,
-                                                     std::unique_ptr<vox::core::Buffer> &instance_buffer,
+                                                     std::unique_ptr<vox::Buffer> &instance_buffer,
                                                      uint32_t instance_count, uint32_t transform_offset,
                                                      VkGeometryFlagsKHR flags) {
     VkAccelerationStructureGeometryKHR *geometry = &geometries[instance_UID].geometry;
@@ -150,7 +149,7 @@ void AccelerationStructure::build(VkQueue queue, VkBuildAccelerationStructureFla
 
     // Create a buffer for the acceleration structure
     if (!buffer || buffer->get_size() != build_sizes_info.accelerationStructureSize) {
-        buffer = std::make_unique<vox::core::Buffer>(
+        buffer = std::make_unique<vox::Buffer>(
             device,
             build_sizes_info.accelerationStructureSize,
             VK_BUFFER_USAGE_ACCELERATION_STRUCTURE_STORAGE_BIT_KHR,
@@ -175,7 +174,7 @@ void AccelerationStructure::build(VkQueue queue, VkBuildAccelerationStructureFla
     device_address = vkGetAccelerationStructureDeviceAddressKHR(device.get_handle(), &acceleration_device_address_info);
 
     // Create a scratch buffer as a temporary storage for the acceleration structure build
-    scratch_buffer = std::make_unique<vox::core::ScratchBuffer>(device, build_sizes_info.buildScratchSize);
+    scratch_buffer = std::make_unique<vox::ScratchBuffer>(device, build_sizes_info.buildScratchSize);
 
     build_geometry_info.scratchData.deviceAddress = scratch_buffer->get_device_address();
     build_geometry_info.dstAccelerationStructure = handle;
@@ -204,5 +203,4 @@ uint64_t AccelerationStructure::get_device_address() const {
     return device_address;
 }
 
-}
-}// namespace vox::core
+}// namespace vox

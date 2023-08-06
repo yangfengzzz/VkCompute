@@ -88,9 +88,9 @@ void BufferPool::reset() {
     active_buffer_block_count = 0;
 }
 
-BufferAllocation::BufferAllocation(core::Buffer &buffer, VkDeviceSize size, VkDeviceSize offset) : buffer{&buffer},
-                                                                                                   size{size},
-                                                                                                   base_offset{offset} {
+BufferAllocation::BufferAllocation(Buffer &buffer, VkDeviceSize size, VkDeviceSize offset) : buffer{&buffer},
+                                                                                             size{size},
+                                                                                             base_offset{offset} {
 }
 
 void BufferAllocation::update(const std::vector<uint8_t> &data, uint32_t offset) {
@@ -115,7 +115,7 @@ VkDeviceSize BufferAllocation::get_offset() const {
     return base_offset;
 }
 
-core::Buffer &BufferAllocation::get_buffer() {
+Buffer &BufferAllocation::get_buffer() {
     assert(buffer && "Invalid buffer pointer");
     return *buffer;
 }

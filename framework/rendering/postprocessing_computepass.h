@@ -13,17 +13,17 @@
 
 namespace vox {
 /**
- * @brief Maps in-shader binding names to the core::SampledImage to bind.
+ * @brief Maps in-shader binding names to the SampledImage to bind.
  */
-using SampledImageMap = std::unordered_map<std::string, core::SampledImage>;
+using SampledImageMap = std::unordered_map<std::string, SampledImage>;
 
 /**
 * @brief A compute pass in a vox::PostProcessingPipeline.
 */
 class PostProcessingComputePass : public PostProcessingPass<PostProcessingComputePass> {
 public:
-    PostProcessingComputePass(PostProcessingPipeline *parent, const ShaderSource &cs_source, const ShaderVariant &cs_variant = {},
-                              std::shared_ptr<core::Sampler> &&default_sampler = {});
+    PostProcessingComputePass(PostProcessingPipeline *parent, ShaderSource cs_source, const ShaderVariant &cs_variant = {},
+                              std::shared_ptr<Sampler> &&default_sampler = {});
 
     PostProcessingComputePass(const PostProcessingComputePass &to_copy) = delete;
     PostProcessingComputePass &operator=(const PostProcessingComputePass &to_copy) = delete;
@@ -50,7 +50,7 @@ public:
     }
 
     /**
-	* @brief Maps the names of samplers in the shader to vox::core::SampledImage.
+	* @brief Maps the names of samplers in the shader to vox::SampledImage.
 	*        These are given as samplers to the subpass, at set 0; they are bound automatically according to their name.
 	* @remarks PostProcessingPipeline::get_sampler() is used as the default sampler if none is specified.
 	*          The RenderTarget for the current PostprocessingStep is used if none is specified for attachment images.
@@ -60,7 +60,7 @@ public:
     }
 
     /**
-	* @brief Maps the names of storage images in the shader to vox::core::SampledImage.
+	* @brief Maps the names of storage images in the shader to vox::SampledImage.
 	*        These are given as image2D / image2DArray / ... to the subpass, at set 0;
 	*        they are bound automatically according to their name.
 	*/
@@ -70,17 +70,17 @@ public:
 
     /**
 	 * @brief Changes (or adds) the sampled image at name for this step.
-	 * @remarks If no RenderTarget is specifically set for the core::SampledImage,
+	 * @remarks If no RenderTarget is specifically set for the SampledImage,
 	 *          it will default to sample in the RenderTarget currently bound for drawing in the parent PostProcessingRenderpass.
 	 * @remarks Images from RenderTarget attachments are automatically transitioned to SHADER_READ_ONLY_OPTIMAL layout if needed.
 	 */
-    PostProcessingComputePass &bind_sampled_image(const std::string &name, core::SampledImage &&new_image);
+    PostProcessingComputePass &bind_sampled_image(const std::string &name, SampledImage &&new_image);
 
     /**
 	 * @brief Changes (or adds) the storage image at name for this step.
 	 * @remarks Images from RenderTarget attachments are automatically transitioned to GENERAL layout if needed.
 	 */
-    PostProcessingComputePass &bind_storage_image(const std::string &name, core::SampledImage &&new_image);
+    PostProcessingComputePass &bind_storage_image(const std::string &name, SampledImage &&new_image);
 
     /**
 	 * @brief Set the uniform data to be bound at set 0, binding 0.
@@ -129,7 +129,7 @@ private:
     ShaderVariant cs_variant;
     glm::tvec3<uint32_t> n_workgroups{1, 1, 1};
 
-    std::shared_ptr<core::Sampler> default_sampler{};
+    std::shared_ptr<Sampler> default_sampler{};
     SampledImageMap sampled_images{};
     SampledImageMap storage_images{};
 

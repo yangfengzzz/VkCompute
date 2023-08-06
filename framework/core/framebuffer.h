@@ -20,7 +20,7 @@ public:
 
     Framebuffer(const Framebuffer &) = delete;
 
-    Framebuffer(Framebuffer &&other);
+    Framebuffer(Framebuffer &&other) noexcept;
 
     ~Framebuffer();
 
@@ -28,9 +28,9 @@ public:
 
     Framebuffer &operator=(Framebuffer &&) = delete;
 
-    VkFramebuffer get_handle() const;
+    [[nodiscard]] VkFramebuffer get_handle() const;
 
-    const VkExtent2D &get_extent() const;
+    [[nodiscard]] const VkExtent2D &get_extent() const;
 
 private:
     Device &device;

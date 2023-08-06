@@ -14,7 +14,7 @@ class Device;
 
 class SemaphorePool {
 public:
-    SemaphorePool(Device &device);
+    explicit SemaphorePool(Device &device);
 
     SemaphorePool(const SemaphorePool &) = delete;
 
@@ -32,7 +32,7 @@ public:
 
     void reset();
 
-    uint32_t get_active_semaphore_count() const;
+    [[nodiscard]] uint32_t get_active_semaphore_count() const;
 
 private:
     Device &device;

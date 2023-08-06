@@ -39,7 +39,7 @@ public:
 
     DescriptorSet(const DescriptorSet &) = delete;
 
-    DescriptorSet(DescriptorSet &&other);
+    DescriptorSet(DescriptorSet &&other) noexcept;
 
     // The descriptor set handle is managed by the pool, and will be destroyed when the pool is reset
     ~DescriptorSet() = default;
@@ -59,7 +59,8 @@ public:
 
     /**
 	 * @brief Updates the contents of the DescriptorSet by performing the write operations
-	 * @param bindings_to_update If empty. we update all bindings. Otherwise, only write the specified bindings if they haven't already been written
+	 * @param bindings_to_update If empty. we update all bindings. Otherwise,
+     * only write the specified bindings if they haven't already been written
 	 */
     void update(const std::vector<uint32_t> &bindings_to_update = {});
 
@@ -68,9 +69,9 @@ public:
 	 */
     void apply_writes() const;
 
-    const DescriptorSetLayout &get_layout() const;
+    [[nodiscard]] const DescriptorSetLayout &get_layout() const;
 
-    VkDescriptorSet get_handle() const;
+    [[nodiscard]] VkDescriptorSet get_handle() const;
 
     BindingMap<VkDescriptorBufferInfo> &get_buffer_infos();
 

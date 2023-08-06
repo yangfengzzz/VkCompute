@@ -15,8 +15,10 @@ bool operator==(const VkVertexInputBindingDescription &lhs, const VkVertexInputB
 }
 
 bool operator==(const vox::ColorBlendAttachmentState &lhs, const vox::ColorBlendAttachmentState &rhs) {
-    return std::tie(lhs.alpha_blend_op, lhs.blend_enable, lhs.color_blend_op, lhs.color_write_mask, lhs.dst_alpha_blend_factor, lhs.dst_color_blend_factor, lhs.src_alpha_blend_factor, lhs.src_color_blend_factor) ==
-           std::tie(rhs.alpha_blend_op, rhs.blend_enable, rhs.color_blend_op, rhs.color_write_mask, rhs.dst_alpha_blend_factor, rhs.dst_color_blend_factor, rhs.src_alpha_blend_factor, rhs.src_color_blend_factor);
+    return std::tie(lhs.alpha_blend_op, lhs.blend_enable, lhs.color_blend_op, lhs.color_write_mask,
+                    lhs.dst_alpha_blend_factor, lhs.dst_color_blend_factor, lhs.src_alpha_blend_factor, lhs.src_color_blend_factor) ==
+           std::tie(rhs.alpha_blend_op, rhs.blend_enable, rhs.color_blend_op, rhs.color_write_mask,
+                    rhs.dst_alpha_blend_factor, rhs.dst_color_blend_factor, rhs.src_alpha_blend_factor, rhs.src_color_blend_factor);
 }
 
 bool operator!=(const vox::StencilOpState &lhs, const vox::StencilOpState &rhs) {
@@ -32,8 +34,10 @@ bool operator!=(const vox::InputAssemblyState &lhs, const vox::InputAssemblyStat
 }
 
 bool operator!=(const vox::RasterizationState &lhs, const vox::RasterizationState &rhs) {
-    return std::tie(lhs.cull_mode, lhs.depth_bias_enable, lhs.depth_clamp_enable, lhs.front_face, lhs.front_face, lhs.polygon_mode, lhs.rasterizer_discard_enable) !=
-           std::tie(rhs.cull_mode, rhs.depth_bias_enable, rhs.depth_clamp_enable, rhs.front_face, rhs.front_face, rhs.polygon_mode, rhs.rasterizer_discard_enable);
+    return std::tie(lhs.cull_mode, lhs.depth_bias_enable, lhs.depth_clamp_enable,
+                    lhs.front_face, lhs.front_face, lhs.polygon_mode, lhs.rasterizer_discard_enable) !=
+           std::tie(rhs.cull_mode, rhs.depth_bias_enable, rhs.depth_clamp_enable,
+                    rhs.front_face, rhs.front_face, rhs.polygon_mode, rhs.rasterizer_discard_enable);
 }
 
 bool operator!=(const vox::ViewportState &lhs, const vox::ViewportState &rhs) {
@@ -41,8 +45,10 @@ bool operator!=(const vox::ViewportState &lhs, const vox::ViewportState &rhs) {
 }
 
 bool operator!=(const vox::MultisampleState &lhs, const vox::MultisampleState &rhs) {
-    return std::tie(lhs.alpha_to_coverage_enable, lhs.alpha_to_one_enable, lhs.min_sample_shading, lhs.rasterization_samples, lhs.sample_mask, lhs.sample_shading_enable) !=
-           std::tie(rhs.alpha_to_coverage_enable, rhs.alpha_to_one_enable, rhs.min_sample_shading, rhs.rasterization_samples, rhs.sample_mask, rhs.sample_shading_enable);
+    return std::tie(lhs.alpha_to_coverage_enable, lhs.alpha_to_one_enable, lhs.min_sample_shading,
+                    lhs.rasterization_samples, lhs.sample_mask, lhs.sample_shading_enable) !=
+           std::tie(rhs.alpha_to_coverage_enable, rhs.alpha_to_one_enable, rhs.min_sample_shading,
+                    rhs.rasterization_samples, rhs.sample_mask, rhs.sample_shading_enable);
 }
 
 bool operator!=(const vox::DepthStencilState &lhs, const vox::DepthStencilState &rhs) {

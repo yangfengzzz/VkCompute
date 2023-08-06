@@ -13,7 +13,6 @@
 namespace vox {
 class Device;
 
-namespace core {
 class Buffer : public VulkanResource<VkBuffer, VK_OBJECT_TYPE_BUFFER, const Device> {
 public:
     /**
@@ -34,7 +33,7 @@ public:
 
     Buffer(const Buffer &) = delete;
 
-    Buffer(Buffer &&other);
+    Buffer(Buffer &&other) noexcept;
 
     ~Buffer();
 
@@ -43,7 +42,7 @@ public:
     Buffer &operator=(Buffer &&) = delete;
 
     template<typename T>
-    static std::vector<T> copy(std::unordered_map<std::string, vox::core::Buffer> &buffers, const char *buffer_name) {
+    static std::vector<T> copy(std::unordered_map<std::string, vox::Buffer> &buffers, const char *buffer_name) {
         auto iter = buffers.find(buffer_name);
         if (iter == buffers.cend()) {
             return {};
@@ -129,7 +128,8 @@ public:
     }
 
     /**
-	 * @return Return the buffer's device address (note: requires that the buffer has been created with the VK_BUFFER_USAGE_SHADER_DEVICE_ADDRESS_BIT usage fla)
+	 * @return Return the buffer's device address (note: requires that the buffer has been created
+     * with the VK_BUFFER_USAGE_SHADER_DEVICE_ADDRESS_BIT usage fla)
 	 */
     uint64_t get_device_address();
 
@@ -148,5 +148,5 @@ private:
     /// Whether the buffer has been mapped with vmaMapMemory
     bool mapped{false};
 };
-}// namespace core
+
 }// namespace vox

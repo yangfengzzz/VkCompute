@@ -17,8 +17,9 @@ const VkExtent2D &Framebuffer::get_extent() const {
     return extent;
 }
 
-Framebuffer::Framebuffer(Device &device, const RenderTarget &render_target, const RenderPass &render_pass) : device{device},
-                                                                                                             extent{render_target.get_extent()} {
+Framebuffer::Framebuffer(Device &device, const RenderTarget &render_target,
+                         const RenderPass &render_pass) : device{device},
+                                                          extent{render_target.get_extent()} {
     std::vector<VkImageView> attachments;
 
     for (auto &view : render_target.get_views()) {
@@ -41,9 +42,9 @@ Framebuffer::Framebuffer(Device &device, const RenderTarget &render_target, cons
     }
 }
 
-Framebuffer::Framebuffer(Framebuffer &&other) : device{other.device},
-                                                handle{other.handle},
-                                                extent{other.extent} {
+Framebuffer::Framebuffer(Framebuffer &&other) noexcept : device{other.device},
+                                                         handle{other.handle},
+                                                         extent{other.extent} {
     other.handle = VK_NULL_HANDLE;
 }
 

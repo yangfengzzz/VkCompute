@@ -16,7 +16,10 @@ RenderContext::RenderContext(Device &device,
                              const Window &window,
                              VkPresentModeKHR present_mode,
                              const std::vector<VkPresentModeKHR> &present_mode_priority_list,
-                             const std::vector<VkSurfaceFormatKHR> &surface_format_priority_list) : device{device}, window{window}, queue{device.get_suitable_graphics_queue()}, surface_extent{window.get_extent().width, window.get_extent().height} {
+                             const std::vector<VkSurfaceFormatKHR> &surface_format_priority_list) : device{device}, window{window},
+                                                                                                    queue{device.get_suitable_graphics_queue()},
+                                                                                                    surface_extent{window.get_extent().width,
+                                                                                                                   window.get_extent().height} {
     if (surface != VK_NULL_HANDLE) {
         VkSurfaceCapabilitiesKHR surface_properties;
         VK_CHECK(vkGetPhysicalDeviceSurfaceCapabilitiesKHR(device.get_gpu().get_handle(),
@@ -40,7 +43,7 @@ void RenderContext::prepare(size_t thread_count, RenderTarget::CreateFunc create
         VkExtent3D extent{surface_extent.width, surface_extent.height, 1};
 
         for (auto &image_handle : swapchain->get_images()) {
-            auto swapchain_image = core::Image{
+            auto swapchain_image = Image{
                 device, image_handle,
                 extent,
                 swapchain->get_format(),
@@ -52,11 +55,11 @@ void RenderContext::prepare(size_t thread_count, RenderTarget::CreateFunc create
         // Otherwise, create a single RenderFrame
         swapchain = nullptr;
 
-        auto color_image = core::Image{device,
-                                       VkExtent3D{surface_extent.width, surface_extent.height, 1},
-                                       DEFAULT_VK_FORMAT,// We can use any format here that we like
-                                       VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT | VK_IMAGE_USAGE_TRANSFER_SRC_BIT,
-                                       VMA_MEMORY_USAGE_GPU_ONLY};
+        auto color_image = Image{device,
+                                 VkExtent3D{surface_extent.width, surface_extent.height, 1},
+                                 DEFAULT_VK_FORMAT,// We can use any format here that we like
+                                 VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT | VK_IMAGE_USAGE_TRANSFER_SRC_BIT,
+                                 VMA_MEMORY_USAGE_GPU_ONLY};
 
         auto render_target = create_render_target_func(std::move(color_image));
         frames.emplace_back(std::make_unique<RenderFrame>(device, std::move(render_target), thread_count));
@@ -79,7 +82,7 @@ VkFormat RenderContext::get_format() const {
 
 void RenderContext::update_swapchain(const VkExtent2D &extent) {
     if (!swapchain) {
-        LOGW("Can't update the swapchains extent in headless mode, skipping.");
+        LOGW("Can't update the swapchains extent in headless mode, skipping.")
         return;
     }
 
@@ -92,7 +95,7 @@ void RenderContext::update_swapchain(const VkExtent2D &extent) {
 
 void RenderContext::update_swapchain(const uint32_t image_count) {
     if (!swapchain) {
-        LOGW("Can't update the swapchains image count in headless mode, skipping.");
+        LOGW("Can't update the swapchains image count in headless mode, skipping.")
         return;
     }
 
@@ -107,7 +110,7 @@ void RenderContext::update_swapchain(const uint32_t image_count) {
 
 void RenderContext::update_swapchain(const std::set<VkImageUsageFlagBits> &image_usage_flags) {
     if (!swapchain) {
-        LOGW("Can't update the swapchains image usage in headless mode, skipping.");
+        LOGW("Can't update the swapchains image usage in headless mode, skipping.")
         return;
     }
 
@@ -120,7 +123,7 @@ void RenderContext::update_swapchain(const std::set<VkImageUsageFlagBits> &image
 
 void RenderContext::update_swapchain(const VkExtent2D &extent, const VkSurfaceTransformFlagBitsKHR transform) {
     if (!swapchain) {
-        LOGW("Can't update the swapchains extent and surface transform in headless mode, skipping.");
+        LOGW("Can't update the swapchains extent and surface transform in headless mode, skipping.")
         return;
     }
 
@@ -142,7 +145,7 @@ void RenderContext::update_swapchain(const VkExtent2D &extent, const VkSurfaceTr
 }
 
 void RenderContext::recreate() {
-    LOGI("Recreated swapchain");
+    LOGI("Recreated swapchain")
 
     VkExtent2D swapchain_extent = swapchain->get_extent();
     VkExtent3D extent{swapchain_extent.width, swapchain_extent.height, 1};
@@ -150,10 +153,10 @@ void RenderContext::recreate() {
     auto frame_it = frames.begin();
 
     for (auto &image_handle : swapchain->get_images()) {
-        core::Image swapchain_image{device, image_handle,
-                                    extent,
-                                    swapchain->get_format(),
-                                    swapchain->get_usage()};
+        Image swapchain_image{device, image_handle,
+                              extent,
+                              swapchain->get_format(),
+                              swapchain->get_usage()};
 
         auto render_target = create_render_target_func(std::move(swapchain_image));
 
@@ -172,7 +175,7 @@ void RenderContext::recreate() {
 
 bool RenderContext::handle_surface_changes(bool force_update) {
     if (!swapchain) {
-        LOGW("Can't handle surface changes in headless mode, skipping.");
+        LOGW("Can't handle surface changes in headless mode, skipping.")
         return false;
     }
 
@@ -416,10 +419,10 @@ void RenderContext::recreate_swapchain() {
     auto frame_it = frames.begin();
 
     for (auto &image_handle : swapchain->get_images()) {
-        core::Image swapchain_image{device, image_handle,
-                                    extent,
-                                    swapchain->get_format(),
-                                    swapchain->get_usage()};
+        Image swapchain_image{device, image_handle,
+                              extent,
+                              swapchain->get_format(),
+                              swapchain->get_usage()};
 
         auto render_target = create_render_target_func(std::move(swapchain_image));
         (*frame_it)->update_render_target(std::move(render_target));

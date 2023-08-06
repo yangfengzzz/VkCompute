@@ -167,7 +167,8 @@ ScopedDebugLabel::ScopedDebugLabel(const DebugUtils &debug_utils, VkCommandBuffe
 }
 
 ScopedDebugLabel::ScopedDebugLabel(const CommandBuffer &command_buffer,
-                                   const char *name, glm::vec4 color) : ScopedDebugLabel{command_buffer.get_device().get_debug_utils(), command_buffer.get_handle(), name, color} {
+                                   const char *name, glm::vec4 color) : ScopedDebugLabel{command_buffer.get_device().get_debug_utils(),
+                                                                                         command_buffer.get_handle(), name, color} {
 }
 
 ScopedDebugLabel::~ScopedDebugLabel() {

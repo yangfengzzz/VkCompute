@@ -25,25 +25,29 @@ void ResourceBindingState::clear_dirty(uint32_t set) {
     resource_sets[set].clear_dirty();
 }
 
-void ResourceBindingState::bind_buffer(const core::Buffer &buffer, VkDeviceSize offset, VkDeviceSize range, uint32_t set, uint32_t binding, uint32_t array_element) {
+void ResourceBindingState::bind_buffer(const Buffer &buffer, VkDeviceSize offset, VkDeviceSize range,
+                                       uint32_t set, uint32_t binding, uint32_t array_element) {
     resource_sets[set].bind_buffer(buffer, offset, range, binding, array_element);
 
     dirty = true;
 }
 
-void ResourceBindingState::bind_image(const core::ImageView &image_view, const core::Sampler &sampler, uint32_t set, uint32_t binding, uint32_t array_element) {
+void ResourceBindingState::bind_image(const ImageView &image_view, const Sampler &sampler,
+                                      uint32_t set, uint32_t binding, uint32_t array_element) {
     resource_sets[set].bind_image(image_view, sampler, binding, array_element);
 
     dirty = true;
 }
 
-void ResourceBindingState::bind_image(const core::ImageView &image_view, uint32_t set, uint32_t binding, uint32_t array_element) {
+void ResourceBindingState::bind_image(const ImageView &image_view,
+                                      uint32_t set, uint32_t binding, uint32_t array_element) {
     resource_sets[set].bind_image(image_view, binding, array_element);
 
     dirty = true;
 }
 
-void ResourceBindingState::bind_input(const core::ImageView &image_view, uint32_t set, uint32_t binding, uint32_t array_element) {
+void ResourceBindingState::bind_input(const ImageView &image_view,
+                                      uint32_t set, uint32_t binding, uint32_t array_element) {
     resource_sets[set].bind_input(image_view, binding, array_element);
 
     dirty = true;
@@ -71,7 +75,8 @@ void ResourceSet::clear_dirty(uint32_t binding, uint32_t array_element) {
     resource_bindings[binding][array_element].dirty = false;
 }
 
-void ResourceSet::bind_buffer(const core::Buffer &buffer, VkDeviceSize offset, VkDeviceSize range, uint32_t binding, uint32_t array_element) {
+void ResourceSet::bind_buffer(const Buffer &buffer, VkDeviceSize offset, VkDeviceSize range,
+                              uint32_t binding, uint32_t array_element) {
     resource_bindings[binding][array_element].dirty = true;
     resource_bindings[binding][array_element].buffer = &buffer;
     resource_bindings[binding][array_element].offset = offset;
@@ -80,7 +85,8 @@ void ResourceSet::bind_buffer(const core::Buffer &buffer, VkDeviceSize offset, V
     dirty = true;
 }
 
-void ResourceSet::bind_image(const core::ImageView &image_view, const core::Sampler &sampler, uint32_t binding, uint32_t array_element) {
+void ResourceSet::bind_image(const ImageView &image_view, const Sampler &sampler,
+                             uint32_t binding, uint32_t array_element) {
     resource_bindings[binding][array_element].dirty = true;
     resource_bindings[binding][array_element].image_view = &image_view;
     resource_bindings[binding][array_element].sampler = &sampler;
@@ -88,7 +94,7 @@ void ResourceSet::bind_image(const core::ImageView &image_view, const core::Samp
     dirty = true;
 }
 
-void ResourceSet::bind_image(const core::ImageView &image_view, uint32_t binding, uint32_t array_element) {
+void ResourceSet::bind_image(const ImageView &image_view, uint32_t binding, uint32_t array_element) {
     resource_bindings[binding][array_element].dirty = true;
     resource_bindings[binding][array_element].image_view = &image_view;
     resource_bindings[binding][array_element].sampler = nullptr;
@@ -96,7 +102,7 @@ void ResourceSet::bind_image(const core::ImageView &image_view, uint32_t binding
     dirty = true;
 }
 
-void ResourceSet::bind_input(const core::ImageView &image_view, const uint32_t binding, const uint32_t array_element) {
+void ResourceSet::bind_input(const ImageView &image_view, const uint32_t binding, const uint32_t array_element) {
     resource_bindings[binding][array_element].dirty = true;
     resource_bindings[binding][array_element].image_view = &image_view;
 

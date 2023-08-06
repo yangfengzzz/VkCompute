@@ -36,7 +36,7 @@ struct DriverVersion {
     uint16_t patch;
 };
 
-class Device : public core::VulkanResource<VkDevice, VK_OBJECT_TYPE_DEVICE> {
+class Device : public VulkanResource<VkDevice, VK_OBJECT_TYPE_DEVICE> {
 public:
     /**
 	 * @brief Device constructor
@@ -64,7 +64,7 @@ public:
 
     Device(Device &&) = delete;
 
-    ~Device();
+    ~Device() override;
 
     Device &operator=(const Device &) = delete;
 
@@ -140,7 +140,8 @@ public:
 	* @param data The data to place inside the buffer
 	* @returns A valid VkBuffer
 	*/
-    VkBuffer create_buffer(VkBufferUsageFlags usage, VkMemoryPropertyFlags properties, VkDeviceSize size, VkDeviceMemory *memory, void *data = nullptr);
+    VkBuffer create_buffer(VkBufferUsageFlags usage, VkMemoryPropertyFlags properties, VkDeviceSize size,
+                           VkDeviceMemory *memory, void *data = nullptr);
 
     /**
 	* @brief Copies a buffer from one to another
@@ -149,7 +150,7 @@ public:
 	* @param queue The queue to submit the copy command to
 	* @param copy_region The amount to copy, if null copies the entire buffer
 	*/
-    void copy_buffer(vox::core::Buffer &src, vox::core::Buffer &dst, VkQueue queue, VkBufferCopy *copy_region = nullptr);
+    void copy_buffer(vox::Buffer &src, vox::Buffer &dst, VkQueue queue, VkBufferCopy *copy_region = nullptr) const;
 
     /**
 	 * @brief Creates a command pool
@@ -174,7 +175,8 @@ public:
 	 * @param free Whether the command buffer should be implicitly freed up
 	 * @param signalSemaphore An optional semaphore to signal when the commands have been executed
 	 */
-    void flush_command_buffer(VkCommandBuffer command_buffer, VkQueue queue, bool free = true, VkSemaphore signalSemaphore = VK_NULL_HANDLE) const;
+    void flush_command_buffer(VkCommandBuffer command_buffer, VkQueue queue, bool free = true,
+                              VkSemaphore signalSemaphore = VK_NULL_HANDLE) const;
 
     /**
 	 * @brief Requests a command buffer from the general command_pool

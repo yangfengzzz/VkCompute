@@ -11,8 +11,6 @@
 
 namespace vox {
 class Device;
-
-namespace core {
 /**
  * @brief Extended buffer class to simplify ray tracing shader binding table usage
  */
@@ -32,9 +30,9 @@ public:
 
     ~ShaderBindingTable();
 
-    const VkStridedDeviceAddressRegionKHR *get_strided_device_address_region() const;
+    [[nodiscard]] const VkStridedDeviceAddressRegionKHR *get_strided_device_address_region() const;
 
-    uint8_t *get_data() const;
+    [[nodiscard]] uint8_t *get_data() const;
 
 private:
     Device &device;
@@ -51,5 +49,4 @@ private:
 
     uint8_t *mapped_data{nullptr};
 };
-}// namespace core
 }// namespace vox

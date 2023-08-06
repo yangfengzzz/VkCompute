@@ -8,7 +8,6 @@
 
 #include "descriptor_set_layout.h"
 #include "device.h"
-#include "pipeline.h"
 #include "shader_module.h"
 
 namespace vox {

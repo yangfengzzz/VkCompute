@@ -15,7 +15,7 @@
 namespace vox {
 /**
  * @brief A RenderPipeline is a sequence of Subpass objects.
- * Subpass holds shaders and can draw the core::sg::Scene.
+ * Subpass holds shaders and can draw the sg::Scene.
  * More subpasses can be added to the sequence if required.
  * For example, postprocessing can be implemented with two pipelines which
  * share render targets.

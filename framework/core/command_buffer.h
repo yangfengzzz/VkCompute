@@ -34,7 +34,7 @@ class Subpass;
  * @brief Helper class to manage and record a command buffer, building and
  *        keeping track of pipeline state and resource bindings
  */
-class CommandBuffer : public core::VulkanResource<VkCommandBuffer, VK_OBJECT_TYPE_COMMAND_BUFFER> {
+class CommandBuffer : public VulkanResource<VkCommandBuffer, VK_OBJECT_TYPE_COMMAND_BUFFER> {
 public:
     enum class ResetMode {
         ResetPool,
@@ -140,20 +140,20 @@ public:
         stored_push_constants.insert(stored_push_constants.end(), data.begin(), data.end());
     }
 
-    void bind_buffer(const core::Buffer &buffer, VkDeviceSize offset, VkDeviceSize range,
+    void bind_buffer(const Buffer &buffer, VkDeviceSize offset, VkDeviceSize range,
                      uint32_t set, uint32_t binding, uint32_t array_element);
 
-    void bind_image(const core::ImageView &image_view, const core::Sampler &sampler,
+    void bind_image(const ImageView &image_view, const Sampler &sampler,
                     uint32_t set, uint32_t binding, uint32_t array_element);
 
-    void bind_image(const core::ImageView &image_view, uint32_t set, uint32_t binding, uint32_t array_element);
+    void bind_image(const ImageView &image_view, uint32_t set, uint32_t binding, uint32_t array_element);
 
-    void bind_input(const core::ImageView &image_view, uint32_t set, uint32_t binding, uint32_t array_element);
+    void bind_input(const ImageView &image_view, uint32_t set, uint32_t binding, uint32_t array_element);
 
-    void bind_vertex_buffers(uint32_t first_binding, const std::vector<std::reference_wrapper<const vox::core::Buffer>> &buffers,
+    void bind_vertex_buffers(uint32_t first_binding, const std::vector<std::reference_wrapper<const vox::Buffer>> &buffers,
                              const std::vector<VkDeviceSize> &offsets);
 
-    void bind_index_buffer(const core::Buffer &buffer, VkDeviceSize offset, VkIndexType index_type);
+    void bind_index_buffer(const Buffer &buffer, VkDeviceSize offset, VkIndexType index_type);
 
     void set_viewport_state(const ViewportState &state_info);
 
@@ -186,30 +186,30 @@ public:
     void draw_indexed(uint32_t index_count, uint32_t instance_count, uint32_t first_index,
                       int32_t vertex_offset, uint32_t first_instance);
 
-    void draw_indexed_indirect(const core::Buffer &buffer, VkDeviceSize offset, uint32_t draw_count, uint32_t stride);
+    void draw_indexed_indirect(const Buffer &buffer, VkDeviceSize offset, uint32_t draw_count, uint32_t stride);
 
     void dispatch(uint32_t group_count_x, uint32_t group_count_y, uint32_t group_count_z);
 
-    void dispatch_indirect(const core::Buffer &buffer, VkDeviceSize offset);
+    void dispatch_indirect(const Buffer &buffer, VkDeviceSize offset);
 
-    void update_buffer(const core::Buffer &buffer, VkDeviceSize offset, const std::vector<uint8_t> &data);
+    void update_buffer(const Buffer &buffer, VkDeviceSize offset, const std::vector<uint8_t> &data);
 
-    void blit_image(const core::Image &src_img, const core::Image &dst_img, const std::vector<VkImageBlit> &regions);
+    void blit_image(const Image &src_img, const Image &dst_img, const std::vector<VkImageBlit> &regions);
 
-    void resolve_image(const core::Image &src_img, const core::Image &dst_img, const std::vector<VkImageResolve> &regions);
+    void resolve_image(const Image &src_img, const Image &dst_img, const std::vector<VkImageResolve> &regions);
 
-    void copy_buffer(const core::Buffer &src_buffer, const core::Buffer &dst_buffer, VkDeviceSize size);
+    void copy_buffer(const Buffer &src_buffer, const Buffer &dst_buffer, VkDeviceSize size);
 
-    void copy_image(const core::Image &src_img, const core::Image &dst_img, const std::vector<VkImageCopy> &regions);
+    void copy_image(const Image &src_img, const Image &dst_img, const std::vector<VkImageCopy> &regions);
 
-    void copy_buffer_to_image(const core::Buffer &buffer, const core::Image &image, const std::vector<VkBufferImageCopy> &regions);
+    void copy_buffer_to_image(const Buffer &buffer, const Image &image, const std::vector<VkBufferImageCopy> &regions);
 
-    void copy_image_to_buffer(const core::Image &image, VkImageLayout image_layout,
-                              const core::Buffer &buffer, const std::vector<VkBufferImageCopy> &regions);
+    void copy_image_to_buffer(const Image &image, VkImageLayout image_layout,
+                              const Buffer &buffer, const std::vector<VkBufferImageCopy> &regions);
 
-    void image_memory_barrier(const core::ImageView &image_view, const ImageMemoryBarrier &memory_barrier) const;
+    void image_memory_barrier(const ImageView &image_view, const ImageMemoryBarrier &memory_barrier) const;
 
-    void buffer_memory_barrier(const core::Buffer &buffer, VkDeviceSize offset,
+    void buffer_memory_barrier(const Buffer &buffer, VkDeviceSize offset,
                                VkDeviceSize size, const BufferMemoryBarrier &memory_barrier);
 
     void set_update_after_bind(bool update_after_bind_);

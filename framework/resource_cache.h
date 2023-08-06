@@ -21,10 +21,7 @@
 
 namespace vox {
 class Device;
-
-namespace core {
 class ImageView;
-}// namespace core
 
 /**
  * @brief Struct to hold the internal state of the Resource Cache
@@ -80,7 +77,8 @@ public:
 
     void set_pipeline_cache(VkPipelineCache pipeline_cache);
 
-    ShaderModule &request_shader_module(VkShaderStageFlagBits stage, const ShaderSource &glsl_source, const ShaderVariant &shader_variant = {});
+    ShaderModule &request_shader_module(VkShaderStageFlagBits stage,
+                                        const ShaderSource &glsl_source, const ShaderVariant &shader_variant = {});
 
     PipelineLayout &request_pipeline_layout(const std::vector<ShaderModule *> &shader_modules);
 
@@ -108,7 +106,7 @@ public:
     /// @brief Update those descriptor sets referring to old views
     /// @param old_views Old image views referred by descriptor sets
     /// @param new_views New image views to be referred
-    void update_descriptor_sets(const std::vector<core::ImageView> &old_views, const std::vector<core::ImageView> &new_views);
+    void update_descriptor_sets(const std::vector<ImageView> &old_views, const std::vector<ImageView> &new_views);
 
     void clear_framebuffers();
 

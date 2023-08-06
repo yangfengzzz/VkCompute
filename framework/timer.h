@@ -92,7 +92,7 @@ public:
     /**
 	 * @brief Check if the timer is running
 	 */
-    bool is_running() const;
+    [[nodiscard]] bool is_running() const;
 
 private:
     bool running{false};
@@ -105,4 +105,4 @@ private:
 
     Clock::time_point previous_tick;
 };
-}// namespace vkb
+}// namespace vox

@@ -55,7 +55,7 @@ bool validate_layers(const std::vector<const char *> &required,
         }
 
         if (!found) {
-            LOGE("Validation Layer {} not found", layer);
+            LOGE("Validation Layer {} not found", layer)
             return false;
         }
     }
@@ -90,7 +90,7 @@ std::vector<const char *> get_optimal_validation_layers(const std::vector<VkLaye
             return validation_layers;
         }
 
-        LOGW("Couldn't enable validation layers (see log for error) - falling back");
+        LOGW("Couldn't enable validation layers (see log for error) - falling back")
     }
 
     // Else return nothing
@@ -110,18 +110,18 @@ bool enable_extension(const char *required_ext_name,
             if (it != enabled_extensions.end()) {
                 // Extension is already enabled
             } else {
-                LOGI("Extension {} found, enabling it", required_ext_name);
+                LOGI("Extension {} found, enabling it", required_ext_name)
                 enabled_extensions.emplace_back(required_ext_name);
             }
             return true;
         }
     }
 
-    LOGI("Extension {} not found", required_ext_name);
+    LOGI("Extension {} not found", required_ext_name)
     return false;
 }
 
-bool enable_all_extensions(const std::vector<const char *> required_ext_names,
+bool enable_all_extensions(const std::vector<const char *> &required_ext_names,
                            const std::vector<VkExtensionProperties> &available_exts,
                            std::vector<const char *> &enabled_extensions) {
     using std::placeholders::_1;
@@ -188,7 +188,7 @@ Instance::Instance(const std::string &application_name,
         const bool has_headless_surface = enable_extension(VK_EXT_HEADLESS_SURFACE_EXTENSION_NAME,
                                                            available_instance_extensions, enabled_extensions);
         if (!has_headless_surface) {
-            LOGW("{} is not available, disabling swapchain creation", VK_EXT_HEADLESS_SURFACE_EXTENSION_NAME);
+            LOGW("{} is not available, disabling swapchain creation", VK_EXT_HEADLESS_SURFACE_EXTENSION_NAME)
         }
     } else {
         enabled_extensions.push_back(VK_KHR_SURFACE_EXTENSION_NAME);
@@ -205,9 +205,9 @@ Instance::Instance(const std::string &application_name,
         auto extension_is_optional = extension.second;
         if (!enable_extension(extension_name, available_instance_extensions, enabled_extensions)) {
             if (extension_is_optional) {
-                LOGW("Optional instance extension {} not available, some features may be disabled", extension_name);
+                LOGW("Optional instance extension {} not available, some features may be disabled", extension_name)
             } else {
-                LOGE("Required instance extension {} not available, cannot run", extension_name);
+                LOGE("Required instance extension {} not available, cannot run", extension_name)
                 extension_error = true;
             }
             extension_error = extension_error || !extension_is_optional;
@@ -235,7 +235,7 @@ Instance::Instance(const std::string &application_name,
     if (validate_layers(requested_validation_layers, supported_validation_layers)) {
         LOGI("Enabled Validation Layers:")
         for (const auto &layer : requested_validation_layers) {
-            LOGI("	\t{}", layer);
+            LOGI("	\t{}", layer)
         }
     } else {
         throw std::runtime_error("Required validation layers are missing.");
@@ -380,7 +380,7 @@ PhysicalDevice &Instance::get_first_gpu() {
     }
 
     // Otherwise just pick the first one
-    LOGW("Couldn't find a discrete physical device, picking default GPU");
+    LOGW("Couldn't find a discrete physical device, picking default GPU")
     return *gpus[0];
 }
 
@@ -401,7 +401,7 @@ PhysicalDevice &Instance::get_suitable_gpu(VkSurfaceKHR surface) {
     }
 
     // Otherwise just pick the first one
-    LOGW("Couldn't find a discrete physical device, picking default GPU");
+    LOGW("Couldn't find a discrete physical device, picking default GPU")
     return *gpus[0];
 }
 

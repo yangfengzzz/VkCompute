@@ -40,14 +40,12 @@ inline VkImageType find_image_type(VkExtent3D extent) {
             break;
         default:
             throw std::runtime_error("No image type found.");
-            break;
     }
 
     return result;
 }
 }// namespace
 
-namespace core {
 Image::Image(Device const &device,
              const VkExtent3D &extent,
              VkFormat format,
@@ -107,12 +105,13 @@ Image::Image(Device const &device,
     }
 }
 
-Image::Image(Device const &device, VkImage handle, const VkExtent3D &extent, VkFormat format, VkImageUsageFlags image_usage, VkSampleCountFlagBits sample_count) : VulkanResource{handle, &device},
-                                                                                                                                                                   type{find_image_type(extent)},
-                                                                                                                                                                   extent{extent},
-                                                                                                                                                                   format{format},
-                                                                                                                                                                   sample_count{sample_count},
-                                                                                                                                                                   usage{image_usage} {
+Image::Image(Device const &device, VkImage handle, const VkExtent3D &extent, VkFormat format,
+             VkImageUsageFlags image_usage, VkSampleCountFlagBits sample_count) : VulkanResource{handle, &device},
+                                                                                  type{find_image_type(extent)},
+                                                                                  extent{extent},
+                                                                                  format{format},
+                                                                                  sample_count{sample_count},
+                                                                                  usage{image_usage} {
     subresource.mipLevel = 1;
     subresource.arrayLayer = 1;
 }
@@ -153,7 +152,7 @@ VmaAllocation Image::get_memory() const {
 uint8_t *Image::map() {
     if (!mapped_data) {
         if (tiling != VK_IMAGE_TILING_LINEAR) {
-            LOGW("Mapping image memory that is not linear");
+            LOGW("Mapping image memory that is not linear")
         }
         VK_CHECK(vmaMapMemory(device->get_memory_allocator(), memory, reinterpret_cast<void **>(&mapped_data)));
         mapped = true;
@@ -205,5 +204,4 @@ std::unordered_set<ImageView *> &Image::get_views() {
     return views;
 }
 
-}// namespace core
 }// namespace vox

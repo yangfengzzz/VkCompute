@@ -10,7 +10,6 @@
 #include "device.h"
 
 namespace vox {
-namespace core {
 ImageView::ImageView(Image &img, VkImageViewType view_type, VkFormat format,
                      uint32_t mip_level, uint32_t array_layer,
                      uint32_t n_mip_levels, uint32_t n_array_layers) : VulkanResource{VK_NULL_HANDLE, &img.get_device()},
@@ -91,5 +90,5 @@ VkImageSubresourceLayers ImageView::get_subresource_layers() const {
     subresource.mipLevel = subresource_range.baseMipLevel;
     return subresource;
 }
-}
-}// namespace vox::core
+
+}// namespace vox

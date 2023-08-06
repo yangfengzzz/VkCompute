@@ -9,8 +9,7 @@
 #include "volk.h"
 #include <vector>
 
-namespace vox {
-namespace initializers {
+namespace vox::initializers {
 inline VkMemoryAllocateInfo memory_allocate_info() {
     VkMemoryAllocateInfo memory_allocation{};
     memory_allocation.sType = VK_STRUCTURE_TYPE_MEMORY_ALLOCATE_INFO;
@@ -572,13 +571,13 @@ inline VkSpecializationMapEntry specialization_map_entry(uint32_t constant_id, u
 }
 
 /** @brief Initialize a specialization constant info structure to pass to a shader stage */
-inline VkSpecializationInfo specialization_info(uint32_t map_entry_count, const VkSpecializationMapEntry *map_entries, size_t data_size, const void *data) {
+inline VkSpecializationInfo specialization_info(uint32_t map_entry_count, const VkSpecializationMapEntry *map_entries,
+                                                size_t data_size, const void *data) {
     VkSpecializationInfo specialization_info{};
     specialization_info.mapEntryCount = map_entry_count;
     specialization_info.pMapEntries = map_entries;
     specialization_info.dataSize = data_size;
     specialization_info.pData = data;
     return specialization_info;
-}
 }
 }// namespace vox::initializers

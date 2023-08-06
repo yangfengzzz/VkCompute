@@ -20,7 +20,7 @@ class BufferAllocation {
 public:
     BufferAllocation() = default;
 
-    BufferAllocation(core::Buffer &buffer, VkDeviceSize size, VkDeviceSize offset);
+    BufferAllocation(Buffer &buffer, VkDeviceSize size, VkDeviceSize offset);
 
     BufferAllocation(const BufferAllocation &) = delete;
 
@@ -43,10 +43,10 @@ public:
 
     VkDeviceSize get_offset() const;
 
-    core::Buffer &get_buffer();
+    Buffer &get_buffer();
 
 private:
-    core::Buffer *buffer{nullptr};
+    Buffer *buffer{nullptr};
 
     VkDeviceSize base_offset{0};
 
@@ -70,7 +70,7 @@ public:
     void reset();
 
 private:
-    core::Buffer buffer;
+    Buffer buffer;
 
     // Memory alignment, it may change according to the usage
     VkDeviceSize alignment{0};

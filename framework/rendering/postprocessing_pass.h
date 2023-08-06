@@ -61,7 +61,7 @@ protected:
     std::string debug_name{};
 
     RenderTarget *render_target{nullptr};
-    std::shared_ptr<core::Sampler> default_sampler{};
+    std::shared_ptr<Sampler> default_sampler{};
 
     HookFunc pre_draw{};
     HookFunc post_draw{};
@@ -69,12 +69,12 @@ protected:
     /**
 	 * @brief Returns the parent's render context.
 	 */
-    RenderContext &get_render_context() const;
+    [[nodiscard]] RenderContext &get_render_context() const;
 
     /**
 	 * @brief Returns the parent's fullscreen triangle vertex shader source.
 	 */
-    ShaderSource &get_triangle_vs() const;
+    [[nodiscard]] ShaderSource &get_triangle_vs() const;
 
     struct BarrierInfo {
         VkPipelineStageFlags pipeline_stage;// Pipeline stage of this pass' inputs/outputs
@@ -86,19 +86,19 @@ protected:
 	 * @brief Returns information that can be used to setup memory barriers of images
 	 *        that are produced (e.g. image stores, color attachment output) by this pass.
 	 */
-    virtual BarrierInfo get_src_barrier_info() const = 0;
+    [[nodiscard]] virtual BarrierInfo get_src_barrier_info() const = 0;
 
     /**
 	 * @brief Returns information that can be used to setup memory barriers of images
 	 *        that are consumed (e.g. image loads, texture sampling) by this pass.
 	 */
-    virtual BarrierInfo get_dst_barrier_info() const = 0;
+    [[nodiscard]] virtual BarrierInfo get_dst_barrier_info() const = 0;
 
     /**
 	 * @brief Convenience function that calls get_src_barrier_info() on the previous pass of the pipeline,
 	 *        if any, or returns the specified default if this is the first pass in the pipeline.
 	 */
-    BarrierInfo get_predecessor_src_barrier_info(BarrierInfo fallback = {}) const;
+    [[nodiscard]] BarrierInfo get_predecessor_src_barrier_info(BarrierInfo fallback = {}) const;
 };
 
 /**
@@ -112,10 +112,10 @@ public:
     PostProcessingPass(const PostProcessingPass &to_copy) = delete;
     PostProcessingPass &operator=(const PostProcessingPass &to_copy) = delete;
 
-    PostProcessingPass(PostProcessingPass &&to_move) = default;
-    PostProcessingPass &operator=(PostProcessingPass &&to_move) = default;
+    PostProcessingPass(PostProcessingPass &&to_move) noexcept = default;
+    PostProcessingPass &operator=(PostProcessingPass &&to_move) noexcept = default;
 
-    virtual ~PostProcessingPass() = default;
+    ~PostProcessingPass() override = default;
 
     /**
 	 * @brief Sets a functor that, if non-null, will be invoked before draw()ing this pass.
@@ -141,7 +141,7 @@ public:
 	 * @brief Render target to output to.
 	 *        If set, this pass will output to the given render target instead of the one passed to draw().
 	 */
-    inline RenderTarget *get_render_target() const {
+    [[nodiscard]] inline RenderTarget *get_render_target() const {
         return render_target;
     }
 
@@ -159,7 +159,7 @@ public:
     /**
 	 * @brief Returns the the debug name of this pass.
 	 */
-    inline const std::string &get_debug_name() const {
+    [[nodiscard]] inline const std::string &get_debug_name() const {
         return debug_name;
     }
 
@@ -175,7 +175,7 @@ public:
     /**
 	 * @brief Returns the vox::PostProcessingPipeline that is the parent of this pass.
 	 */
-    inline PostProcessingPipeline &get_parent() const {
+    [[nodiscard]] inline PostProcessingPipeline &get_parent() const {
         return *parent;
     }
 };

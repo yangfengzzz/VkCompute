@@ -96,7 +96,7 @@ public:
 
     void set_depth_stencil_resolve_attachment(uint32_t depth_stencil_resolve);
 
-    [[nodiscard]] const VkResolveModeFlagBits get_depth_stencil_resolve_mode() const;
+    [[nodiscard]] VkResolveModeFlagBits get_depth_stencil_resolve_mode() const;
 
     void set_depth_stencil_resolve_mode(VkResolveModeFlagBits mode);
 

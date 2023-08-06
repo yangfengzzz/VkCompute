@@ -19,7 +19,7 @@ Device::Device(PhysicalDevice &gpu,
                                                                               debug_utils{std::move(debug_utils)},
                                                                               gpu{gpu},
                                                                               resource_cache{*this} {
-    LOGI("Selected GPU: {}", gpu.get_properties().deviceName);
+    LOGI("Selected GPU: {}", gpu.get_properties().deviceName)
 
     // Prepare the device queues
     uint32_t queue_family_properties_count = to_u32(gpu.get_queue_family_properties().size());
@@ -58,10 +58,10 @@ Device::Device(PhysicalDevice &gpu,
     VK_CHECK(vkEnumerateDeviceExtensionProperties(gpu.get_handle(), nullptr, &device_extension_count, device_extensions.data()));
 
     // Display supported extensions
-    if (device_extensions.size() > 0) {
-        LOGD("Device supports the following extensions:");
+    if (!device_extensions.empty()) {
+        LOGD("Device supports the following extensions:")
         for (auto &extension : device_extensions) {
-            LOGD("  \t{}", extension.extensionName);
+            LOGD("  \t{}", extension.extensionName)
         }
     }
 
@@ -72,7 +72,7 @@ Device::Device(PhysicalDevice &gpu,
         enabled_extensions.push_back("VK_KHR_get_memory_requirements2");
         enabled_extensions.push_back("VK_KHR_dedicated_allocation");
 
-        LOGI("Dedicated Allocation enabled");
+        LOGI("Dedicated Allocation enabled")
     }
 
     // For performance queries, we also use host query reset since queryPool resets cannot
@@ -85,7 +85,7 @@ Device::Device(PhysicalDevice &gpu,
         if (perf_counter_features.performanceCounterQueryPools && host_query_reset_features.hostQueryReset) {
             enabled_extensions.push_back("VK_KHR_performance_query");
             enabled_extensions.push_back("VK_EXT_host_query_reset");
-            LOGI("Performance query enabled");
+            LOGI("Performance query enabled")
         }
     }
 
@@ -99,21 +99,21 @@ Device::Device(PhysicalDevice &gpu,
         }
     }
 
-    if (enabled_extensions.size() > 0) {
-        LOGI("Device supports the following requested extensions:");
+    if (!enabled_extensions.empty()) {
+        LOGI("Device supports the following requested extensions:")
         for (auto &extension : enabled_extensions) {
-            LOGI("  \t{}", extension);
+            LOGI("  \t{}", extension)
         }
     }
 
-    if (unsupported_extensions.size() > 0) {
+    if (!unsupported_extensions.empty()) {
         auto error = false;
         for (auto &extension : unsupported_extensions) {
             auto extension_is_optional = requested_extensions[extension];
             if (extension_is_optional) {
-                LOGW("Optional device extension {} not available, some features may be disabled", extension);
+                LOGW("Optional device extension {} not available, some features may be disabled", extension)
             } else {
-                LOGE("Required device extension {} not available, cannot run", extension);
+                LOGE("Required device extension {} not available, cannot run", extension)
                 error = true;
             }
         }
@@ -216,7 +216,7 @@ Device::~Device() {
         VmaStats stats;
         vmaCalculateStats(memory_allocator, &stats);
 
-        LOGI("Total device memory leaked: {} bytes.", stats.total.usedBytes);
+        LOGI("Total device memory leaked: {} bytes.", stats.total.usedBytes)
 
         vmaDestroyAllocator(memory_allocator);
     }
@@ -246,7 +246,7 @@ VmaAllocator Device::get_memory_allocator() const {
 }
 
 DriverVersion Device::get_driver_version() const {
-    DriverVersion version;
+    DriverVersion version{};
 
     switch (gpu.get_properties().vendorID) {
         case 0x10DE: {
@@ -306,14 +306,14 @@ const Queue &Device::get_queue(uint32_t queue_family_index, uint32_t queue_index
 }
 
 const Queue &Device::get_queue_by_flags(VkQueueFlags required_queue_flags, uint32_t queue_index) const {
-    for (uint32_t queue_family_index = 0U; queue_family_index < queues.size(); ++queue_family_index) {
-        Queue const &first_queue = queues[queue_family_index][0];
+    for (const auto &queue : queues) {
+        Queue const &first_queue = queue[0];
 
         VkQueueFlags queue_flags = first_queue.get_properties().queueFlags;
         uint32_t queue_count = first_queue.get_properties().queueCount;
 
         if (((queue_flags & required_queue_flags) == required_queue_flags) && queue_index < queue_count) {
-            return queues[queue_family_index][queue_index];
+            return queue[queue_index];
         }
     }
 
@@ -321,13 +321,13 @@ const Queue &Device::get_queue_by_flags(VkQueueFlags required_queue_flags, uint3
 }
 
 const Queue &Device::get_queue_by_present(uint32_t queue_index) const {
-    for (uint32_t queue_family_index = 0U; queue_family_index < queues.size(); ++queue_family_index) {
-        Queue const &first_queue = queues[queue_family_index][0];
+    for (const auto &queue : queues) {
+        Queue const &first_queue = queue[0];
 
         uint32_t queue_count = first_queue.get_properties().queueCount;
 
         if (first_queue.support_present() && queue_index < queue_count) {
-            return queues[queue_family_index][queue_index];
+            return queue[queue_index];
         }
     }
 
@@ -383,13 +383,13 @@ uint32_t Device::get_queue_family_index(VkQueueFlagBits queue_flag) {
 }
 
 const Queue &Device::get_suitable_graphics_queue() const {
-    for (uint32_t queue_family_index = 0U; queue_family_index < queues.size(); ++queue_family_index) {
-        Queue const &first_queue = queues[queue_family_index][0];
+    for (const auto &queue : queues) {
+        Queue const &first_queue = queue[0];
 
         uint32_t queue_count = first_queue.get_properties().queueCount;
 
         if (first_queue.support_present() && 0 < queue_count) {
-            return queues[queue_family_index][0];
+            return queue[0];
         }
     }
 
@@ -440,7 +440,7 @@ VkBuffer Device::create_buffer(VkBufferUsageFlags usage, VkMemoryPropertyFlags p
     return buffer;
 }
 
-void Device::copy_buffer(vox::core::Buffer &src, vox::core::Buffer &dst, VkQueue queue, VkBufferCopy *copy_region) {
+void Device::copy_buffer(vox::Buffer &src, vox::Buffer &dst, VkQueue queue, VkBufferCopy *copy_region) const {
     assert(dst.get_size() <= src.get_size());
     assert(src.get_handle());
 

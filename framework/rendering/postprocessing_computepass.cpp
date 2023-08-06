@@ -6,14 +6,16 @@
 
 #include "postprocessing_computepass.h"
 
+#include <utility>
+
 #include "postprocessing_pipeline.h"
 
 namespace vox {
-PostProcessingComputePass::PostProcessingComputePass(PostProcessingPipeline *parent, const ShaderSource &cs_source, const ShaderVariant &cs_variant,
-                                                     std::shared_ptr<core::Sampler> &&default_sampler) : PostProcessingPass{parent},
-                                                                                                         cs_source{cs_source},
-                                                                                                         cs_variant{cs_variant},
-                                                                                                         default_sampler{std::move(default_sampler)} {
+PostProcessingComputePass::PostProcessingComputePass(PostProcessingPipeline *parent, ShaderSource cs_source, const ShaderVariant &cs_variant,
+                                                     std::shared_ptr<Sampler> &&default_sampler) : PostProcessingPass{parent},
+                                                                                                   cs_source{std::move(cs_source)},
+                                                                                                   cs_variant{cs_variant},
+                                                                                                   default_sampler{std::move(default_sampler)} {
     if (this->default_sampler == nullptr) {
         // Setup a sane default sampler if none was passed
         VkSamplerCreateInfo sampler_info{VK_STRUCTURE_TYPE_SAMPLER_CREATE_INFO};
@@ -31,7 +33,7 @@ PostProcessingComputePass::PostProcessingComputePass(PostProcessingPipeline *par
         sampler_info.maxAnisotropy = 0.0f;
         sampler_info.borderColor = VK_BORDER_COLOR_FLOAT_OPAQUE_WHITE;
 
-        this->default_sampler = std::make_shared<vox::core::Sampler>(get_render_context().get_device(), sampler_info);
+        this->default_sampler = std::make_shared<vox::Sampler>(get_render_context().get_device(), sampler_info);
     }
 }
 
@@ -41,7 +43,7 @@ void PostProcessingComputePass::prepare(CommandBuffer &command_buffer, RenderTar
     resource_cache.request_shader_module(VK_SHADER_STAGE_COMPUTE_BIT, cs_source, cs_variant);
 }
 
-PostProcessingComputePass &PostProcessingComputePass::bind_sampled_image(const std::string &name, core::SampledImage &&new_image) {
+PostProcessingComputePass &PostProcessingComputePass::bind_sampled_image(const std::string &name, SampledImage &&new_image) {
     auto it = sampled_images.find(name);
     if (it != sampled_images.end()) {
         it->second = new_image;
@@ -52,7 +54,7 @@ PostProcessingComputePass &PostProcessingComputePass::bind_sampled_image(const s
     return *this;
 }
 
-PostProcessingComputePass &PostProcessingComputePass::bind_storage_image(const std::string &name, core::SampledImage &&new_image) {
+PostProcessingComputePass &PostProcessingComputePass::bind_storage_image(const std::string &name, SampledImage &&new_image) {
     auto it = storage_images.find(name);
     if (it != storage_images.end()) {
         it->second = new_image;

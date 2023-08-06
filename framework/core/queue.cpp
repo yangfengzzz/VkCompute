@@ -1,19 +1,8 @@
-/* Copyright (c) 2019-2022, Arm Limited and Contributors
- *
- * SPDX-License-Identifier: Apache-2.0
- *
- * Licensed under the Apache License, Version 2.0 the "License";
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *     http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
+//  Copyright (c) 2023 Feng Yang
+//
+//  I am making my contributions/submissions to this project solely in my
+//  personal capacity and am not conveying any rights to any intellectual
+//  property of any third parties.
 
 #include "queue.h"
 
@@ -21,20 +10,21 @@
 #include "device.h"
 
 namespace vox {
-Queue::Queue(Device &device, uint32_t family_index, VkQueueFamilyProperties properties, VkBool32 can_present, uint32_t index) : device{device},
-                                                                                                                                family_index{family_index},
-                                                                                                                                index{index},
-                                                                                                                                can_present{can_present},
-                                                                                                                                properties{properties} {
+Queue::Queue(Device &device, uint32_t family_index, VkQueueFamilyProperties properties,
+             VkBool32 can_present, uint32_t index) : device{device},
+                                                     family_index{family_index},
+                                                     index{index},
+                                                     can_present{can_present},
+                                                     properties{properties} {
     vkGetDeviceQueue(device.get_handle(), family_index, index, &handle);
 }
 
-Queue::Queue(Queue &&other) : device{other.device},
-                              handle{other.handle},
-                              family_index{other.family_index},
-                              index{other.index},
-                              can_present{other.can_present},
-                              properties{other.properties} {
+Queue::Queue(Queue &&other) noexcept : device{other.device},
+                                       handle{other.handle},
+                                       family_index{other.family_index},
+                                       index{other.index},
+                                       can_present{other.can_present},
+                                       properties{other.properties} {
     other.handle = VK_NULL_HANDLE;
     other.family_index = {};
     other.properties = {};

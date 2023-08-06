@@ -12,7 +12,6 @@
 #include "core/vulkan_resource.h"
 
 namespace vox {
-namespace core {
 class ImageView : public VulkanResource<VkImageView, VK_OBJECT_TYPE_IMAGE_VIEW, const Device> {
 public:
     ImageView(Image &image, VkImageViewType view_type, VkFormat format = VK_FORMAT_UNDEFINED,
@@ -50,5 +49,5 @@ private:
 
     VkImageSubresourceRange subresource_range{};
 };
-}
-}// namespace vox::core
+
+}// namespace vox

@@ -9,9 +9,10 @@
 #include "device.h"
 
 namespace vox {
-namespace core {
-Buffer::Buffer(Device const &device, VkDeviceSize size, VkBufferUsageFlags buffer_usage, VmaMemoryUsage memory_usage, VmaAllocationCreateFlags flags, const std::vector<uint32_t> &queue_family_indices) : VulkanResource{VK_NULL_HANDLE, &device},
-                                                                                                                                                                                                           size{size} {
+Buffer::Buffer(Device const &device, VkDeviceSize size, VkBufferUsageFlags buffer_usage,
+               VmaMemoryUsage memory_usage, VmaAllocationCreateFlags flags,
+               const std::vector<uint32_t> &queue_family_indices) : VulkanResource{VK_NULL_HANDLE, &device},
+                                                                    size{size} {
 #ifdef VK_USE_PLATFORM_METAL_EXT
     // Workaround for Mac (MoltenVK requires unmapping https://github.com/KhronosGroup/MoltenVK/issues/175)
     // Force cleares the flag VMA_ALLOCATION_CREATE_MAPPED_BIT
@@ -50,12 +51,12 @@ Buffer::Buffer(Device const &device, VkDeviceSize size, VkBufferUsageFlags buffe
     }
 }
 
-Buffer::Buffer(Buffer &&other) : VulkanResource{other.handle, other.device},
-                                 allocation{other.allocation},
-                                 memory{other.memory},
-                                 size{other.size},
-                                 mapped_data{other.mapped_data},
-                                 mapped{other.mapped} {
+Buffer::Buffer(Buffer &&other) noexcept : VulkanResource{other.handle, other.device},
+                                          allocation{other.allocation},
+                                          memory{other.memory},
+                                          size{other.size},
+                                          mapped_data{other.mapped_data},
+                                          mapped{other.mapped} {
     // Reset other handles to avoid releasing on destruction
     other.allocation = VK_NULL_HANDLE;
     other.memory = VK_NULL_HANDLE;
@@ -133,5 +134,4 @@ void Buffer::update(const uint8_t *data, const size_t size, const size_t offset)
     }
 }
 
-}
-}// namespace vox::core
+}// namespace vox

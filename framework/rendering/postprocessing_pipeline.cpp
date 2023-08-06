@@ -6,11 +6,10 @@
 
 #include "postprocessing_pipeline.h"
 
-#include "common/utils.h"
-
 namespace vox {
-PostProcessingPipeline::PostProcessingPipeline(RenderContext &render_context, ShaderSource triangle_vs) : render_context{&render_context},
-                                                                                                          triangle_vs{std::move(triangle_vs)} {}
+PostProcessingPipeline::PostProcessingPipeline(RenderContext &render_context,
+                                               ShaderSource triangle_vs) : render_context{&render_context},
+                                                                           triangle_vs{std::move(triangle_vs)} {}
 
 void PostProcessingPipeline::draw(CommandBuffer &command_buffer, RenderTarget &default_render_target) {
     for (current_pass_index = 0; current_pass_index < passes.size(); current_pass_index++) {

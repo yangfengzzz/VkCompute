@@ -13,7 +13,6 @@
 namespace vox {
 class Device;
 
-namespace core {
 /**
  * @brief Represents a Vulkan Sampler
  */
@@ -28,13 +27,13 @@ public:
 
     Sampler(const Sampler &) = delete;
 
-    Sampler(Sampler &&sampler);
+    Sampler(Sampler &&sampler) noexcept;
 
-    ~Sampler();
+    ~Sampler() override;
 
     Sampler &operator=(const Sampler &) = delete;
 
     Sampler &operator=(Sampler &&) = delete;
 };
-}// namespace core
+
 }// namespace vox
