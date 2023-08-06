@@ -20,23 +20,6 @@ VKBP_ENABLE_WARNINGS()
 namespace vox {
 class CommandBuffer;
 
-struct alignas(16) Light {
-    glm::vec4 position; // position.w represents type of light
-    glm::vec4 color;    // color.w represents light intensity
-    glm::vec4 direction;// direction.w represents range
-    glm::vec2 info;     // (only used for spot lights) info.x represents light inner cone angle, info.y represents light outer cone angle
-};
-
-struct LightingState {
-    std::vector<Light> directional_lights;
-
-    std::vector<Light> point_lights;
-
-    std::vector<Light> spot_lights;
-
-    BufferAllocation light_buffer;
-};
-
 /**
  * @brief Calculates the vulkan style projection matrix
  * @param proj The projection matrix
@@ -85,41 +68,39 @@ public:
 
     RenderContext &get_render_context();
 
-    const ShaderSource &get_vertex_shader() const;
+    [[nodiscard]] const ShaderSource &get_vertex_shader() const;
 
-    const ShaderSource &get_fragment_shader() const;
+    [[nodiscard]] const ShaderSource &get_fragment_shader() const;
 
     DepthStencilState &get_depth_stencil_state();
 
-    const std::vector<uint32_t> &get_input_attachments() const;
+    [[nodiscard]] const std::vector<uint32_t> &get_input_attachments() const;
 
     void set_input_attachments(std::vector<uint32_t> input);
 
-    const std::vector<uint32_t> &get_output_attachments() const;
+    [[nodiscard]] const std::vector<uint32_t> &get_output_attachments() const;
 
     void set_output_attachments(std::vector<uint32_t> output);
 
     void set_sample_count(VkSampleCountFlagBits sample_count);
 
-    const std::vector<uint32_t> &get_color_resolve_attachments() const;
+    [[nodiscard]] const std::vector<uint32_t> &get_color_resolve_attachments() const;
 
     void set_color_resolve_attachments(std::vector<uint32_t> color_resolve);
 
-    const bool &get_disable_depth_stencil_attachment() const;
+    [[nodiscard]] const bool &get_disable_depth_stencil_attachment() const;
 
     void set_disable_depth_stencil_attachment(bool disable_depth_stencil);
 
-    const uint32_t &get_depth_stencil_resolve_attachment() const;
+    [[nodiscard]] const uint32_t &get_depth_stencil_resolve_attachment() const;
 
     void set_depth_stencil_resolve_attachment(uint32_t depth_stencil_resolve);
 
-    const VkResolveModeFlagBits get_depth_stencil_resolve_mode() const;
+    [[nodiscard]] const VkResolveModeFlagBits get_depth_stencil_resolve_mode() const;
 
     void set_depth_stencil_resolve_mode(VkResolveModeFlagBits mode);
 
-    LightingState &get_lighting_state();
-
-    const std::string &get_debug_name() const;
+    [[nodiscard]] const std::string &get_debug_name() const;
 
     void set_debug_name(const std::string &name);
 
@@ -130,9 +111,6 @@ protected:
 
     // A map of shader resource names and the mode of constant data
     std::unordered_map<std::string, ShaderResourceMode> resource_mode_map;
-
-    /// The structure containing all the requested render-ready lights for the scene
-    LightingState lighting_state{};
 
 private:
     std::string debug_name{};

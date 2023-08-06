@@ -9,11 +9,6 @@
 #include "render_context.h"
 
 namespace vox {
-const std::vector<std::string> light_type_definitions = {
-    "DIRECTIONAL_LIGHT " + std::to_string(static_cast<float>(sg::LightType::Directional)),
-    "POINT_LIGHT " + std::to_string(static_cast<float>(sg::LightType::Point)),
-    "SPOT_LIGHT " + std::to_string(static_cast<float>(sg::LightType::Spot))};
-
 glm::mat4 vulkan_style_projection(const glm::mat4 &proj) {
     // Flip Y in clipspace. X = -1, Y = -1 is topLeft in Vulkan.
     glm::mat4 mat = proj;
@@ -22,9 +17,10 @@ glm::mat4 vulkan_style_projection(const glm::mat4 &proj) {
     return mat;
 }
 
-Subpass::Subpass(RenderContext &render_context, ShaderSource &&vertex_source, ShaderSource &&fragment_source) : render_context{render_context},
-                                                                                                                vertex_shader{std::move(vertex_source)},
-                                                                                                                fragment_shader{std::move(fragment_source)} {
+Subpass::Subpass(RenderContext &render_context, ShaderSource &&vertex_source,
+                 ShaderSource &&fragment_source) : render_context{render_context},
+                                                   vertex_shader{std::move(vertex_source)},
+                                                   fragment_shader{std::move(fragment_source)} {
 }
 
 void Subpass::update_render_target_attachments(RenderTarget &render_target) {
@@ -98,10 +94,6 @@ void Subpass::set_depth_stencil_resolve_mode(VkResolveModeFlagBits mode) {
 
 void Subpass::set_sample_count(VkSampleCountFlagBits sample_count) {
     this->sample_count = sample_count;
-}
-
-LightingState &Subpass::get_lighting_state() {
-    return lighting_state;
 }
 
 const std::string &Subpass::get_debug_name() const {

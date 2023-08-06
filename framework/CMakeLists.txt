@@ -329,7 +329,7 @@ source_group("platform\\" FILES ${PLATFORM_FILES})
 #source_group("platform\\unix" FILES ${LINUX_D2D_FILES})
 #source_group("core\\" FILES ${CORE_FILES})
 #source_group("geometry\\" FILES ${GEOMETRY_FILES})
-#source_group("rendering\\" FILES ${RENDERING_FILES})
+source_group("rendering\\" FILES ${RENDERING_FILES})
 #source_group("rendering\\subpasses" FILES ${RENDERING_SUBPASSES_FILES})
 #source_group("scene_graph\\" FILES ${SCENE_GRAPH_FILES})
 #source_group("scene_graph\\components\\" FILES ${SCENE_GRAPH_COMPONENT_FILES})
@@ -343,7 +343,7 @@ set(PROJECT_FILES
         ${FRAMEWORK_FILES}
         ${CORE_FILES}
         #    ${GEOMETRY_FILES}
-        #    ${RENDERING_FILES}
+        ${RENDERING_FILES}
         #    ${RENDERING_SUBPASSES_FILES}
         #    ${SCENE_GRAPH_FILES}
         #    ${SCENE_GRAPH_COMPONENT_FILES}
@@ -448,7 +448,7 @@ target_link_libraries(${PROJECT_NAME} PUBLIC
         vma
         #    hwcpipe
         #    spirv-cross-glsl
-        #    glslang-default-resource-limits
+        glslang-default-resource-limits
         spdlog
         #    ctpl
         #    CLI11::CLI11

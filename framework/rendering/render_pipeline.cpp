@@ -6,16 +6,6 @@
 
 #include "render_pipeline.h"
 
-#include "scene_graph/components/camera.h"
-#include "scene_graph/components/image.h"
-#include "scene_graph/components/material.h"
-#include "scene_graph/components/mesh.h"
-#include "scene_graph/components/pbr_material.h"
-#include "scene_graph/components/sampler.h"
-#include "scene_graph/components/sub_mesh.h"
-#include "scene_graph/components/texture.h"
-#include "scene_graph/node.h"
-
 namespace vox {
 RenderPipeline::RenderPipeline(std::vector<std::unique_ptr<Subpass>> &&subpasses_) : subpasses{std::move(subpasses_)} {
     prepare();

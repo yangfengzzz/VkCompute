@@ -9,18 +9,14 @@
 #include "command_pool.h"
 #include "common/error.h"
 #include "device.h"
-#include "rendering/render_frame.h"
 #include "rendering/subpass.h"
 
-VKBP_DISABLE_WARNINGS()
-#include <glm/gtc/type_ptr.hpp>
-VKBP_ENABLE_WARNINGS()
-
 namespace vox {
-CommandBuffer::CommandBuffer(CommandPool &command_pool, VkCommandBufferLevel level) : VulkanResource{VK_NULL_HANDLE, &command_pool.get_device()},
-                                                                                      command_pool{command_pool},
-                                                                                      max_push_constants_size{device->get_gpu().get_properties().limits.maxPushConstantsSize},
-                                                                                      level{level} {
+CommandBuffer::CommandBuffer(CommandPool &command_pool,
+                             VkCommandBufferLevel level) : VulkanResource{VK_NULL_HANDLE, &command_pool.get_device()},
+                                                           command_pool{command_pool},
+                                                           max_push_constants_size{device->get_gpu().get_properties().limits.maxPushConstantsSize},
+                                                           level{level} {
     VkCommandBufferAllocateInfo allocate_info{VK_STRUCTURE_TYPE_COMMAND_BUFFER_ALLOCATE_INFO};
 
     allocate_info.commandPool = command_pool.get_handle();
@@ -69,7 +65,8 @@ VkResult CommandBuffer::begin(VkCommandBufferUsageFlags flags, CommandBuffer *pr
     return begin(flags, nullptr, nullptr, 0);
 }
 
-VkResult CommandBuffer::begin(VkCommandBufferUsageFlags flags, const RenderPass *render_pass, const Framebuffer *framebuffer, uint32_t subpass_index) {
+VkResult CommandBuffer::begin(VkCommandBufferUsageFlags flags, const RenderPass *render_pass,
+                              const Framebuffer *framebuffer, uint32_t subpass_index) {
     // Reset state
     pipeline_state.reset();
     resource_binding_state.reset();
@@ -110,7 +107,9 @@ void CommandBuffer::flush(VkPipelineBindPoint pipeline_bind_point) {
     flush_descriptor_state(pipeline_bind_point);
 }
 
-void CommandBuffer::begin_render_pass(const RenderTarget &render_target, const std::vector<LoadStoreInfo> &load_store_infos, const std::vector<VkClearValue> &clear_values, const std::vector<std::unique_ptr<Subpass>> &subpasses, VkSubpassContents contents) {
+void CommandBuffer::begin_render_pass(const RenderTarget &render_target, const std::vector<LoadStoreInfo> &load_store_infos,
+                                      const std::vector<VkClearValue> &clear_values, const std::vector<std::unique_ptr<Subpass>> &subpasses,
+                                      VkSubpassContents contents) {
     // Reset state
     pipeline_state.reset();
     resource_binding_state.reset();
@@ -122,7 +121,9 @@ void CommandBuffer::begin_render_pass(const RenderTarget &render_target, const s
     begin_render_pass(render_target, render_pass, framebuffer, clear_values, contents);
 }
 
-void CommandBuffer::begin_render_pass(const RenderTarget &render_target, const RenderPass &render_pass, const Framebuffer &framebuffer, const std::vector<VkClearValue> &clear_values, VkSubpassContents contents) {
+void CommandBuffer::begin_render_pass(const RenderTarget &render_target, const RenderPass &render_pass,
+                                      const Framebuffer &framebuffer, const std::vector<VkClearValue> &clear_values,
+                                      VkSubpassContents contents) {
     current_render_pass.render_pass = &render_pass;
     current_render_pass.framebuffer = &framebuffer;
 
@@ -141,7 +142,7 @@ void CommandBuffer::begin_render_pass(const RenderTarget &render_target, const R
         // Only prints the warning if the framebuffer or render area are different since the last time the render size was not optimal
         if (framebuffer_extent.width != last_framebuffer_extent.width || framebuffer_extent.height != last_framebuffer_extent.height ||
             begin_info.renderArea.extent.width != last_render_area_extent.width || begin_info.renderArea.extent.height != last_render_area_extent.height) {
-            LOGW("Render target extent is not an optimal size, this may result in reduced performance.");
+            LOGW("Render target extent is not an optimal size, this may result in reduced performance.")
         }
 
         last_framebuffer_extent = current_render_pass.framebuffer->get_extent();
@@ -202,18 +203,21 @@ void CommandBuffer::push_constants(const std::vector<uint8_t> &values) {
     uint32_t push_constant_size = to_u32(stored_push_constants.size() + values.size());
 
     if (push_constant_size > max_push_constants_size) {
-        LOGE("Push constant limit of {} exceeded (pushing {} bytes for a total of {} bytes)", max_push_constants_size, values.size(), push_constant_size);
+        LOGE("Push constant limit of {} exceeded (pushing {} bytes for a total of {} bytes)", max_push_constants_size,
+             values.size(), push_constant_size)
         throw std::runtime_error("Push constant limit exceeded.");
     } else {
         stored_push_constants.insert(stored_push_constants.end(), values.begin(), values.end());
     }
 }
 
-void CommandBuffer::bind_buffer(const core::Buffer &buffer, VkDeviceSize offset, VkDeviceSize range, uint32_t set, uint32_t binding, uint32_t array_element) {
+void CommandBuffer::bind_buffer(const core::Buffer &buffer, VkDeviceSize offset, VkDeviceSize range,
+                                uint32_t set, uint32_t binding, uint32_t array_element) {
     resource_binding_state.bind_buffer(buffer, offset, range, set, binding, array_element);
 }
 
-void CommandBuffer::bind_image(const core::ImageView &image_view, const core::Sampler &sampler, uint32_t set, uint32_t binding, uint32_t array_element) {
+void CommandBuffer::bind_image(const core::ImageView &image_view, const core::Sampler &sampler,
+                               uint32_t set, uint32_t binding, uint32_t array_element) {
     resource_binding_state.bind_image(image_view, sampler, set, binding, array_element);
 }
 
@@ -225,7 +229,9 @@ void CommandBuffer::bind_input(const core::ImageView &image_view, uint32_t set, 
     resource_binding_state.bind_input(image_view, set, binding, array_element);
 }
 
-void CommandBuffer::bind_vertex_buffers(uint32_t first_binding, const std::vector<std::reference_wrapper<const vox::core::Buffer>> &buffers, const std::vector<VkDeviceSize> &offsets) {
+void CommandBuffer::bind_vertex_buffers(uint32_t first_binding,
+                                        const std::vector<std::reference_wrapper<const vox::core::Buffer>> &buffers,
+                                        const std::vector<VkDeviceSize> &offsets) {
     std::vector<VkBuffer> buffer_handles(buffers.size(), VK_NULL_HANDLE);
     std::transform(buffers.begin(), buffers.end(), buffer_handles.begin(),
                    [](const core::Buffer &buffer) { return buffer.get_handle(); });
@@ -234,14 +240,6 @@ void CommandBuffer::bind_vertex_buffers(uint32_t first_binding, const std::vecto
 
 void CommandBuffer::bind_index_buffer(const core::Buffer &buffer, VkDeviceSize offset, VkIndexType index_type) {
     vkCmdBindIndexBuffer(get_handle(), buffer.get_handle(), offset, index_type);
-}
-
-void CommandBuffer::bind_lighting(LightingState &lighting_state, uint32_t set, uint32_t binding) {
-    bind_buffer(lighting_state.light_buffer.get_buffer(), lighting_state.light_buffer.get_offset(), lighting_state.light_buffer.get_size(), set, binding, 0);
-
-    set_specialization_constant(0, to_u32(lighting_state.directional_lights.size()));
-    set_specialization_constant(1, to_u32(lighting_state.point_lights.size()));
-    set_specialization_constant(2, to_u32(lighting_state.spot_lights.size()));
 }
 
 void CommandBuffer::set_viewport_state(const ViewportState &state_info) {
@@ -302,7 +300,8 @@ void CommandBuffer::draw(uint32_t vertex_count, uint32_t instance_count, uint32_
     vkCmdDraw(get_handle(), vertex_count, instance_count, first_vertex, first_instance);
 }
 
-void CommandBuffer::draw_indexed(uint32_t index_count, uint32_t instance_count, uint32_t first_index, int32_t vertex_offset, uint32_t first_instance) {
+void CommandBuffer::draw_indexed(uint32_t index_count, uint32_t instance_count, uint32_t first_index,
+                                 int32_t vertex_offset, uint32_t first_instance) {
     flush(VK_PIPELINE_BIND_POINT_GRAPHICS);
 
     vkCmdDrawIndexed(get_handle(), index_count, instance_count, first_index, vertex_offset, first_instance);
@@ -354,13 +353,15 @@ void CommandBuffer::copy_image(const core::Image &src_img, const core::Image &ds
                    to_u32(regions.size()), regions.data());
 }
 
-void CommandBuffer::copy_buffer_to_image(const core::Buffer &buffer, const core::Image &image, const std::vector<VkBufferImageCopy> &regions) {
+void CommandBuffer::copy_buffer_to_image(const core::Buffer &buffer, const core::Image &image,
+                                         const std::vector<VkBufferImageCopy> &regions) {
     vkCmdCopyBufferToImage(get_handle(), buffer.get_handle(),
                            image.get_handle(), VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL,
                            to_u32(regions.size()), regions.data());
 }
 
-void CommandBuffer::copy_image_to_buffer(const core::Image &image, VkImageLayout image_layout, const core::Buffer &buffer, const std::vector<VkBufferImageCopy> &regions) {
+void CommandBuffer::copy_image_to_buffer(const core::Image &image, VkImageLayout image_layout, const core::Buffer &buffer,
+                                         const std::vector<VkBufferImageCopy> &regions) {
     vkCmdCopyImageToBuffer(get_handle(), image.get_handle(), image_layout,
                            buffer.get_handle(), to_u32(regions.size()), regions.data());
 }
@@ -399,7 +400,8 @@ void CommandBuffer::image_memory_barrier(const core::ImageView &image_view, cons
         &image_memory_barrier);
 }
 
-void CommandBuffer::buffer_memory_barrier(const core::Buffer &buffer, VkDeviceSize offset, VkDeviceSize size, const BufferMemoryBarrier &memory_barrier) {
+void CommandBuffer::buffer_memory_barrier(const core::Buffer &buffer, VkDeviceSize offset, VkDeviceSize size,
+                                          const BufferMemoryBarrier &memory_barrier) {
     VkBufferMemoryBarrier buffer_memory_barrier{VK_STRUCTURE_TYPE_BUFFER_MEMORY_BARRIER};
     buffer_memory_barrier.srcAccessMask = memory_barrier.src_access_mask;
     buffer_memory_barrier.dstAccessMask = memory_barrier.dst_access_mask;
@@ -611,9 +613,10 @@ void CommandBuffer::flush_push_constants() {
     VkShaderStageFlags shader_stage = pipeline_layout.get_push_constant_range_stage(to_u32(stored_push_constants.size()));
 
     if (shader_stage) {
-        vkCmdPushConstants(get_handle(), pipeline_layout.get_handle(), shader_stage, 0, to_u32(stored_push_constants.size()), stored_push_constants.data());
+        vkCmdPushConstants(get_handle(), pipeline_layout.get_handle(), shader_stage, 0, to_u32(stored_push_constants.size()),
+                           stored_push_constants.data());
     } else {
-        LOGW("Push constant range [{}, {}] not found", 0, stored_push_constants.size());
+        LOGW("Push constant range [{}, {}] not found", 0, stored_push_constants.size())
     }
 
     stored_push_constants.clear();
@@ -668,7 +671,8 @@ VkResult CommandBuffer::reset(ResetMode reset_mode) {
     return result;
 }
 
-RenderPass &CommandBuffer::get_render_pass(const vox::RenderTarget &render_target, const std::vector<LoadStoreInfo> &load_store_infos, const std::vector<std::unique_ptr<Subpass>> &subpasses) {
+RenderPass &CommandBuffer::get_render_pass(const vox::RenderTarget &render_target, const std::vector<LoadStoreInfo> &load_store_infos,
+                                           const std::vector<std::unique_ptr<Subpass>> &subpasses) {
     // Create render pass
     assert(subpasses.size() > 0 && "Cannot create a render pass without any subpass");
 

@@ -29,7 +29,6 @@ class PipelineLayout;
 class PipelineState;
 class RenderTarget;
 class Subpass;
-struct LightingState;
 
 /**
  * @brief Helper class to manage and record a command buffer, building and
@@ -90,15 +89,21 @@ public:
 	 * @param subpass_index
 	 * @return Whether it succeeded or not
 	 */
-    VkResult begin(VkCommandBufferUsageFlags flags, const RenderPass *render_pass, const Framebuffer *framebuffer, uint32_t subpass_index);
+    VkResult begin(VkCommandBufferUsageFlags flags, const RenderPass *render_pass,
+                   const Framebuffer *framebuffer, uint32_t subpass_index);
 
     VkResult end();
 
     void clear(VkClearAttachment info, VkClearRect rect);
 
-    void begin_render_pass(const RenderTarget &render_target, const std::vector<LoadStoreInfo> &load_store_infos, const std::vector<VkClearValue> &clear_values, const std::vector<std::unique_ptr<Subpass>> &subpasses, VkSubpassContents contents = VK_SUBPASS_CONTENTS_INLINE);
+    void begin_render_pass(const RenderTarget &render_target, const std::vector<LoadStoreInfo> &load_store_infos,
+                           const std::vector<VkClearValue> &clear_values,
+                           const std::vector<std::unique_ptr<Subpass>> &subpasses,
+                           VkSubpassContents contents = VK_SUBPASS_CONTENTS_INLINE);
 
-    void begin_render_pass(const RenderTarget &render_target, const RenderPass &render_pass, const Framebuffer &framebuffer, const std::vector<VkClearValue> &clear_values, VkSubpassContents contents = VK_SUBPASS_CONTENTS_INLINE);
+    void begin_render_pass(const RenderTarget &render_target, const RenderPass &render_pass,
+                           const Framebuffer &framebuffer, const std::vector<VkClearValue> &clear_values,
+                           VkSubpassContents contents = VK_SUBPASS_CONTENTS_INLINE);
 
     void next_subpass();
 
@@ -128,26 +133,27 @@ public:
         uint32_t size = to_u32(stored_push_constants.size() + data.size());
 
         if (size > max_push_constants_size) {
-            LOGE("Push constant limit exceeded ({} / {} bytes)", size, max_push_constants_size);
+            LOGE("Push constant limit exceeded ({} / {} bytes)", size, max_push_constants_size)
             throw std::runtime_error("Cannot overflow push constant limit");
         }
 
         stored_push_constants.insert(stored_push_constants.end(), data.begin(), data.end());
     }
 
-    void bind_buffer(const core::Buffer &buffer, VkDeviceSize offset, VkDeviceSize range, uint32_t set, uint32_t binding, uint32_t array_element);
+    void bind_buffer(const core::Buffer &buffer, VkDeviceSize offset, VkDeviceSize range,
+                     uint32_t set, uint32_t binding, uint32_t array_element);
 
-    void bind_image(const core::ImageView &image_view, const core::Sampler &sampler, uint32_t set, uint32_t binding, uint32_t array_element);
+    void bind_image(const core::ImageView &image_view, const core::Sampler &sampler,
+                    uint32_t set, uint32_t binding, uint32_t array_element);
 
     void bind_image(const core::ImageView &image_view, uint32_t set, uint32_t binding, uint32_t array_element);
 
     void bind_input(const core::ImageView &image_view, uint32_t set, uint32_t binding, uint32_t array_element);
 
-    void bind_vertex_buffers(uint32_t first_binding, const std::vector<std::reference_wrapper<const vox::core::Buffer>> &buffers, const std::vector<VkDeviceSize> &offsets);
+    void bind_vertex_buffers(uint32_t first_binding, const std::vector<std::reference_wrapper<const vox::core::Buffer>> &buffers,
+                             const std::vector<VkDeviceSize> &offsets);
 
     void bind_index_buffer(const core::Buffer &buffer, VkDeviceSize offset, VkIndexType index_type);
-
-    void bind_lighting(LightingState &lighting_state, uint32_t set, uint32_t binding);
 
     void set_viewport_state(const ViewportState &state_info);
 
@@ -177,7 +183,8 @@ public:
 
     void draw(uint32_t vertex_count, uint32_t instance_count, uint32_t first_vertex, uint32_t first_instance);
 
-    void draw_indexed(uint32_t index_count, uint32_t instance_count, uint32_t first_index, int32_t vertex_offset, uint32_t first_instance);
+    void draw_indexed(uint32_t index_count, uint32_t instance_count, uint32_t first_index,
+                      int32_t vertex_offset, uint32_t first_instance);
 
     void draw_indexed_indirect(const core::Buffer &buffer, VkDeviceSize offset, uint32_t draw_count, uint32_t stride);
 
@@ -197,11 +204,13 @@ public:
 
     void copy_buffer_to_image(const core::Buffer &buffer, const core::Image &image, const std::vector<VkBufferImageCopy> &regions);
 
-    void copy_image_to_buffer(const core::Image &image, VkImageLayout image_layout, const core::Buffer &buffer, const std::vector<VkBufferImageCopy> &regions);
+    void copy_image_to_buffer(const core::Image &image, VkImageLayout image_layout,
+                              const core::Buffer &buffer, const std::vector<VkBufferImageCopy> &regions);
 
     void image_memory_barrier(const core::ImageView &image_view, const ImageMemoryBarrier &memory_barrier) const;
 
-    void buffer_memory_barrier(const core::Buffer &buffer, VkDeviceSize offset, VkDeviceSize size, const BufferMemoryBarrier &memory_barrier);
+    void buffer_memory_barrier(const core::Buffer &buffer, VkDeviceSize offset,
+                               VkDeviceSize size, const BufferMemoryBarrier &memory_barrier);
 
     void set_update_after_bind(bool update_after_bind_);
 
@@ -219,7 +228,9 @@ public:
 	 */
     VkResult reset(ResetMode reset_mode);
 
-    RenderPass &get_render_pass(const vox::RenderTarget &render_target, const std::vector<LoadStoreInfo> &load_store_infos, const std::vector<std::unique_ptr<Subpass>> &subpasses);
+    RenderPass &get_render_pass(const vox::RenderTarget &render_target,
+                                const std::vector<LoadStoreInfo> &load_store_infos,
+                                const std::vector<std::unique_ptr<Subpass>> &subpasses);
 
     const VkCommandBufferLevel level;
 
