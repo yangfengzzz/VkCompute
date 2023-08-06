@@ -13,7 +13,7 @@ VKBP_DISABLE_WARNINGS()
 #include <stb_image_write.h>
 VKBP_ENABLE_WARNINGS()
 
-#include "platform/platform.h"
+//#include "platform/platform.h"
 
 namespace vox {
 namespace fs {
@@ -26,35 +26,35 @@ const std::unordered_map<Type, std::string> relative_paths = {
     {Type::Logs, "output/logs/"},
 };
 
-const std::string get(const Type type, const std::string &file) {
-    assert(relative_paths.size() == Type::TotalRelativePathTypes && "Not all paths are defined in filesystem, please check that each enum is specified");
-
-    // Check for special cases first
-    if (type == Type::WorkingDir) {
-        return Platform::get_external_storage_directory();
-    } else if (type == Type::Temp) {
-        return Platform::get_temp_directory();
-    }
-
-    // Check for relative paths
-    auto it = relative_paths.find(type);
-
-    if (relative_paths.size() < Type::TotalRelativePathTypes) {
-        throw std::runtime_error("Platform hasn't initialized the paths correctly");
-    } else if (it == relative_paths.end()) {
-        throw std::runtime_error("Path enum doesn't exist, or wasn't specified in the path map");
-    } else if (it->second.empty()) {
-        throw std::runtime_error("Path was found, but it is empty");
-    }
-
-    auto path = Platform::get_external_storage_directory() + it->second;
-
-    if (!is_directory(path)) {
-        create_path(Platform::get_external_storage_directory(), it->second);
-    }
-
-    return path + file;
-}
+//const std::string get(const Type type, const std::string &file) {
+//    assert(relative_paths.size() == Type::TotalRelativePathTypes && "Not all paths are defined in filesystem, please check that each enum is specified");
+//
+//    // Check for special cases first
+//    if (type == Type::WorkingDir) {
+//        return Platform::get_external_storage_directory();
+//    } else if (type == Type::Temp) {
+//        return Platform::get_temp_directory();
+//    }
+//
+//    // Check for relative paths
+//    auto it = relative_paths.find(type);
+//
+//    if (relative_paths.size() < Type::TotalRelativePathTypes) {
+//        throw std::runtime_error("Platform hasn't initialized the paths correctly");
+//    } else if (it == relative_paths.end()) {
+//        throw std::runtime_error("Path enum doesn't exist, or wasn't specified in the path map");
+//    } else if (it->second.empty()) {
+//        throw std::runtime_error("Path was found, but it is empty");
+//    }
+//
+//    auto path = Platform::get_external_storage_directory() + it->second;
+//
+//    if (!is_directory(path)) {
+//        create_path(Platform::get_external_storage_directory(), it->second);
+//    }
+//
+//    return path + file;
+//}
 }// namespace path
 
 bool is_directory(const std::string &path) {

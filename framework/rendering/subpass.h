@@ -12,8 +12,6 @@
 #include "rendering/pipeline_state.h"
 #include "rendering/render_context.h"
 #include "rendering/render_frame.h"
-#include "scene_graph/components/light.h"
-#include "scene_graph/node.h"
 
 VKBP_DISABLE_WARNINGS()
 #include "common/glm_common.h"
@@ -124,66 +122,6 @@ public:
     const std::string &get_debug_name() const;
 
     void set_debug_name(const std::string &name);
-
-    /**
-	 * @brief Prepares the lighting state to have its lights 
-	 * 
-	 * @tparam A light structure that has 'directional_lights', 'point_lights' and 'spot_light' array fields defined.
-	 * @param scene_lights All of the light components from the scene graph
-	 * @param light_count The maximum amount of lights allowed for any given type of light.
-	 */
-    template<typename T>
-    void allocate_lights(const std::vector<sg::Light *> &scene_lights,
-                         size_t light_count) {
-        assert(scene_lights.size() <= (light_count * sg::LightType::Max) && "Exceeding Max Light Capacity");
-
-        lighting_state.directional_lights.clear();
-        lighting_state.point_lights.clear();
-        lighting_state.spot_lights.clear();
-
-        for (auto &scene_light : scene_lights) {
-            const auto &properties = scene_light->get_properties();
-            auto &transform = scene_light->get_node()->get_transform();
-
-            Light light{{transform.get_translation(), static_cast<float>(scene_light->get_light_type())},
-                        {properties.color, properties.intensity},
-                        {transform.get_rotation() * properties.direction, properties.range},
-                        {properties.inner_cone_angle, properties.outer_cone_angle}};
-
-            switch (scene_light->get_light_type()) {
-                case sg::LightType::Directional: {
-                    if (lighting_state.directional_lights.size() < light_count) {
-                        lighting_state.directional_lights.push_back(light);
-                    }
-                    break;
-                }
-                case sg::LightType::Point: {
-                    if (lighting_state.point_lights.size() < light_count) {
-                        lighting_state.point_lights.push_back(light);
-                    }
-                    break;
-                }
-                case sg::LightType::Spot: {
-                    if (lighting_state.spot_lights.size() < light_count) {
-                        lighting_state.spot_lights.push_back(light);
-                    }
-                    break;
-                }
-                default:
-                    break;
-            }
-        }
-
-        T light_info;
-
-        std::copy(lighting_state.directional_lights.begin(), lighting_state.directional_lights.end(), light_info.directional_lights);
-        std::copy(lighting_state.point_lights.begin(), lighting_state.point_lights.end(), light_info.point_lights);
-        std::copy(lighting_state.spot_lights.begin(), lighting_state.spot_lights.end(), light_info.spot_lights);
-
-        auto &render_frame = get_render_context().get_active_frame();
-        lighting_state.light_buffer = render_frame.allocate_buffer(VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT, sizeof(T));
-        lighting_state.light_buffer.update(light_info);
-    }
 
 protected:
     RenderContext &render_context;

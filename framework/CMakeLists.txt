@@ -21,41 +21,42 @@ project(framework LANGUAGES C CXX)
 
 set(FRAMEWORK_FILES
         # Header Files
-        gui.h
+        #        gui.h
         glsl_compiler.h
-        spirv_reflection.h
-        gltf_loader.h
+        #        spirv_reflection.h
+        #        gltf_loader.h
         buffer_pool.h
         debug_info.h
         fence_pool.h
-        heightmap.h
+        #        heightmap.h
         semaphore_pool.h
         resource_binding_state.h
         resource_cache.h
         resource_record.h
         resource_replay.h
-        vulkan_sample.h
-        api_vulkan_sample.h
+        #        vulkan_sample.h
+        #        api_vulkan_sample.h
         timer.h
-        camera.h
+        #        camera.h
         # Source Files
-        gui.cpp
+        #        gui.cpp
         glsl_compiler.cpp
-        spirv_reflection.cpp
-        gltf_loader.cpp
+        #        spirv_reflection.cpp
+        #        gltf_loader.cpp
         debug_info.cpp
         buffer_pool.cpp
         fence_pool.cpp
-        heightmap.cpp
+        #        heightmap.cpp
         semaphore_pool.cpp
         resource_binding_state.cpp
         resource_cache.cpp
         resource_record.cpp
         resource_replay.cpp
-        vulkan_sample.cpp
-        api_vulkan_sample.cpp
+        #        vulkan_sample.cpp
+        #        api_vulkan_sample.cpp
         timer.cpp
-        camera.cpp)
+        #        camera.cpp
+        )
 
 set(COMMON_FILES
         # Header Files
@@ -250,27 +251,28 @@ set(CORE_FILES
 
 set(PLATFORM_FILES
         # Header Files
-        platform/application.h
-        platform/platform.h
+        #        platform/application.h
+        #        platform/platform.h
         platform/window.h
         platform/filesystem.h
         platform/input_events.h
         platform/configuration.h
         platform/parser.h
         platform/headless_window.h
-        platform/plugins/plugin.h
-        platform/plugins/plugin_base.h
+        #        platform/plugins/plugin.h
+        #        platform/plugins/plugin_base.h
 
         # Source Files
         platform/headless_window.cpp
-        platform/application.cpp
-        platform/platform.cpp
+        #        platform/application.cpp
+        #        platform/platform.cpp
         platform/window.cpp
         platform/filesystem.cpp
         platform/input_events.cpp
         platform/configuration.cpp
         platform/parser.cpp
-        platform/plugins/plugin.cpp)
+        #        platform/plugins/plugin.cpp
+        )
 
 set(GLFW_FILES
         # Header Files
@@ -316,9 +318,9 @@ set(LINUX_D2D_FILES
         platform/unix/unix_d2d_platform.cpp
         platform/unix/direct_window.cpp)
 
-#source_group("\\" FILES ${FRAMEWORK_FILES})
+source_group("\\" FILES ${FRAMEWORK_FILES})
 source_group("common\\" FILES ${COMMON_FILES})
-#source_group("platform\\" FILES ${PLATFORM_FILES})
+source_group("platform\\" FILES ${PLATFORM_FILES})
 #source_group("platform\\" FILES ${GLFW_FILES})
 #source_group("platform\\parsers" FILES ${PARSER_FILES})
 #source_group("platform\\windows" FILES ${WINDOWS_FILES})
@@ -335,11 +337,11 @@ source_group("common\\" FILES ${COMMON_FILES})
 #source_group("stats\\" FILES ${STATS_FILES})
 
 set(PROJECT_FILES
-        #    ${PLATFORM_FILES}
+        ${PLATFORM_FILES}
         #    ${PARSER_FILES}
         ${COMMON_FILES}
-        #    ${FRAMEWORK_FILES}
-        #    ${CORE_FILES}
+        ${FRAMEWORK_FILES}
+        ${CORE_FILES}
         #    ${GEOMETRY_FILES}
         #    ${RENDERING_FILES}
         #    ${RENDERING_SUBPASSES_FILES}
@@ -436,11 +438,11 @@ target_link_libraries(${PROJECT_NAME} PUBLIC
         vkb__core
         volk
         #    ktx
-        #    stb
+        stb
         #    astc
         #    imgui
         #    tinygltf
-            glm
+        glm
         glslang
         SPIRV
         vma

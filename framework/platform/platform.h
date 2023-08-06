@@ -13,7 +13,6 @@
 #include <core/platform/context.hpp>
 
 #include "apps.h"
-#include "common/optional.h"
 #include "common/utils.h"
 #include "common/vk_common.h"
 #include "platform/application.h"

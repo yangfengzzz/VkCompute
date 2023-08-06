@@ -274,8 +274,8 @@ set_target_properties(SPIRV PROPERTIES FOLDER "ThirdParty" POSITION_INDEPENDENT_
 #set_target_properties(hwcpipe PROPERTIES FOLDER "ThirdParty" POSITION_INDEPENDENT_CODE ON)
 
 # stb
-#add_library(stb INTERFACE)
-#target_include_directories(stb INTERFACE "${CMAKE_CURRENT_SOURCE_DIR}/stb")
+add_library(stb INTERFACE)
+target_include_directories(stb INTERFACE "${CMAKE_CURRENT_SOURCE_DIR}/stb")
 
 # astc
 #set(ASTC_DIR ${CMAKE_CURRENT_SOURCE_DIR}/astc)

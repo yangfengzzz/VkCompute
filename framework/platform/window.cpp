@@ -6,7 +6,7 @@
 
 #include "window.h"
 
-#include "platform/platform.h"
+//#include "platform/platform.h"
 
 namespace vox {
 Window::Window(const Properties &properties) : properties{properties} {

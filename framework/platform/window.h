@@ -6,7 +6,6 @@
 
 #pragma once
 
-#include "common/optional.h"
 #include "common/vk_common.h"
 #include "core/instance.h"
 
@@ -22,8 +21,8 @@ public:
     };
 
     struct OptionalExtent {
-        Optional<uint32_t> width;
-        Optional<uint32_t> height;
+        std::optional<uint32_t> width;
+        std::optional<uint32_t> height;
     };
 
     enum class Mode {
@@ -41,10 +40,10 @@ public:
     };
 
     struct OptionalProperties {
-        Optional<std::string> title;
-        Optional<Mode> mode;
-        Optional<bool> resizable;
-        Optional<Vsync> vsync;
+        std::optional<std::string> title;
+        std::optional<Mode> mode;
+        std::optional<bool> resizable;
+        std::optional<Vsync> vsync;
         OptionalExtent extent;
     };
 

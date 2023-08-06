@@ -10,7 +10,6 @@
 #include "device.h"
 #include "glsl_compiler.h"
 #include "platform/filesystem.h"
-#include "spirv_reflection.h"
 
 namespace vox {
 /**
@@ -56,9 +55,10 @@ inline std::vector<uint8_t> convert_to_bytes(std::vector<std::string> &lines) {
     return bytes;
 }
 
-ShaderModule::ShaderModule(Device &device, VkShaderStageFlagBits stage, const ShaderSource &glsl_source, const std::string &entry_point, const ShaderVariant &shader_variant) : device{device},
-                                                                                                                                                                                stage{stage},
-                                                                                                                                                                                entry_point{entry_point} {
+ShaderModule::ShaderModule(Device &device, VkShaderStageFlagBits stage, const ShaderSource &glsl_source,
+                           const std::string &entry_point, const ShaderVariant &shader_variant) : device{device},
+                                                                                                  stage{stage},
+                                                                                                  entry_point{entry_point} {
     debug_name = fmt::format("{} [variant {:X}] [entrypoint {}]",
                              glsl_source.get_filename(), shader_variant.get_id(), entry_point);
 
@@ -83,13 +83,6 @@ ShaderModule::ShaderModule(Device &device, VkShaderStageFlagBits stage, const Sh
     if (!glsl_compiler.compile_to_spirv(stage, convert_to_bytes(glsl_final_source), entry_point, shader_variant, spirv, info_log)) {
         LOGE("Shader compilation failed for shader \"{}\"", glsl_source.get_filename());
         LOGE("{}", info_log);
-        throw VulkanException{VK_ERROR_INITIALIZATION_FAILED};
-    }
-
-    SPIRVReflection spirv_reflection;
-
-    // Reflect all shader resources
-    if (!spirv_reflection.reflect_shader_resources(stage, spirv, resources, shader_variant)) {
         throw VulkanException{VK_ERROR_INITIALIZATION_FAILED};
     }
 
