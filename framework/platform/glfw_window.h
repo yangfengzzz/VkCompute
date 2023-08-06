@@ -21,7 +21,7 @@ class GlfwWindow : public Window {
 public:
     GlfwWindow(Platform *platform, const Window::Properties &properties);
 
-    virtual ~GlfwWindow();
+    ~GlfwWindow() override;
 
     VkSurfaceKHR create_surface(Instance &instance) override;
 
@@ -33,11 +33,11 @@ public:
 
     void close() override;
 
-    float get_dpi_factor() const override;
+    [[nodiscard]] float get_dpi_factor() const override;
 
-    float get_content_scale_factor() const override;
+    [[nodiscard]] float get_content_scale_factor() const override;
 
-    std::vector<const char *> get_required_surface_extensions() const override;
+    [[nodiscard]] std::vector<const char *> get_required_surface_extensions() const override;
 
 private:
     GLFWwindow *handle = nullptr;

@@ -16,12 +16,12 @@ enum UnixType {
 
 class UnixPlatform : public Platform {
 public:
-    UnixPlatform(const UnixType &type);
+    explicit UnixPlatform(const UnixType &type);
 
-    virtual ~UnixPlatform() = default;
+    ~UnixPlatform() override = default;
 
 protected:
-    virtual void create_window(const Window::Properties &properties) override;
+    void create_window(const Window::Properties &properties) override;
 
 private:
     UnixType type;

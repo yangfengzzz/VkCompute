@@ -7,6 +7,7 @@
 #include "platform.h"
 
 #include <algorithm>
+#include <utility>
 #include <vector>
 
 #include <spdlog/async_logger.h>
@@ -22,9 +23,9 @@ const uint32_t Platform::MIN_WINDOW_HEIGHT = 320;
 ExitCode Platform::initialize(std::function<void(float)> update,
                               std::function<void(uint32_t, uint32_t)> resize,
                               std::function<void(const InputEvent &)> event) {
-    update_callback = update;
-    resize_callback = resize;
-    event_callback = event;
+    update_callback = std::move(update);
+    resize_callback = std::move(resize);
+    event_callback = std::move(event);
 
     auto sinks = get_platform_sinks();
 
@@ -39,7 +40,7 @@ ExitCode Platform::initialize(std::function<void(float)> update,
     logger->set_pattern(LOGGER_FORMAT);
     spdlog::set_default_logger(logger);
 
-    LOGI("Logger initialized");
+    LOGI("Logger initialized")
 
     // Platform has been closed by a plugins initialization phase
     if (close_requested) {
@@ -49,7 +50,7 @@ ExitCode Platform::initialize(std::function<void(float)> update,
     create_window(window_properties);
 
     if (!window) {
-        LOGE("Window creation failed!");
+        LOGE("Window creation failed!")
         return ExitCode::FatalError;
     }
 
@@ -62,7 +63,7 @@ ExitCode Platform::main_loop() {
             update();
             window->process_events();
         } catch (std::exception &e) {
-            LOGE("Error Message: {}", e.what());
+            LOGE("Error Message: {}", e.what())
         }
     }
 

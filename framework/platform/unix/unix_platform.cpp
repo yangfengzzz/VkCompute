@@ -13,7 +13,6 @@
 
 VKBP_DISABLE_WARNINGS()
 #include <spdlog/sinks/stdout_color_sinks.h>
-#include <spdlog/spdlog.h>
 VKBP_ENABLE_WARNINGS()
 
 #ifndef VK_MVK_MACOS_SURFACE_EXTENSION_NAME

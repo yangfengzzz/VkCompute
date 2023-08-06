@@ -14,9 +14,9 @@ namespace vox {
  */
 class HeadlessWindow : public Window {
 public:
-    HeadlessWindow(const Window::Properties &properties);
+    explicit HeadlessWindow(const Window::Properties &properties);
 
-    virtual ~HeadlessWindow() = default;
+    ~HeadlessWindow() override = default;
 
     /**
 	 * @brief A direct window doesn't have a surface
@@ -34,9 +34,9 @@ public:
 
     void close() override;
 
-    float get_dpi_factor() const override;
+    [[nodiscard]] float get_dpi_factor() const override;
 
-    std::vector<const char *> get_required_surface_extensions() const override;
+    [[nodiscard]] std::vector<const char *> get_required_surface_extensions() const override;
 
 private:
     bool closed{false};
