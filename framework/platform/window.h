@@ -8,6 +8,7 @@
 
 #include "common/vk_common.h"
 #include "core/instance.h"
+#include <optional>
 
 namespace vox {
 /**

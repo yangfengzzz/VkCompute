@@ -32,7 +32,7 @@ target_compile_definitions(glm INTERFACE
     GLM_ENABLE_EXPERIMENTAL
 )
 if(NOT CMAKE_CXX_COMPILER_ID MATCHES "MSVC")
-    target_compile_definitions(glm INTERFACE GLM_FORCE_CXX14)
+    target_compile_definitions(glm INTERFACE GLM_FORCE_CXX17)
 endif()
 
 # tinygltf
