@@ -9,8 +9,7 @@
 #include "common/helpers.h"
 #include "common/vk_common.h"
 
-namespace vox {
-namespace core {
+namespace vox::core {
 class Device;
 
 class SemaphorePool {
@@ -44,5 +43,4 @@ private:
     uint32_t active_semaphore_count{0};
 };
 
-}
 }// namespace vox::core

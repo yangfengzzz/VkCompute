@@ -9,13 +9,13 @@
 #include "core/image.h"
 #include "device.h"
 
-namespace vox {
-namespace core {
+namespace vox::core {
 ImageView::ImageView(Image &img, VkImageViewType view_type, VkFormat format,
                      uint32_t mip_level, uint32_t array_layer,
-                     uint32_t n_mip_levels, uint32_t n_array_layers) : VulkanResource{VK_NULL_HANDLE, &img.get_device()},
-                                                                       image{&img},
-                                                                       format{format} {
+                     uint32_t n_mip_levels, uint32_t n_array_layers)
+    : VulkanResource{VK_NULL_HANDLE, &img.get_device()},
+      image{&img},
+      format{format} {
     if (format == VK_FORMAT_UNDEFINED) {
         this->format = format = image->get_format();
     }
@@ -48,10 +48,11 @@ ImageView::ImageView(Image &img, VkImageViewType view_type, VkFormat format,
     image->get_views().emplace(this);
 }
 
-ImageView::ImageView(ImageView &&other) : VulkanResource{std::move(other)},
-                                          image{other.image},
-                                          format{other.format},
-                                          subresource_range{other.subresource_range} {
+ImageView::ImageView(ImageView &&other) noexcept
+    : VulkanResource{std::move(other)},
+      image{other.image},
+      format{other.format},
+      subresource_range{other.subresource_range} {
     // Remove old view from image set and add this new one
     auto &views = image->get_views();
     views.erase(&other);
@@ -92,5 +93,4 @@ VkImageSubresourceLayers ImageView::get_subresource_layers() const {
     return subresource;
 }
 
-}
 }// namespace vox::core

@@ -30,8 +30,7 @@
 #include "rendering/framebuffer.h"
 #include "rendering/swapchain.h"
 
-namespace vox {
-namespace core {
+namespace vox::core {
 struct DriverVersion {
     uint16_t major;
     uint16_t minor;
@@ -237,5 +236,4 @@ private:
     ResourceCache resource_cache;
 };
 
-}
 }// namespace vox::core

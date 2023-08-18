@@ -66,8 +66,7 @@ bool operator!=(const vox::core::ColorBlendState &lhs, const vox::core::ColorBle
                        });
 }
 
-namespace vox {
-namespace core {
+namespace vox::core {
 void SpecializationConstantState::reset() {
     if (dirty) {
         specialization_constant_state.clear();
@@ -282,5 +281,4 @@ void PipelineState::clear_dirty() {
     specialization_constant_state.clear_dirty();
 }
 
-}
 }// namespace vox::core

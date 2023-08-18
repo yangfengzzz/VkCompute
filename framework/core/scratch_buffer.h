@@ -9,8 +9,7 @@
 #include "common/helpers.h"
 #include "common/vk_common.h"
 
-namespace vox {
-namespace core {
+namespace vox::core {
 class Device;
 
 /**
@@ -53,5 +52,4 @@ private:
     VkDeviceSize size{0};
 };
 
-}
 }// namespace vox::core

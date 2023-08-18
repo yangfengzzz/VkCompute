@@ -11,8 +11,7 @@
 #include "device.h"
 #include "rendering/render_target.h"
 
-namespace vox {
-namespace core {
+namespace vox::core {
 namespace {
 inline void set_structure_type(VkAttachmentDescription &attachment) {
     // VkAttachmentDescription has no sType field
@@ -428,5 +427,4 @@ VkExtent2D RenderPass::get_render_area_granularity() const {
     return render_area_granularity;
 }
 
-}
 }// namespace vox::core

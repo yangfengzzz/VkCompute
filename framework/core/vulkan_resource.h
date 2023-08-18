@@ -11,8 +11,7 @@
 #include <cstdint>
 #include <type_traits>
 
-namespace vox {
-namespace core {
+namespace vox::core {
 class Device;
 
 namespace detail {
@@ -87,5 +86,4 @@ protected:
     std::string debug_name;
 };
 
-}
 }// namespace vox::core

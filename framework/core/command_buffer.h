@@ -58,7 +58,7 @@ public:
 
     CommandBuffer(const CommandBuffer &) = delete;
 
-    CommandBuffer(CommandBuffer &&other);
+    CommandBuffer(CommandBuffer &&other) noexcept;
 
     ~CommandBuffer();
 
@@ -240,7 +240,7 @@ public:
 private:
     CommandPool &command_pool;
 
-    RenderPassBinding current_render_pass;
+    RenderPassBinding current_render_pass{};
 
     PipelineState pipeline_state;
 
@@ -262,12 +262,12 @@ private:
 
     const RenderPassBinding &get_current_render_pass() const;
 
-    const uint32_t get_current_subpass_index() const;
+    uint32_t get_current_subpass_index() const;
 
     /**
 	 * @brief Check that the render area is an optimal size by comparing to the render area granularity
 	 */
-    const bool is_render_size_optimal(const VkExtent2D &extent, const VkRect2D &render_area);
+    const bool is_render_size_optimal(const VkExtent2D &extent, const VkRect2D &render_area) const;
 
     /**
 	 * @brief Flush the pipeline state

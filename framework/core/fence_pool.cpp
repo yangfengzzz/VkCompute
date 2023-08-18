@@ -8,8 +8,7 @@
 
 #include "core/device.h"
 
-namespace vox {
-namespace core {
+namespace vox::core {
 FencePool::FencePool(Device &device) : device{device} {
 }
 
@@ -72,5 +71,4 @@ VkResult FencePool::reset() {
     return VK_SUCCESS;
 }
 
-}
 }// namespace vox::core

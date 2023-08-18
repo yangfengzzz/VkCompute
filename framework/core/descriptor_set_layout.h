@@ -9,8 +9,7 @@
 #include "common/helpers.h"
 #include "common/vk_common.h"
 
-namespace vox {
-namespace core {
+namespace vox::core {
 class DescriptorPool;
 class Device;
 class ShaderModule;
@@ -51,13 +50,13 @@ public:
 
     [[nodiscard]] const std::vector<VkDescriptorSetLayoutBinding> &get_bindings() const;
 
-    [[nodiscard]] std::unique_ptr<VkDescriptorSetLayoutBinding> get_layout_binding(const uint32_t binding_index) const;
+    [[nodiscard]] std::unique_ptr<VkDescriptorSetLayoutBinding> get_layout_binding(uint32_t binding_index) const;
 
     [[nodiscard]] std::unique_ptr<VkDescriptorSetLayoutBinding> get_layout_binding(const std::string &name) const;
 
     [[nodiscard]] const std::vector<VkDescriptorBindingFlagsEXT> &get_binding_flags() const;
 
-    [[nodiscard]] VkDescriptorBindingFlagsEXT get_layout_binding_flag(const uint32_t binding_index) const;
+    [[nodiscard]] VkDescriptorBindingFlagsEXT get_layout_binding_flag(uint32_t binding_index) const;
 
     [[nodiscard]] const std::vector<ShaderModule *> &get_shader_modules() const;
 
@@ -81,5 +80,4 @@ private:
     std::vector<ShaderModule *> shader_modules;
 };
 
-}
 }// namespace vox::core

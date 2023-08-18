@@ -11,8 +11,7 @@
 #include <algorithm>
 #include <functional>
 
-namespace vox {
-namespace core {
+namespace vox::core {
 namespace {
 #if defined(VKB_DEBUG) || defined(VKB_VALIDATION_LAYERS)
 
@@ -29,9 +28,9 @@ VKAPI_ATTR VkBool32 VKAPI_CALL debug_utils_messenger_callback(VkDebugUtilsMessag
     return VK_FALSE;
 }
 
-static VKAPI_ATTR VkBool32 VKAPI_CALL debug_callback(VkDebugReportFlagsEXT flags, VkDebugReportObjectTypeEXT /*type*/,
-                                                     uint64_t /*object*/, size_t /*location*/, int32_t /*message_code*/,
-                                                     const char *layer_prefix, const char *message, void * /*user_data*/) {
+VKAPI_ATTR VkBool32 VKAPI_CALL debug_callback(VkDebugReportFlagsEXT flags, VkDebugReportObjectTypeEXT /*type*/,
+                                              uint64_t /*object*/, size_t /*location*/, int32_t /*message_code*/,
+                                              const char *layer_prefix, const char *message, void * /*user_data*/) {
     if (flags & VK_DEBUG_REPORT_ERROR_BIT_EXT) {
         LOGE("{}: {}", layer_prefix, message);
     } else if (flags & VK_DEBUG_REPORT_WARNING_BIT_EXT) {
@@ -419,5 +418,4 @@ const std::vector<const char *> &Instance::get_extensions() {
     return enabled_extensions;
 }
 
-}
 }// namespace vox::core

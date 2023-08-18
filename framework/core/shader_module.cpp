@@ -11,8 +11,7 @@
 #include "common/filesystem.h"
 #include "core/device.h"
 
-namespace vox {
-namespace core {
+namespace vox::core {
 /**
  * @brief Pre-compiles project shader files to include header code
  * @param source The shader file
@@ -245,5 +244,4 @@ const std::string &ShaderSource::get_source() const {
     return source;
 }
 
-}
 }// namespace vox::core

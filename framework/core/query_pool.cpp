@@ -8,8 +8,7 @@
 
 #include "device.h"
 
-namespace vox {
-namespace core {
+namespace vox::core {
 QueryPool::QueryPool(Device &d, const VkQueryPoolCreateInfo &info) : device{d} {
     VK_CHECK(vkCreateQueryPool(device.get_handle(), &info, nullptr, &handle));
 }
@@ -44,5 +43,4 @@ VkResult QueryPool::get_results(uint32_t first_query, uint32_t num_queries,
                                  result_bytes, results, stride, flags);
 }
 
-}
 }// namespace vox::core

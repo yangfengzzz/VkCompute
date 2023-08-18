@@ -6,8 +6,7 @@
 
 #include "physical_device.h"
 
-namespace vox {
-namespace core {
+namespace vox::core {
 PhysicalDevice::PhysicalDevice(Instance &instance, VkPhysicalDevice physical_device) : instance{instance},
                                                                                        handle{physical_device} {
     vkGetPhysicalDeviceFeatures(physical_device, &features);
@@ -93,5 +92,4 @@ void *PhysicalDevice::get_extension_feature_chain() const {
     return last_requested_extension_feature;
 }
 
-}
 }// namespace vox::core

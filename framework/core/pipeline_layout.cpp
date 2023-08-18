@@ -10,8 +10,7 @@
 #include "device.h"
 #include "shader_module.h"
 
-namespace vox {
-namespace core {
+namespace vox::core {
 PipelineLayout::PipelineLayout(Device &device, const std::vector<ShaderModule *> &shader_modules)
     : device{device},
       shader_modules{shader_modules} {
@@ -159,5 +158,4 @@ VkShaderStageFlags PipelineLayout::get_push_constant_range_stage(uint32_t size, 
     return stages;
 }
 
-}
 }// namespace vox::core

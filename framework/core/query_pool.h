@@ -9,8 +9,7 @@
 #include "common/helpers.h"
 #include "common/vk_common.h"
 
-namespace vox {
-namespace core {
+namespace vox::core {
 class Device;
 
 /**
@@ -66,5 +65,4 @@ private:
     VkQueryPool handle{VK_NULL_HANDLE};
 };
 
-}
 }// namespace vox::core

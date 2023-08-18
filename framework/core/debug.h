@@ -10,8 +10,7 @@
 #include "common/vk_common.h"
 #include <cassert>
 
-namespace vox {
-namespace core {
+namespace vox::core {
 /**
  * @brief An interface over platform-specific debug extensions.
  */
@@ -137,5 +136,4 @@ private:
     VkCommandBuffer command_buffer;
 };
 
-}
 }// namespace vox::core

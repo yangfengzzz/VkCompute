@@ -16,10 +16,11 @@ namespace core {
 Device::Device(PhysicalDevice &gpu,
                VkSurfaceKHR surface,
                std::unique_ptr<DebugUtils> &&debug_utils,
-               std::unordered_map<const char *, bool> requested_extensions) : VulkanResource{VK_NULL_HANDLE, this},// Recursive, but valid
-                                                                              debug_utils{std::move(debug_utils)},
-                                                                              gpu{gpu},
-                                                                              resource_cache{*this} {
+               std::unordered_map<const char *, bool> requested_extensions)
+    : VulkanResource{VK_NULL_HANDLE, this},// Recursive, but valid
+      debug_utils{std::move(debug_utils)},
+      gpu{gpu},
+      resource_cache{*this} {
     LOGI("Selected GPU: {}", gpu.get_properties().deviceName)
 
     // Prepare the device queues

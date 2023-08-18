@@ -11,8 +11,7 @@
 #include "core/pipeline_state.h"
 #include "resource_cache.h"
 
-namespace vox {
-namespace core {
+namespace vox::core {
 namespace {
 inline void read_subpass_info(std::istringstream &is, std::vector<SubpassInfo> &value) {
     std::size_t size;
@@ -190,5 +189,4 @@ void ResourceReplay::create_graphics_pipeline(ResourceCache &resource_cache, std
     graphics_pipelines.push_back(&graphics_pipeline);
 }
 
-}
 }// namespace vox::core

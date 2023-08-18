@@ -9,8 +9,7 @@
 #include "command_buffer.h"
 #include "device.h"
 
-namespace vox {
-namespace core {
+namespace vox::core {
 Queue::Queue(Device &device, uint32_t family_index, VkQueueFamilyProperties properties,
              VkBool32 can_present, uint32_t index) : device{device},
                                                      family_index{family_index},
@@ -81,5 +80,4 @@ VkResult Queue::wait_idle() const {
     return vkQueueWaitIdle(handle);
 }
 
-}
 }// namespace vox::core

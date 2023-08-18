@@ -9,8 +9,7 @@
 #include "common/helpers.h"
 #include "common/vk_common.h"
 
-namespace vox {
-namespace core {
+namespace vox::core {
 class Device;
 class DescriptorSetLayout;
 class DescriptorPool;
@@ -106,5 +105,4 @@ private:
     std::unordered_map<uint32_t, size_t> updated_bindings;
 };
 
-}
 }// namespace vox::core

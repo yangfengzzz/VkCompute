@@ -10,8 +10,7 @@
 #include "common/vk_common.h"
 #include "core/pipeline_state.h"
 
-namespace vox {
-namespace core {
+namespace vox::core {
 class Device;
 
 class Pipeline {
@@ -62,5 +61,4 @@ public:
                      PipelineState &pipeline_state);
 };
 
-}
 }// namespace vox::core

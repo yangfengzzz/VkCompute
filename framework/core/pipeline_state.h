@@ -12,8 +12,7 @@
 #include "core/pipeline_layout.h"
 #include "core/render_pass.h"
 
-namespace vox {
-namespace core {
+namespace vox::core {
 
 struct VertexInputState {
     std::vector<VkVertexInputBindingDescription> bindings;
@@ -120,7 +119,7 @@ class SpecializationConstantState {
 public:
     void reset();
 
-    bool is_dirty() const;
+    [[nodiscard]] bool is_dirty() const;
 
     void clear_dirty();
 
@@ -131,7 +130,7 @@ public:
 
     void set_specialization_constant_state(const std::map<uint32_t, std::vector<uint8_t>> &state);
 
-    const std::map<uint32_t, std::vector<uint8_t>> &get_specialization_constant_state() const;
+    [[nodiscard]] const std::map<uint32_t, std::vector<uint8_t>> &get_specialization_constant_state() const;
 
 private:
     bool dirty{false};
@@ -175,29 +174,29 @@ public:
 
     void set_subpass_index(uint32_t subpass_index);
 
-    const PipelineLayout &get_pipeline_layout() const;
+    [[nodiscard]] const PipelineLayout &get_pipeline_layout() const;
 
-    const RenderPass *get_render_pass() const;
+    [[nodiscard]] const RenderPass *get_render_pass() const;
 
-    const SpecializationConstantState &get_specialization_constant_state() const;
+    [[nodiscard]] const SpecializationConstantState &get_specialization_constant_state() const;
 
-    const VertexInputState &get_vertex_input_state() const;
+    [[nodiscard]] const VertexInputState &get_vertex_input_state() const;
 
-    const InputAssemblyState &get_input_assembly_state() const;
+    [[nodiscard]] const InputAssemblyState &get_input_assembly_state() const;
 
-    const RasterizationState &get_rasterization_state() const;
+    [[nodiscard]] const RasterizationState &get_rasterization_state() const;
 
-    const ViewportState &get_viewport_state() const;
+    [[nodiscard]] const ViewportState &get_viewport_state() const;
 
-    const MultisampleState &get_multisample_state() const;
+    [[nodiscard]] const MultisampleState &get_multisample_state() const;
 
-    const DepthStencilState &get_depth_stencil_state() const;
+    [[nodiscard]] const DepthStencilState &get_depth_stencil_state() const;
 
-    const ColorBlendState &get_color_blend_state() const;
+    [[nodiscard]] const ColorBlendState &get_color_blend_state() const;
 
-    uint32_t get_subpass_index() const;
+    [[nodiscard]] uint32_t get_subpass_index() const;
 
-    bool is_dirty() const;
+    [[nodiscard]] bool is_dirty() const;
 
     void clear_dirty();
 
@@ -227,5 +226,4 @@ private:
     uint32_t subpass_index{0U};
 };
 
-}
 }// namespace vox::core

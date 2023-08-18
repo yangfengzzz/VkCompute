@@ -11,8 +11,7 @@
 #include "core/buffer.h"
 #include "core/scratch_buffer.h"
 
-namespace vox {
-namespace core {
+namespace vox::core {
 class Device;
 /**
  * @brief Wraps setup and access for a ray tracing top- or bottom-level acceleration structure
@@ -138,5 +137,4 @@ private:
     std::unique_ptr<Buffer> buffer{nullptr};
 };
 
-}
 }// namespace vox::core

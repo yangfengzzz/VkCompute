@@ -13,8 +13,7 @@
 #undef None
 #endif
 
-namespace vox {
-namespace core {
+namespace vox::core {
 class Device;
 
 /// Types of shader resources
@@ -240,5 +239,4 @@ private:
     std::string info_log;
 };
 
-}
 }// namespace vox::core

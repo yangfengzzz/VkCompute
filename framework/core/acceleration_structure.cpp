@@ -8,8 +8,7 @@
 
 #include "device.h"
 
-namespace vox {
-namespace core {
+namespace vox::core {
 AccelerationStructure::AccelerationStructure(Device &device,
                                              VkAccelerationStructureTypeKHR type) : device{device},
                                                                                     type{type} {
@@ -205,5 +204,4 @@ uint64_t AccelerationStructure::get_device_address() const {
     return device_address;
 }
 
-}
 }// namespace vox::core

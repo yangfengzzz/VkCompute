@@ -12,8 +12,7 @@
 #include "common/vk_common.h"
 #include "core/vulkan_resource.h"
 
-namespace vox {
-namespace core {
+namespace vox::core {
 class Device;
 class ImageView;
 
@@ -41,7 +40,7 @@ public:
 
     Image(const Image &) = delete;
 
-    Image(Image &&other);
+    Image(Image &&other) noexcept;
 
     ~Image() override;
 
@@ -49,36 +48,36 @@ public:
 
     Image &operator=(Image &&) = delete;
 
-    VmaAllocation get_memory() const;
+    [[nodiscard]] VmaAllocation get_memory() const;
 
     /**
 	 * @brief Maps vulkan memory to an host visible address
 	 * @return Pointer to host visible memory
 	 */
-    uint8_t *map();
+    [[nodiscard]] uint8_t *map();
 
     /**
 	 * @brief Unmaps vulkan memory from the host visible address
 	 */
     void unmap();
 
-    VkImageType get_type() const;
+    [[nodiscard]] VkImageType get_type() const;
 
-    const VkExtent3D &get_extent() const;
+    [[nodiscard]] const VkExtent3D &get_extent() const;
 
-    VkFormat get_format() const;
+    [[nodiscard]] VkFormat get_format() const;
 
-    VkSampleCountFlagBits get_sample_count() const;
+    [[nodiscard]] VkSampleCountFlagBits get_sample_count() const;
 
-    VkImageUsageFlags get_usage() const;
+    [[nodiscard]] VkImageUsageFlags get_usage() const;
 
-    VkImageTiling get_tiling() const;
+    [[nodiscard]] VkImageTiling get_tiling() const;
 
-    VkImageSubresource get_subresource() const;
+    [[nodiscard]] VkImageSubresource get_subresource() const;
 
-    uint32_t get_array_layer_count() const;
+    [[nodiscard]] uint32_t get_array_layer_count() const;
 
-    std::unordered_set<ImageView *> &get_views();
+    [[nodiscard]] std::unordered_set<ImageView *> &get_views();
 
 private:
     VmaAllocation memory{VK_NULL_HANDLE};
@@ -108,5 +107,4 @@ private:
     bool mapped{false};
 };
 
-}
 }// namespace vox::core

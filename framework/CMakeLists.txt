@@ -233,7 +233,7 @@ set(PROJECT_FILES
         ${PLATFORM_FILES}
         ${CORE_FILES}
         ${RENDERING_FILES}
-        #    ${STATS_FILES}
+        ${STATS_FILES}
         )
 
 # Add files based on platform
@@ -322,22 +322,14 @@ target_include_directories(${PROJECT_NAME} PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})
 target_link_libraries(${PROJECT_NAME} PUBLIC
         vkb__core
         volk
-        #    ktx
         stb
-        #    astc
-        #    imgui
-        #    tinygltf
         glm
         glslang
         SPIRV
         vma
-        #    hwcpipe
-        #    spirv-cross-glsl
+        hwcpipe
         glslang-default-resource-limits
         spdlog
-        #    ctpl
-        #    CLI11::CLI11
-        #    plugins
         )
 
 if (${NEED_LINK_ATOMIC})

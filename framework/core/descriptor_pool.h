@@ -11,8 +11,7 @@
 #include "common/helpers.h"
 #include "common/vk_common.h"
 
-namespace vox {
-namespace core {
+namespace vox::core {
 class Device;
 class DescriptorSetLayout;
 
@@ -74,5 +73,4 @@ private:
     uint32_t find_available_pool(uint32_t pool_index);
 };
 
-}
 }// namespace vox::core

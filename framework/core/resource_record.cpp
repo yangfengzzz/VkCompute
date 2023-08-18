@@ -12,8 +12,7 @@
 #include "core/shader_module.h"
 #include "resource_cache.h"
 
-namespace vox {
-namespace core {
+namespace vox::core {
 namespace {
 inline void write_subpass_info(std::ostringstream &os, const std::vector<SubpassInfo> &value) {
     write(os, value.size());
@@ -141,5 +140,4 @@ void ResourceRecord::set_graphics_pipeline(size_t index, const GraphicsPipeline 
     graphics_pipeline_to_index[&graphics_pipeline] = index;
 }
 
-}
 }// namespace vox::core

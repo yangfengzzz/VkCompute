@@ -11,8 +11,7 @@
 #include "core/descriptor_set_layout.h"
 #include "core/shader_module.h"
 
-namespace vox {
-namespace core {
+namespace vox::core {
 class Device;
 class ShaderModule;
 class DescriptorSetLayout;
@@ -64,5 +63,4 @@ private:
     std::vector<DescriptorSetLayout *> descriptor_set_layouts;
 };
 
-}
 }// namespace vox::core

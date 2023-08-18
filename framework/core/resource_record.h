@@ -10,8 +10,7 @@
 
 #include "core/pipeline_state.h"
 
-namespace vox {
-namespace core {
+namespace vox::core {
 class GraphicsPipeline;
 class PipelineLayout;
 class RenderPass;
@@ -77,5 +76,4 @@ private:
     std::unordered_map<const GraphicsPipeline *, size_t> graphics_pipeline_to_index;
 };
 
-}
 }// namespace vox::core

@@ -9,8 +9,7 @@
 #include "device.h"
 #include "rendering/render_frame.h"
 
-namespace vox {
-namespace core {
+namespace vox::core {
 CommandPool::CommandPool(Device &d, uint32_t queue_family_index,
                          rendering::RenderFrame *render_frame, size_t thread_index,
                          CommandBuffer::ResetMode reset_mode)
@@ -181,5 +180,4 @@ CommandBuffer::ResetMode CommandPool::get_reset_mode() const {
     return reset_mode;
 }
 
-}
 }// namespace vox::core

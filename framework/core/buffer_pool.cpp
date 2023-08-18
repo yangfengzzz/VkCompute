@@ -6,13 +6,10 @@
 
 #include "buffer_pool.h"
 
-#include <cstddef>
-
 #include "common/logging.h"
 #include "core/device.h"
 
-namespace vox {
-namespace core {
+namespace vox::core {
 BufferBlock::BufferBlock(Device &device, VkDeviceSize size, VkBufferUsageFlags usage, VmaMemoryUsage memory_usage) : buffer{device, size, usage, memory_usage} {
     if (usage == VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT) {
         alignment = device.get_gpu().get_properties().limits.minUniformBufferOffsetAlignment;
@@ -66,7 +63,7 @@ BufferBlock &BufferPool::request_buffer_block(const VkDeviceSize minimum_size, b
     if (it != buffer_blocks.end()) {
         // Recycle inactive block
         active_buffer_block_count++;
-        return *it->get();
+        return **it;
     }
 
     LOGD("Building #{} buffer block ({})", buffer_blocks.size(), usage);
@@ -121,5 +118,4 @@ Buffer &BufferAllocation::get_buffer() {
     return *buffer;
 }
 
-}
 }// namespace vox::core

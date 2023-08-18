@@ -9,8 +9,7 @@
 #include "descriptor_set_layout.h"
 #include "device.h"
 
-namespace vox {
-namespace core {
+namespace vox::core {
 DescriptorPool::DescriptorPool(Device &device,
                                const DescriptorSetLayout &descriptor_set_layout,
                                uint32_t pool_size) : device{device},
@@ -171,5 +170,4 @@ std::uint32_t DescriptorPool::find_available_pool(std::uint32_t search_index) {
     return find_available_pool(++search_index);
 }
 
-}
 }// namespace vox::core

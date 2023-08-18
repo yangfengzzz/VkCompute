@@ -11,8 +11,7 @@
 #include "core/image.h"
 #include "core/vulkan_resource.h"
 
-namespace vox {
-namespace core {
+namespace vox::core {
 class ImageView : public VulkanResource<VkImageView, VK_OBJECT_TYPE_IMAGE_VIEW, const Device> {
 public:
     ImageView(Image &image, VkImageViewType view_type, VkFormat format = VK_FORMAT_UNDEFINED,
@@ -21,7 +20,7 @@ public:
 
     ImageView(ImageView &) = delete;
 
-    ImageView(ImageView &&other);
+    ImageView(ImageView &&other) noexcept;
 
     ~ImageView() override;
 
@@ -29,7 +28,7 @@ public:
 
     ImageView &operator=(ImageView &&) = delete;
 
-    const Image &get_image() const;
+    [[nodiscard]] const Image &get_image() const;
 
     /**
 	 * @brief Update the image this view is referring to
@@ -37,11 +36,11 @@ public:
 	 */
     void set_image(Image &image);
 
-    VkFormat get_format() const;
+    [[nodiscard]] VkFormat get_format() const;
 
-    VkImageSubresourceRange get_subresource_range() const;
+    [[nodiscard]] VkImageSubresourceRange get_subresource_range() const;
 
-    VkImageSubresourceLayers get_subresource_layers() const;
+    [[nodiscard]] VkImageSubresourceLayers get_subresource_layers() const;
 
 private:
     Image *image{};
@@ -51,5 +50,4 @@ private:
     VkImageSubresourceRange subresource_range{};
 };
 
-}
 }// namespace vox::core

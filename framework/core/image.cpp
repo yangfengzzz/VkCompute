@@ -9,8 +9,7 @@
 #include "device.h"
 #include "image_view.h"
 
-namespace vox {
-namespace core {
+namespace vox::core {
 namespace {
 inline VkImageType find_image_type(VkExtent3D extent) {
     VkImageType result{};
@@ -117,18 +116,19 @@ Image::Image(Device const &device, VkImage handle, const VkExtent3D &extent, VkF
     subresource.arrayLayer = 1;
 }
 
-Image::Image(Image &&other) : VulkanResource{std::move(other)},
-                              memory{other.memory},
-                              type{other.type},
-                              extent{other.extent},
-                              format{other.format},
-                              sample_count{other.sample_count},
-                              usage{other.usage},
-                              tiling{other.tiling},
-                              subresource{other.subresource},
-                              views(std::exchange(other.views, {})),
-                              mapped_data{other.mapped_data},
-                              mapped{other.mapped} {
+Image::Image(Image &&other) noexcept
+    : VulkanResource{std::move(other)},
+      memory{other.memory},
+      type{other.type},
+      extent{other.extent},
+      format{other.format},
+      sample_count{other.sample_count},
+      usage{other.usage},
+      tiling{other.tiling},
+      subresource{other.subresource},
+      views(std::exchange(other.views, {})),
+      mapped_data{other.mapped_data},
+      mapped{other.mapped} {
     other.memory = VK_NULL_HANDLE;
     other.mapped_data = nullptr;
     other.mapped = false;
@@ -205,5 +205,4 @@ std::unordered_set<ImageView *> &Image::get_views() {
     return views;
 }
 
-}
 }// namespace vox::core

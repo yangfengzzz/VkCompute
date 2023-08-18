@@ -9,8 +9,7 @@
 #include "common/helpers.h"
 #include "common/vk_common.h"
 
-namespace vox {
-namespace core {
+namespace vox::core {
 class PhysicalDevice;
 /**
  * @brief Returns a list of Khronos/LunarG supported validation layers
@@ -129,5 +128,4 @@ private:
     std::vector<std::unique_ptr<PhysicalDevice>> gpus;
 };
 
-}
 }// namespace vox::core

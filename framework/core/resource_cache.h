@@ -19,8 +19,7 @@
 #include "core/resource_replay.h"
 #include "rendering/framebuffer.h"
 
-namespace vox {
-namespace core {
+namespace vox::core {
 class Device;
 class ImageView;
 
@@ -62,7 +61,7 @@ struct ResourceCacheState {
  */
 class ResourceCache {
 public:
-    ResourceCache(Device &device);
+    explicit ResourceCache(Device &device);
 
     ResourceCache(const ResourceCache &) = delete;
 
@@ -83,7 +82,7 @@ public:
 
     PipelineLayout &request_pipeline_layout(const std::vector<ShaderModule *> &shader_modules);
 
-    DescriptorSetLayout &request_descriptor_set_layout(const uint32_t set_index,
+    DescriptorSetLayout &request_descriptor_set_layout(uint32_t set_index,
                                                        const std::vector<ShaderModule *> &shader_modules,
                                                        const std::vector<ShaderResource> &set_resources);
 
@@ -143,5 +142,4 @@ private:
     std::mutex framebuffer_mutex;
 };
 
-}
 }// namespace vox::core

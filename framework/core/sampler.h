@@ -10,8 +10,7 @@
 #include "common/vk_common.h"
 #include "core/vulkan_resource.h"
 
-namespace vox {
-namespace core {
+namespace vox::core {
 class Device;
 
 /**
@@ -37,5 +36,4 @@ public:
     Sampler &operator=(Sampler &&) = delete;
 };
 
-}
 }// namespace vox::core

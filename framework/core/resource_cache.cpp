@@ -9,8 +9,7 @@
 #include "core/resource_caching.h"
 #include "core/device.h"
 
-namespace vox {
-namespace core {
+namespace vox::core {
 namespace {
 template<class T, class... A>
 T &request_resource(Device &device, ResourceRecord &recorder, std::mutex &resource_mutex,
@@ -182,5 +181,4 @@ const ResourceCacheState &ResourceCache::get_internal_state() const {
     return state;
 }
 
-}
 }// namespace vox::core

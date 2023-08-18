@@ -10,8 +10,7 @@
 #include "physical_device.h"
 #include "shader_module.h"
 
-namespace vox {
-namespace core {
+namespace vox::core {
 namespace {
 inline VkDescriptorType find_descriptor_type(ShaderResourceType resource_type, bool dynamic) {
     switch (resource_type) {
@@ -145,15 +144,16 @@ DescriptorSetLayout::DescriptorSetLayout(Device &device,
     }
 }
 
-DescriptorSetLayout::DescriptorSetLayout(DescriptorSetLayout &&other) noexcept : device{other.device},
-                                                                                 shader_modules{other.shader_modules},
-                                                                                 handle{other.handle},
-                                                                                 set_index{other.set_index},
-                                                                                 bindings{std::move(other.bindings)},
-                                                                                 binding_flags{std::move(other.binding_flags)},
-                                                                                 bindings_lookup{std::move(other.bindings_lookup)},
-                                                                                 binding_flags_lookup{std::move(other.binding_flags_lookup)},
-                                                                                 resources_lookup{std::move(other.resources_lookup)} {
+DescriptorSetLayout::DescriptorSetLayout(DescriptorSetLayout &&other) noexcept
+    : device{other.device},
+      shader_modules{other.shader_modules},
+      handle{other.handle},
+      set_index{other.set_index},
+      bindings{std::move(other.bindings)},
+      binding_flags{std::move(other.binding_flags)},
+      bindings_lookup{std::move(other.bindings_lookup)},
+      binding_flags_lookup{std::move(other.binding_flags_lookup)},
+      resources_lookup{std::move(other.resources_lookup)} {
     other.handle = VK_NULL_HANDLE;
 }
 
@@ -214,5 +214,4 @@ const std::vector<ShaderModule *> &DescriptorSetLayout::get_shader_modules() con
     return shader_modules;
 }
 
-}
 }// namespace vox::core

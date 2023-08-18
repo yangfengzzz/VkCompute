@@ -10,8 +10,7 @@
 #include "common/vk_common.h"
 #include "rendering/swapchain.h"
 
-namespace vox {
-namespace core {
+namespace vox::core {
 class Device;
 class CommandBuffer;
 
@@ -61,5 +60,4 @@ private:
     VkQueueFamilyProperties properties{};
 };
 
-}
 }// namespace vox::core

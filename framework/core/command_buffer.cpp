@@ -11,8 +11,7 @@
 #include "device.h"
 #include "rendering/subpass.h"
 
-namespace vox {
-namespace core {
+namespace vox::core {
 CommandBuffer::CommandBuffer(CommandPool &command_pool,
                              VkCommandBufferLevel level)
     : VulkanResource{VK_NULL_HANDLE, &command_pool.get_device()},
@@ -39,18 +38,19 @@ CommandBuffer::~CommandBuffer() {
     }
 }
 
-CommandBuffer::CommandBuffer(CommandBuffer &&other) : VulkanResource(std::move(other)),
-                                                      level(other.level),
-                                                      command_pool(other.command_pool),
-                                                      current_render_pass(std::exchange(other.current_render_pass, {})),
-                                                      pipeline_state(std::exchange(other.pipeline_state, {})),
-                                                      resource_binding_state(std::exchange(other.resource_binding_state, {})),
-                                                      stored_push_constants(std::exchange(other.stored_push_constants, {})),
-                                                      max_push_constants_size(std::exchange(other.max_push_constants_size, {})),
-                                                      last_framebuffer_extent(std::exchange(other.last_framebuffer_extent, {})),
-                                                      last_render_area_extent(std::exchange(other.last_render_area_extent, {})),
-                                                      update_after_bind(std::exchange(other.update_after_bind, {})),
-                                                      descriptor_set_layout_binding_state(std::exchange(other.descriptor_set_layout_binding_state, {})) {}
+CommandBuffer::CommandBuffer(CommandBuffer &&other) noexcept
+    : VulkanResource(std::move(other)),
+      level(other.level),
+      command_pool(other.command_pool),
+      current_render_pass(std::exchange(other.current_render_pass, {})),
+      pipeline_state(std::exchange(other.pipeline_state, {})),
+      resource_binding_state(std::exchange(other.resource_binding_state, {})),
+      stored_push_constants(std::exchange(other.stored_push_constants, {})),
+      max_push_constants_size(std::exchange(other.max_push_constants_size, {})),
+      last_framebuffer_extent(std::exchange(other.last_framebuffer_extent, {})),
+      last_render_area_extent(std::exchange(other.last_render_area_extent, {})),
+      update_after_bind(std::exchange(other.update_after_bind, {})),
+      descriptor_set_layout_binding_state(std::exchange(other.descriptor_set_layout_binding_state, {})) {}
 
 void CommandBuffer::clear(VkClearAttachment attachment, VkClearRect rect) {
     vkCmdClearAttachments(handle, 1, &attachment, 1, &rect);
@@ -634,11 +634,11 @@ const CommandBuffer::RenderPassBinding &CommandBuffer::get_current_render_pass()
     return current_render_pass;
 }
 
-const uint32_t CommandBuffer::get_current_subpass_index() const {
+uint32_t CommandBuffer::get_current_subpass_index() const {
     return pipeline_state.get_subpass_index();
 }
 
-const bool CommandBuffer::is_render_size_optimal(const VkExtent2D &framebuffer_extent, const VkRect2D &render_area) {
+const bool CommandBuffer::is_render_size_optimal(const VkExtent2D &framebuffer_extent, const VkRect2D &render_area) const {
     auto render_area_granularity = current_render_pass.render_pass->get_render_area_granularity();
 
     return ((render_area.offset.x % render_area_granularity.width == 0) && (render_area.offset.y % render_area_granularity.height == 0) &&
@@ -678,7 +678,7 @@ VkResult CommandBuffer::reset(ResetMode reset_mode) {
 RenderPass &CommandBuffer::get_render_pass(const rendering::RenderTarget &render_target, const std::vector<LoadStoreInfo> &load_store_infos,
                                            const std::vector<std::unique_ptr<rendering::Subpass>> &subpasses) {
     // Create render pass
-    assert(subpasses.size() > 0 && "Cannot create a render pass without any subpass");
+    assert(!subpasses.empty() && "Cannot create a render pass without any subpass");
 
     std::vector<SubpassInfo> subpass_infos(subpasses.size());
     auto subpass_info_it = subpass_infos.begin();
@@ -697,5 +697,4 @@ RenderPass &CommandBuffer::get_render_pass(const rendering::RenderTarget &render
     return get_device().get_resource_cache().request_render_pass(render_target.get_attachments(), load_store_infos, subpass_infos);
 }
 
-}
 }// namespace vox::core
