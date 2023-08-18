@@ -8,8 +8,8 @@
 
 #include <spdlog/fmt/fmt.h>
 
-#include "glsl_compiler.h"
-#include "platform/filesystem.h"
+#include "common/glsl_compiler.h"
+#include "common/filesystem.h"
 
 std::ostream &operator<<(std::ostream &os, const VkResult result) {
 #define WRITE_VK_ENUM(r) \

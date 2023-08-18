@@ -9,7 +9,7 @@
 #include "common/logging.h"
 #include "device.h"
 #include "glsl_compiler.h"
-#include "platform/filesystem.h"
+#include "common/filesystem.h"
 
 namespace vox {
 /**

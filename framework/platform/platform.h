@@ -14,7 +14,7 @@
 #include "common/vk_common.h"
 #include "platform/window.h"
 #include "platform/input_events.h"
-#include "../timer.h"
+#include "common/timer.h"
 
 #if defined(VK_USE_PLATFORM_XLIB_KHR)
 #undef Success

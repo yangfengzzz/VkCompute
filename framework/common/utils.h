@@ -7,15 +7,7 @@
 #pragma once
 
 #include "common/error.h"
-
-VKBP_DISABLE_WARNINGS()
-#include "common/glm_common.h"
-#include "glm/gtx/quaternion.hpp"
-VKBP_ENABLE_WARNINGS()
-
-#include "platform/filesystem.h"
-#include "rendering/pipeline_state.h"
-#include "rendering/render_context.h"
+#include "common/filesystem.h"
 
 namespace vox {
 /**
@@ -30,14 +22,5 @@ std::string get_extension(const std::string &uri);
  * @return a snake case version of the string
  */
 std::string to_snake_case(const std::string &name);
-
-class CommandBuffer;
-
-/**
- * @brief Takes a screenshot of the app by writing the swapchain image to file (slow function)
- * @param render_context The RenderContext to use
- * @param filename The name of the file to save the output to
- */
-void screenshot(RenderContext &render_context, const std::string &filename);
 
 }// namespace vox

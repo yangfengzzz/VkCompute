@@ -4,8 +4,7 @@
 //  personal capacity and am not conveying any rights to any intellectual
 //  property of any third parties.
 
-#include "platform/filesystem.h"
-
+#include "common/filesystem.h"
 #include "common/error.h"
 
 VKBP_DISABLE_WARNINGS()

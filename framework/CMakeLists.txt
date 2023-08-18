@@ -19,67 +19,28 @@ cmake_minimum_required(VERSION 3.16)
 
 project(framework LANGUAGES C CXX)
 
-set(FRAMEWORK_FILES
-        # Header Files
-        #        gui.h
-        glsl_compiler.h
-        #        spirv_reflection.h
-        #        gltf_loader.h
-        buffer_pool.h
-        debug_info.h
-        fence_pool.h
-        #        heightmap.h
-        semaphore_pool.h
-        resource_binding_state.h
-        resource_cache.h
-        resource_record.h
-        resource_replay.h
-        #        vulkan_sample.h
-        #        api_vulkan_sample.h
-        timer.h
-        #        camera.h
-        # Source Files
-        #        gui.cpp
-        glsl_compiler.cpp
-        #        spirv_reflection.cpp
-        #        gltf_loader.cpp
-        debug_info.cpp
-        buffer_pool.cpp
-        fence_pool.cpp
-        #        heightmap.cpp
-        semaphore_pool.cpp
-        resource_binding_state.cpp
-        resource_cache.cpp
-        resource_record.cpp
-        resource_replay.cpp
-        #        vulkan_sample.cpp
-        #        api_vulkan_sample.cpp
-        timer.cpp
-        #        camera.cpp
-        )
-
 set(COMMON_FILES
         # Header Files
-        common/vk_common.h
-        common/vk_initializers.h
-        common/resource_caching.h
-        common/logging.h
-        common/helpers.h
         common/error.h
-        common/utils.h
+        common/glm_common.h
+        common/helpers.h
+        common/logging.h
         common/strings.h
         common/tags.h
+        common/timer.h
+        common/utils.h
+        common/vk_common.h
+        common/vk_initializers.h
+        common/glsl_compiler.h
+        common/filesystem.h
         # Source Files
         common/error.cpp
-        common/vk_common.cpp
+        common/timer.cpp
         common/utils.cpp
-        common/strings.cpp)
-
-set(GEOMETRY_FILES
-        # Header Files
-        geometry/frustum.h
-        # Source Files
-        geometry/frustum.cpp)
+        common/vk_common.cpp
+        common/glsl_compiler.cpp
+        common/filesystem.cpp
+        )
 
 set(RENDERING_FILES
         # Header files
@@ -328,13 +289,13 @@ source_group("rendering\\" FILES ${RENDERING_FILES})
 #source_group("stats\\" FILES ${STATS_FILES})
 
 set(PROJECT_FILES
-        ${PLATFORM_FILES}
+#        ${PLATFORM_FILES}
         #    ${PARSER_FILES}
         ${COMMON_FILES}
-        ${FRAMEWORK_FILES}
-        ${CORE_FILES}
+#        ${FRAMEWORK_FILES}
+#        ${CORE_FILES}
         #    ${GEOMETRY_FILES}
-        ${RENDERING_FILES}
+#        ${RENDERING_FILES}
         #    ${RENDERING_SUBPASSES_FILES}
         #    ${SCENE_GRAPH_FILES}
         #    ${SCENE_GRAPH_COMPONENT_FILES}
