@@ -9,6 +9,7 @@
 #include "device.h"
 
 namespace vox {
+namespace core {
 Sampler::Sampler(Device const &d, const VkSamplerCreateInfo &info) : VulkanResource{VK_NULL_HANDLE, &d} {
     VK_CHECK(vkCreateSampler(device->get_handle(), &info, nullptr, &handle));
 }
@@ -22,4 +23,5 @@ Sampler::~Sampler() {
     }
 }
 
-}// namespace vox
+}
+}// namespace vox::core

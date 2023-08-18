@@ -16,19 +16,22 @@
 #include "core/query_pool.h"
 #include "core/sampler.h"
 #include "core/vulkan_resource.h"
-#include "rendering/pipeline_state.h"
+#include "core/pipeline_state.h"
+#include "core/resource_binding_state.h"
 #include "rendering/render_target.h"
-#include "resource_binding_state.h"
 
 namespace vox {
+namespace rendering {
+class Framebuffer;
+class RenderTarget;
+class Subpass;
+}// namespace rendering
+namespace core {
 class CommandPool;
 class DescriptorSet;
-class Framebuffer;
 class Pipeline;
 class PipelineLayout;
 class PipelineState;
-class RenderTarget;
-class Subpass;
 
 /**
  * @brief Helper class to manage and record a command buffer, building and
@@ -48,7 +51,7 @@ public:
     struct RenderPassBinding {
         const RenderPass *render_pass;
 
-        const Framebuffer *framebuffer;
+        const rendering::Framebuffer *framebuffer;
     };
 
     CommandBuffer(CommandPool &command_pool, VkCommandBufferLevel level);
@@ -90,19 +93,19 @@ public:
 	 * @return Whether it succeeded or not
 	 */
     VkResult begin(VkCommandBufferUsageFlags flags, const RenderPass *render_pass,
-                   const Framebuffer *framebuffer, uint32_t subpass_index);
+                   const rendering::Framebuffer *framebuffer, uint32_t subpass_index);
 
     VkResult end();
 
     void clear(VkClearAttachment info, VkClearRect rect);
 
-    void begin_render_pass(const RenderTarget &render_target, const std::vector<LoadStoreInfo> &load_store_infos,
+    void begin_render_pass(const rendering::RenderTarget &render_target, const std::vector<LoadStoreInfo> &load_store_infos,
                            const std::vector<VkClearValue> &clear_values,
-                           const std::vector<std::unique_ptr<Subpass>> &subpasses,
+                           const std::vector<std::unique_ptr<rendering::Subpass>> &subpasses,
                            VkSubpassContents contents = VK_SUBPASS_CONTENTS_INLINE);
 
-    void begin_render_pass(const RenderTarget &render_target, const RenderPass &render_pass,
-                           const Framebuffer &framebuffer, const std::vector<VkClearValue> &clear_values,
+    void begin_render_pass(const rendering::RenderTarget &render_target, const RenderPass &render_pass,
+                           const rendering::Framebuffer &framebuffer, const std::vector<VkClearValue> &clear_values,
                            VkSubpassContents contents = VK_SUBPASS_CONTENTS_INLINE);
 
     void next_subpass();
@@ -150,7 +153,7 @@ public:
 
     void bind_input(const ImageView &image_view, uint32_t set, uint32_t binding, uint32_t array_element);
 
-    void bind_vertex_buffers(uint32_t first_binding, const std::vector<std::reference_wrapper<const vox::Buffer>> &buffers,
+    void bind_vertex_buffers(uint32_t first_binding, const std::vector<std::reference_wrapper<const Buffer>> &buffers,
                              const std::vector<VkDeviceSize> &offsets);
 
     void bind_index_buffer(const Buffer &buffer, VkDeviceSize offset, VkIndexType index_type);
@@ -228,9 +231,9 @@ public:
 	 */
     VkResult reset(ResetMode reset_mode);
 
-    RenderPass &get_render_pass(const vox::RenderTarget &render_target,
+    RenderPass &get_render_pass(const vox::rendering::RenderTarget &render_target,
                                 const std::vector<LoadStoreInfo> &load_store_infos,
-                                const std::vector<std::unique_ptr<Subpass>> &subpasses);
+                                const std::vector<std::unique_ptr<rendering::Subpass>> &subpasses);
 
     const VkCommandBufferLevel level;
 
@@ -291,4 +294,6 @@ template<>
 inline void CommandBuffer::set_specialization_constant<bool>(std::uint32_t constant_id, const bool &data) {
     set_specialization_constant(constant_id, to_bytes(to_u32(data)));
 }
+
+}// namespace core
 }// namespace vox

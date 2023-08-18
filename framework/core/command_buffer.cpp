@@ -12,11 +12,13 @@
 #include "rendering/subpass.h"
 
 namespace vox {
+namespace core {
 CommandBuffer::CommandBuffer(CommandPool &command_pool,
-                             VkCommandBufferLevel level) : VulkanResource{VK_NULL_HANDLE, &command_pool.get_device()},
-                                                           command_pool{command_pool},
-                                                           max_push_constants_size{device->get_gpu().get_properties().limits.maxPushConstantsSize},
-                                                           level{level} {
+                             VkCommandBufferLevel level)
+    : VulkanResource{VK_NULL_HANDLE, &command_pool.get_device()},
+      command_pool{command_pool},
+      max_push_constants_size{device->get_gpu().get_properties().limits.maxPushConstantsSize},
+      level{level} {
     VkCommandBufferAllocateInfo allocate_info{VK_STRUCTURE_TYPE_COMMAND_BUFFER_ALLOCATE_INFO};
 
     allocate_info.commandPool = command_pool.get_handle();
@@ -66,7 +68,7 @@ VkResult CommandBuffer::begin(VkCommandBufferUsageFlags flags, CommandBuffer *pr
 }
 
 VkResult CommandBuffer::begin(VkCommandBufferUsageFlags flags, const RenderPass *render_pass,
-                              const Framebuffer *framebuffer, uint32_t subpass_index) {
+                              const rendering::Framebuffer *framebuffer, uint32_t subpass_index) {
     // Reset state
     pipeline_state.reset();
     resource_binding_state.reset();
@@ -107,8 +109,10 @@ void CommandBuffer::flush(VkPipelineBindPoint pipeline_bind_point) {
     flush_descriptor_state(pipeline_bind_point);
 }
 
-void CommandBuffer::begin_render_pass(const RenderTarget &render_target, const std::vector<LoadStoreInfo> &load_store_infos,
-                                      const std::vector<VkClearValue> &clear_values, const std::vector<std::unique_ptr<Subpass>> &subpasses,
+void CommandBuffer::begin_render_pass(const rendering::RenderTarget &render_target,
+                                      const std::vector<LoadStoreInfo> &load_store_infos,
+                                      const std::vector<VkClearValue> &clear_values,
+                                      const std::vector<std::unique_ptr<rendering::Subpass>> &subpasses,
                                       VkSubpassContents contents) {
     // Reset state
     pipeline_state.reset();
@@ -121,8 +125,8 @@ void CommandBuffer::begin_render_pass(const RenderTarget &render_target, const s
     begin_render_pass(render_target, render_pass, framebuffer, clear_values, contents);
 }
 
-void CommandBuffer::begin_render_pass(const RenderTarget &render_target, const RenderPass &render_pass,
-                                      const Framebuffer &framebuffer, const std::vector<VkClearValue> &clear_values,
+void CommandBuffer::begin_render_pass(const rendering::RenderTarget &render_target, const RenderPass &render_pass,
+                                      const rendering::Framebuffer &framebuffer, const std::vector<VkClearValue> &clear_values,
                                       VkSubpassContents contents) {
     current_render_pass.render_pass = &render_pass;
     current_render_pass.framebuffer = &framebuffer;
@@ -183,7 +187,7 @@ void CommandBuffer::execute_commands(CommandBuffer &secondary_command_buffer) {
 void CommandBuffer::execute_commands(std::vector<CommandBuffer *> &secondary_command_buffers) {
     std::vector<VkCommandBuffer> sec_cmd_buf_handles(secondary_command_buffers.size(), VK_NULL_HANDLE);
     std::transform(secondary_command_buffers.begin(), secondary_command_buffers.end(), sec_cmd_buf_handles.begin(),
-                   [](const vox::CommandBuffer *sec_cmd_buf) { return sec_cmd_buf->get_handle(); });
+                   [](const CommandBuffer *sec_cmd_buf) { return sec_cmd_buf->get_handle(); });
     vkCmdExecuteCommands(get_handle(), to_u32(sec_cmd_buf_handles.size()), sec_cmd_buf_handles.data());
 }
 
@@ -230,7 +234,7 @@ void CommandBuffer::bind_input(const ImageView &image_view, uint32_t set, uint32
 }
 
 void CommandBuffer::bind_vertex_buffers(uint32_t first_binding,
-                                        const std::vector<std::reference_wrapper<const vox::Buffer>> &buffers,
+                                        const std::vector<std::reference_wrapper<const Buffer>> &buffers,
                                         const std::vector<VkDeviceSize> &offsets) {
     std::vector<VkBuffer> buffer_handles(buffers.size(), VK_NULL_HANDLE);
     std::transform(buffers.begin(), buffers.end(), buffer_handles.begin(),
@@ -671,12 +675,12 @@ VkResult CommandBuffer::reset(ResetMode reset_mode) {
     return result;
 }
 
-RenderPass &CommandBuffer::get_render_pass(const vox::RenderTarget &render_target, const std::vector<LoadStoreInfo> &load_store_infos,
-                                           const std::vector<std::unique_ptr<Subpass>> &subpasses) {
+RenderPass &CommandBuffer::get_render_pass(const rendering::RenderTarget &render_target, const std::vector<LoadStoreInfo> &load_store_infos,
+                                           const std::vector<std::unique_ptr<rendering::Subpass>> &subpasses) {
     // Create render pass
     assert(subpasses.size() > 0 && "Cannot create a render pass without any subpass");
 
-    std::vector<vox::SubpassInfo> subpass_infos(subpasses.size());
+    std::vector<SubpassInfo> subpass_infos(subpasses.size());
     auto subpass_info_it = subpass_infos.begin();
     for (auto &subpass : subpasses) {
         subpass_info_it->input_attachments = subpass->get_input_attachments();
@@ -692,4 +696,6 @@ RenderPass &CommandBuffer::get_render_pass(const vox::RenderTarget &render_targe
 
     return get_device().get_resource_cache().request_render_pass(render_target.get_attachments(), load_store_infos, subpass_infos);
 }
-}// namespace vox
+
+}
+}// namespace vox::core

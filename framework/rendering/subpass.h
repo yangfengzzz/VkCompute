@@ -6,10 +6,10 @@
 
 #pragma once
 
-#include "buffer_pool.h"
 #include "common/helpers.h"
+#include "core/buffer_pool.h"
 #include "core/shader_module.h"
-#include "rendering/pipeline_state.h"
+#include "core/pipeline_state.h"
 #include "rendering/render_context.h"
 #include "rendering/render_frame.h"
 
@@ -18,16 +18,10 @@ VKBP_DISABLE_WARNINGS()
 VKBP_ENABLE_WARNINGS()
 
 namespace vox {
+namespace core {
 class CommandBuffer;
-
-/**
- * @brief Calculates the vulkan style projection matrix
- * @param proj The projection matrix
- * @return The vulkan style projection matrix
- */
-glm::mat4 vulkan_style_projection(const glm::mat4 &proj);
-
-extern const std::vector<std::string> light_type_definitions;
+}// namespace core
+namespace rendering {
 
 /**
  * @brief This class defines an interface for subpasses
@@ -36,7 +30,7 @@ extern const std::vector<std::string> light_type_definitions;
  */
 class Subpass {
 public:
-    Subpass(RenderContext &render_context, ShaderSource &&vertex_shader, ShaderSource &&fragment_shader);
+    Subpass(RenderContext &render_context, core::ShaderSource &&vertex_shader, core::ShaderSource &&fragment_shader);
 
     Subpass(const Subpass &) = delete;
 
@@ -64,15 +58,15 @@ public:
 	 * @brief Draw virtual function
 	 * @param command_buffer Command buffer to use to record draw commands
 	 */
-    virtual void draw(CommandBuffer &command_buffer) = 0;
+    virtual void draw(core::CommandBuffer &command_buffer) = 0;
 
     RenderContext &get_render_context();
 
-    [[nodiscard]] const ShaderSource &get_vertex_shader() const;
+    [[nodiscard]] const core::ShaderSource &get_vertex_shader() const;
 
-    [[nodiscard]] const ShaderSource &get_fragment_shader() const;
+    [[nodiscard]] const core::ShaderSource &get_fragment_shader() const;
 
-    DepthStencilState &get_depth_stencil_state();
+    core::DepthStencilState &get_depth_stencil_state();
 
     [[nodiscard]] const std::vector<uint32_t> &get_input_attachments() const;
 
@@ -110,16 +104,16 @@ protected:
     VkSampleCountFlagBits sample_count{VK_SAMPLE_COUNT_1_BIT};
 
     // A map of shader resource names and the mode of constant data
-    std::unordered_map<std::string, ShaderResourceMode> resource_mode_map;
+    std::unordered_map<std::string, core::ShaderResourceMode> resource_mode_map;
 
 private:
     std::string debug_name{};
 
-    ShaderSource vertex_shader;
+    core::ShaderSource vertex_shader;
 
-    ShaderSource fragment_shader;
+    core::ShaderSource fragment_shader;
 
-    DepthStencilState depth_stencil_state{};
+    core::DepthStencilState depth_stencil_state{};
 
     /**
 	 * @brief When creating the renderpass, pDepthStencilAttachment will
@@ -147,4 +141,5 @@ private:
     uint32_t depth_stencil_resolve_attachment{VK_ATTACHMENT_UNUSED};
 };
 
+}// namespace rendering
 }// namespace vox

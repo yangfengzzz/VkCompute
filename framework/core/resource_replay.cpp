@@ -8,10 +8,11 @@
 
 #include "common/logging.h"
 #include "common/vk_common.h"
-#include "rendering/pipeline_state.h"
+#include "core/pipeline_state.h"
 #include "resource_cache.h"
 
 namespace vox {
+namespace core {
 namespace {
 inline void read_subpass_info(std::istringstream &is, std::vector<SubpassInfo> &value) {
     std::size_t size;
@@ -110,7 +111,7 @@ void ResourceReplay::create_pipeline_layout(ResourceCache &resource_cache, std::
 }
 
 void ResourceReplay::create_render_pass(ResourceCache &resource_cache, std::istringstream &stream) {
-    std::vector<Attachment> attachments;
+    std::vector<rendering::Attachment> attachments;
     std::vector<LoadStoreInfo> load_store_infos;
     std::vector<SubpassInfo> subpasses;
 
@@ -188,4 +189,6 @@ void ResourceReplay::create_graphics_pipeline(ResourceCache &resource_cache, std
 
     graphics_pipelines.push_back(&graphics_pipeline);
 }
-}// namespace vox
+
+}
+}// namespace vox::core

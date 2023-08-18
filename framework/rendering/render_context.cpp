@@ -9,9 +9,11 @@
 #include "platform/window.h"
 
 namespace vox {
+namespace rendering {
+
 VkFormat RenderContext::DEFAULT_VK_FORMAT = VK_FORMAT_R8G8B8A8_SRGB;
 
-RenderContext::RenderContext(Device &device,
+RenderContext::RenderContext(core::Device &device,
                              VkSurfaceKHR surface,
                              const Window &window,
                              VkPresentModeKHR present_mode,
@@ -43,7 +45,7 @@ void RenderContext::prepare(size_t thread_count, RenderTarget::CreateFunc create
         VkExtent3D extent{surface_extent.width, surface_extent.height, 1};
 
         for (auto &image_handle : swapchain->get_images()) {
-            auto swapchain_image = Image{
+            auto swapchain_image = core::Image{
                 device, image_handle,
                 extent,
                 swapchain->get_format(),
@@ -55,11 +57,11 @@ void RenderContext::prepare(size_t thread_count, RenderTarget::CreateFunc create
         // Otherwise, create a single RenderFrame
         swapchain = nullptr;
 
-        auto color_image = Image{device,
-                                 VkExtent3D{surface_extent.width, surface_extent.height, 1},
-                                 DEFAULT_VK_FORMAT,// We can use any format here that we like
-                                 VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT | VK_IMAGE_USAGE_TRANSFER_SRC_BIT,
-                                 VMA_MEMORY_USAGE_GPU_ONLY};
+        auto color_image = core::Image{device,
+                                       VkExtent3D{surface_extent.width, surface_extent.height, 1},
+                                       DEFAULT_VK_FORMAT,// We can use any format here that we like
+                                       VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT | VK_IMAGE_USAGE_TRANSFER_SRC_BIT,
+                                       VMA_MEMORY_USAGE_GPU_ONLY};
 
         auto render_target = create_render_target_func(std::move(color_image));
         frames.emplace_back(std::make_unique<RenderFrame>(device, std::move(render_target), thread_count));
@@ -153,10 +155,10 @@ void RenderContext::recreate() {
     auto frame_it = frames.begin();
 
     for (auto &image_handle : swapchain->get_images()) {
-        Image swapchain_image{device, image_handle,
-                              extent,
-                              swapchain->get_format(),
-                              swapchain->get_usage()};
+        core::Image swapchain_image{device, image_handle,
+                                    extent,
+                                    swapchain->get_format(),
+                                    swapchain->get_usage()};
 
         auto render_target = create_render_target_func(std::move(swapchain_image));
 
@@ -207,7 +209,7 @@ bool RenderContext::handle_surface_changes(bool force_update) {
     return false;
 }
 
-CommandBuffer &RenderContext::begin(CommandBuffer::ResetMode reset_mode) {
+core::CommandBuffer &RenderContext::begin(core::CommandBuffer::ResetMode reset_mode) {
     assert(prepared && "RenderContext not prepared for rendering, call prepare()");
 
     if (!frame_active) {
@@ -222,11 +224,11 @@ CommandBuffer &RenderContext::begin(CommandBuffer::ResetMode reset_mode) {
     return get_active_frame().request_command_buffer(queue, reset_mode);
 }
 
-void RenderContext::submit(CommandBuffer &command_buffer) {
+void RenderContext::submit(core::CommandBuffer &command_buffer) {
     submit({&command_buffer});
 }
 
-void RenderContext::submit(const std::vector<CommandBuffer *> &command_buffers) {
+void RenderContext::submit(const std::vector<core::CommandBuffer *> &command_buffers) {
     assert(frame_active && "RenderContext is inactive, cannot submit command buffer. Please call begin()");
 
     VkSemaphore render_semaphore = VK_NULL_HANDLE;
@@ -280,9 +282,10 @@ void RenderContext::begin_frame() {
     wait_frame();
 }
 
-VkSemaphore RenderContext::submit(const Queue &queue, const std::vector<CommandBuffer *> &command_buffers, VkSemaphore wait_semaphore, VkPipelineStageFlags wait_pipeline_stage) {
+VkSemaphore RenderContext::submit(const core::Queue &queue, const std::vector<core::CommandBuffer *> &command_buffers,
+                                  VkSemaphore wait_semaphore, VkPipelineStageFlags wait_pipeline_stage) {
     std::vector<VkCommandBuffer> cmd_buf_handles(command_buffers.size(), VK_NULL_HANDLE);
-    std::transform(command_buffers.begin(), command_buffers.end(), cmd_buf_handles.begin(), [](const CommandBuffer *cmd_buf) { return cmd_buf->get_handle(); });
+    std::transform(command_buffers.begin(), command_buffers.end(), cmd_buf_handles.begin(), [](const core::CommandBuffer *cmd_buf) { return cmd_buf->get_handle(); });
 
     RenderFrame &frame = get_active_frame();
 
@@ -309,9 +312,9 @@ VkSemaphore RenderContext::submit(const Queue &queue, const std::vector<CommandB
     return signal_semaphore;
 }
 
-void RenderContext::submit(const Queue &queue, const std::vector<CommandBuffer *> &command_buffers) {
+void RenderContext::submit(const core::Queue &queue, const std::vector<core::CommandBuffer *> &command_buffers) {
     std::vector<VkCommandBuffer> cmd_buf_handles(command_buffers.size(), VK_NULL_HANDLE);
-    std::transform(command_buffers.begin(), command_buffers.end(), cmd_buf_handles.begin(), [](const CommandBuffer *cmd_buf) { return cmd_buf->get_handle(); });
+    std::transform(command_buffers.begin(), command_buffers.end(), cmd_buf_handles.begin(), [](const core::CommandBuffer *cmd_buf) { return cmd_buf->get_handle(); });
 
     RenderFrame &frame = get_active_frame();
 
@@ -405,7 +408,7 @@ void RenderContext::release_owned_semaphore(VkSemaphore semaphore) {
     frame.release_owned_semaphore(semaphore);
 }
 
-Device &RenderContext::get_device() {
+core::Device &RenderContext::get_device() {
     return device;
 }
 
@@ -419,10 +422,10 @@ void RenderContext::recreate_swapchain() {
     auto frame_it = frames.begin();
 
     for (auto &image_handle : swapchain->get_images()) {
-        Image swapchain_image{device, image_handle,
-                              extent,
-                              swapchain->get_format(),
-                              swapchain->get_usage()};
+        core::Image swapchain_image{device, image_handle,
+                                    extent,
+                                    swapchain->get_format(),
+                                    swapchain->get_usage()};
 
         auto render_target = create_render_target_func(std::move(swapchain_image));
         (*frame_it)->update_render_target(std::move(render_target));
@@ -452,4 +455,5 @@ std::vector<std::unique_ptr<RenderFrame>> &RenderContext::get_render_frames() {
     return frames;
 }
 
-}// namespace vox
+}
+}// namespace vox::rendering

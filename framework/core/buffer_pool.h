@@ -10,6 +10,7 @@
 #include "core/buffer.h"
 
 namespace vox {
+namespace core {
 class Device;
 
 /**
@@ -119,4 +120,6 @@ private:
     /// Numbers of active blocks from the start of buffer_blocks
     uint32_t active_buffer_block_count{0};
 };
-}// namespace vox
+
+}
+}// namespace vox::core

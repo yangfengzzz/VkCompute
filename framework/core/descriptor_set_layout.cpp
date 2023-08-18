@@ -11,6 +11,7 @@
 #include "shader_module.h"
 
 namespace vox {
+namespace core {
 namespace {
 inline VkDescriptorType find_descriptor_type(ShaderResourceType resource_type, bool dynamic) {
     switch (resource_type) {
@@ -213,4 +214,5 @@ const std::vector<ShaderModule *> &DescriptorSetLayout::get_shader_modules() con
     return shader_modules;
 }
 
-}// namespace vox
+}
+}// namespace vox::core

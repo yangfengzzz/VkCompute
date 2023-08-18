@@ -11,8 +11,10 @@
 #include "shader_module.h"
 
 namespace vox {
-PipelineLayout::PipelineLayout(Device &device, const std::vector<ShaderModule *> &shader_modules) : device{device},
-                                                                                                    shader_modules{shader_modules} {
+namespace core {
+PipelineLayout::PipelineLayout(Device &device, const std::vector<ShaderModule *> &shader_modules)
+    : device{device},
+      shader_modules{shader_modules} {
     // Collect and combine all the shader resources from each of the shader modules
     // Collate them all into a map that is indexed by the name of the resource
     for (auto *shader_module : shader_modules) {
@@ -156,4 +158,6 @@ VkShaderStageFlags PipelineLayout::get_push_constant_range_stage(uint32_t size, 
     }
     return stages;
 }
-}// namespace vox
+
+}
+}// namespace vox::core

@@ -11,11 +11,16 @@
 #include "postprocessing_pipeline.h"
 
 namespace vox {
-PostProcessingComputePass::PostProcessingComputePass(PostProcessingPipeline *parent, ShaderSource cs_source, const ShaderVariant &cs_variant,
-                                                     std::shared_ptr<Sampler> &&default_sampler) : PostProcessingPass{parent},
-                                                                                                   cs_source{std::move(cs_source)},
-                                                                                                   cs_variant{cs_variant},
-                                                                                                   default_sampler{std::move(default_sampler)} {
+namespace rendering {
+
+PostProcessingComputePass::PostProcessingComputePass(PostProcessingPipeline *parent,
+                                                     core::ShaderSource cs_source,
+                                                     const core::ShaderVariant &cs_variant,
+                                                     std::shared_ptr<core::Sampler> &&default_sampler)
+    : PostProcessingPass{parent},
+      cs_source{std::move(cs_source)},
+      cs_variant{cs_variant},
+      default_sampler{std::move(default_sampler)} {
     if (this->default_sampler == nullptr) {
         // Setup a sane default sampler if none was passed
         VkSamplerCreateInfo sampler_info{VK_STRUCTURE_TYPE_SAMPLER_CREATE_INFO};
@@ -33,11 +38,11 @@ PostProcessingComputePass::PostProcessingComputePass(PostProcessingPipeline *par
         sampler_info.maxAnisotropy = 0.0f;
         sampler_info.borderColor = VK_BORDER_COLOR_FLOAT_OPAQUE_WHITE;
 
-        this->default_sampler = std::make_shared<vox::Sampler>(get_render_context().get_device(), sampler_info);
+        this->default_sampler = std::make_shared<core::Sampler>(get_render_context().get_device(), sampler_info);
     }
 }
 
-void PostProcessingComputePass::prepare(CommandBuffer &command_buffer, RenderTarget &default_render_target) {
+void PostProcessingComputePass::prepare(core::CommandBuffer &command_buffer, RenderTarget &default_render_target) {
     // Build the compute shader upfront
     auto &resource_cache = get_render_context().get_device().get_resource_cache();
     resource_cache.request_shader_module(VK_SHADER_STAGE_COMPUTE_BIT, cs_source, cs_variant);
@@ -65,7 +70,7 @@ PostProcessingComputePass &PostProcessingComputePass::bind_storage_image(const s
     return *this;
 }
 
-void PostProcessingComputePass::transition_images(CommandBuffer &command_buffer, RenderTarget &default_render_target) {
+void PostProcessingComputePass::transition_images(core::CommandBuffer &command_buffer, RenderTarget &default_render_target) {
     BarrierInfo fallback_barrier_src{};
     fallback_barrier_src.pipeline_stage = VK_PIPELINE_STAGE_COMPUTE_SHADER_BIT;
     fallback_barrier_src.image_read_access = 0;// For UNDEFINED -> STORAGE in first CP
@@ -124,8 +129,8 @@ void PostProcessingComputePass::transition_images(CommandBuffer &command_buffer,
                 continue;
             }
 
-            const bool readable = !(resource->qualifiers & ShaderResourceQualifiers::NonReadable);
-            const bool writable = !(resource->qualifiers & ShaderResourceQualifiers::NonReadable);
+            const bool readable = !(resource->qualifiers & core::ShaderResourceQualifiers::NonReadable);
+            const bool writable = !(resource->qualifiers & core::ShaderResourceQualifiers::NonReadable);
 
             vox::ImageMemoryBarrier barrier;
             barrier.old_layout = storage_rt->get_layout(*attachment);
@@ -155,7 +160,7 @@ void PostProcessingComputePass::transition_images(CommandBuffer &command_buffer,
     }
 }
 
-void PostProcessingComputePass::draw(CommandBuffer &command_buffer, RenderTarget &default_render_target) {
+void PostProcessingComputePass::draw(core::CommandBuffer &command_buffer, RenderTarget &default_render_target) {
     transition_images(command_buffer, default_render_target);
 
     // Get compute shader from cache
@@ -189,7 +194,7 @@ void PostProcessingComputePass::draw(CommandBuffer &command_buffer, RenderTarget
     if (!uniform_data.empty()) {
         auto &render_frame = parent->get_render_context().get_active_frame();
 
-        uniform_alloc = std::make_unique<BufferAllocation>(render_frame.allocate_buffer(VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT, uniform_data.size()));
+        uniform_alloc = std::make_unique<core::BufferAllocation>(render_frame.allocate_buffer(VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT, uniform_data.size()));
         uniform_alloc->update(uniform_data);
 
         // Bind buffer to set = 0, binding = 0
@@ -220,4 +225,5 @@ PostProcessingComputePass::BarrierInfo PostProcessingComputePass::get_dst_barrie
     return info;
 }
 
-}// namespace vox
+}
+}// namespace vox::rendering

@@ -4,12 +4,14 @@
 //  personal capacity and am not conveying any rights to any intellectual
 //  property of any third parties.
 
-#include "core/swapchain.h"
+#include "rendering/swapchain.h"
 
 #include "common/logging.h"
-#include "device.h"
+#include "core/device.h"
 
 namespace vox {
+namespace rendering {
+
 namespace {
 inline uint32_t choose_image_count(
     uint32_t request_image_count,
@@ -224,53 +226,57 @@ inline VkImageUsageFlags composite_image_flags(std::set<VkImageUsageFlagBits> &i
 }// namespace
 
 Swapchain::Swapchain(Swapchain &old_swapchain,
-                     const VkExtent2D &extent) : Swapchain{old_swapchain,
-                                                           old_swapchain.device,
-                                                           old_swapchain.surface,
-                                                           old_swapchain.properties.present_mode,
-                                                           old_swapchain.present_mode_priority_list,
-                                                           old_swapchain.surface_format_priority_list,
-                                                           extent,
-                                                           old_swapchain.properties.image_count,
-                                                           old_swapchain.properties.pre_transform,
-                                                           old_swapchain.image_usage_flags} {}
+                     const VkExtent2D &extent)
+    : Swapchain{old_swapchain,
+                old_swapchain.device,
+                old_swapchain.surface,
+                old_swapchain.properties.present_mode,
+                old_swapchain.present_mode_priority_list,
+                old_swapchain.surface_format_priority_list,
+                extent,
+                old_swapchain.properties.image_count,
+                old_swapchain.properties.pre_transform,
+                old_swapchain.image_usage_flags} {}
 
-Swapchain::Swapchain(Swapchain &old_swapchain, const uint32_t image_count) : Swapchain{old_swapchain,
-                                                                                       old_swapchain.device,
-                                                                                       old_swapchain.surface,
-                                                                                       old_swapchain.properties.present_mode,
-                                                                                       old_swapchain.present_mode_priority_list,
-                                                                                       old_swapchain.surface_format_priority_list,
-                                                                                       old_swapchain.properties.extent,
-                                                                                       image_count,
-                                                                                       old_swapchain.properties.pre_transform,
-                                                                                       old_swapchain.image_usage_flags} {}
+Swapchain::Swapchain(Swapchain &old_swapchain, const uint32_t image_count)
+    : Swapchain{old_swapchain,
+                old_swapchain.device,
+                old_swapchain.surface,
+                old_swapchain.properties.present_mode,
+                old_swapchain.present_mode_priority_list,
+                old_swapchain.surface_format_priority_list,
+                old_swapchain.properties.extent,
+                image_count,
+                old_swapchain.properties.pre_transform,
+                old_swapchain.image_usage_flags} {}
 
 Swapchain::Swapchain(Swapchain &old_swapchain,
-                     const std::set<VkImageUsageFlagBits> &image_usage_flags) : Swapchain{old_swapchain,
-                                                                                          old_swapchain.device,
-                                                                                          old_swapchain.surface,
-                                                                                          old_swapchain.properties.present_mode,
-                                                                                          old_swapchain.present_mode_priority_list,
-                                                                                          old_swapchain.surface_format_priority_list,
-                                                                                          old_swapchain.properties.extent,
-                                                                                          old_swapchain.properties.image_count,
-                                                                                          old_swapchain.properties.pre_transform,
-                                                                                          image_usage_flags} {}
+                     const std::set<VkImageUsageFlagBits> &image_usage_flags)
+    : Swapchain{old_swapchain,
+                old_swapchain.device,
+                old_swapchain.surface,
+                old_swapchain.properties.present_mode,
+                old_swapchain.present_mode_priority_list,
+                old_swapchain.surface_format_priority_list,
+                old_swapchain.properties.extent,
+                old_swapchain.properties.image_count,
+                old_swapchain.properties.pre_transform,
+                image_usage_flags} {}
 
 Swapchain::Swapchain(Swapchain &old_swapchain, const VkExtent2D &extent,
-                     const VkSurfaceTransformFlagBitsKHR transform) : Swapchain{old_swapchain,
-                                                                                old_swapchain.device,
-                                                                                old_swapchain.surface,
-                                                                                old_swapchain.properties.present_mode,
-                                                                                old_swapchain.present_mode_priority_list,
-                                                                                old_swapchain.surface_format_priority_list,
-                                                                                extent,
-                                                                                old_swapchain.properties.image_count,
-                                                                                transform,
-                                                                                old_swapchain.image_usage_flags} {}
+                     const VkSurfaceTransformFlagBitsKHR transform)
+    : Swapchain{old_swapchain,
+                old_swapchain.device,
+                old_swapchain.surface,
+                old_swapchain.properties.present_mode,
+                old_swapchain.present_mode_priority_list,
+                old_swapchain.surface_format_priority_list,
+                extent,
+                old_swapchain.properties.image_count,
+                transform,
+                old_swapchain.image_usage_flags} {}
 
-Swapchain::Swapchain(Device &device,
+Swapchain::Swapchain(core::Device &device,
                      VkSurfaceKHR surface,
                      const VkPresentModeKHR present_mode,
                      std::vector<VkPresentModeKHR> const &present_mode_priority_list,
@@ -278,12 +284,13 @@ Swapchain::Swapchain(Device &device,
                      const VkExtent2D &extent,
                      const uint32_t image_count,
                      const VkSurfaceTransformFlagBitsKHR transform,
-                     const std::set<VkImageUsageFlagBits> &image_usage_flags) : Swapchain{*this, device, surface, present_mode, present_mode_priority_list,
-                                                                                          surface_format_priority_list, extent, image_count, transform, image_usage_flags} {
+                     const std::set<VkImageUsageFlagBits> &image_usage_flags)
+    : Swapchain{*this, device, surface, present_mode, present_mode_priority_list,
+                surface_format_priority_list, extent, image_count, transform, image_usage_flags} {
 }
 
 Swapchain::Swapchain(Swapchain &old_swapchain,
-                     Device &device,
+                     core::Device &device,
                      VkSurfaceKHR surface,
                      const VkPresentModeKHR present_mode,
                      std::vector<VkPresentModeKHR> const &present_mode_priority_list,
@@ -291,8 +298,9 @@ Swapchain::Swapchain(Swapchain &old_swapchain,
                      const VkExtent2D &extent,
                      const uint32_t image_count,
                      const VkSurfaceTransformFlagBitsKHR transform,
-                     const std::set<VkImageUsageFlagBits> &image_usage_flags) : device{device},
-                                                                                surface{surface} {
+                     const std::set<VkImageUsageFlagBits> &image_usage_flags)
+    : device{device},
+      surface{surface} {
     this->present_mode_priority_list = present_mode_priority_list;
     this->surface_format_priority_list = surface_format_priority_list;
 
@@ -387,7 +395,7 @@ bool Swapchain::is_valid() const {
     return handle != VK_NULL_HANDLE;
 }
 
-Device &Swapchain::get_device() {
+core::Device &Swapchain::get_device() {
     return device;
 }
 
@@ -426,4 +434,6 @@ VkImageUsageFlags Swapchain::get_usage() const {
 VkPresentModeKHR Swapchain::get_present_mode() const {
     return properties.present_mode;
 }
-}// namespace vox
+
+}
+}// namespace vox::rendering

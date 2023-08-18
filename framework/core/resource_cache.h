@@ -14,12 +14,13 @@
 #include "core/descriptor_pool.h"
 #include "core/descriptor_set.h"
 #include "core/descriptor_set_layout.h"
-#include "core/framebuffer.h"
 #include "core/pipeline.h"
-#include "resource_record.h"
-#include "resource_replay.h"
+#include "core/resource_record.h"
+#include "core/resource_replay.h"
+#include "rendering/framebuffer.h"
 
 namespace vox {
+namespace core {
 class Device;
 class ImageView;
 
@@ -44,7 +45,7 @@ struct ResourceCacheState {
 
     std::unordered_map<std::size_t, DescriptorSet> descriptor_sets;
 
-    std::unordered_map<std::size_t, Framebuffer> framebuffers;
+    std::unordered_map<std::size_t, rendering::Framebuffer> framebuffers;
 };
 
 /**
@@ -94,12 +95,12 @@ public:
                                           const BindingMap<VkDescriptorBufferInfo> &buffer_infos,
                                           const BindingMap<VkDescriptorImageInfo> &image_infos);
 
-    RenderPass &request_render_pass(const std::vector<Attachment> &attachments,
+    RenderPass &request_render_pass(const std::vector<rendering::Attachment> &attachments,
                                     const std::vector<LoadStoreInfo> &load_store_infos,
                                     const std::vector<SubpassInfo> &subpasses);
 
-    Framebuffer &request_framebuffer(const RenderTarget &render_target,
-                                     const RenderPass &render_pass);
+    rendering::Framebuffer &request_framebuffer(const rendering::RenderTarget &render_target,
+                                                const RenderPass &render_pass);
 
     void clear_pipelines();
 
@@ -141,4 +142,6 @@ private:
 
     std::mutex framebuffer_mutex;
 };
-}// namespace vox
+
+}
+}// namespace vox::core

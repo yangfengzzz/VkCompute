@@ -10,6 +10,7 @@
 #include "device.h"
 
 namespace vox {
+namespace core {
 DescriptorPool::DescriptorPool(Device &device,
                                const DescriptorSetLayout &descriptor_set_layout,
                                uint32_t pool_size) : device{device},
@@ -169,4 +170,6 @@ std::uint32_t DescriptorPool::find_available_pool(std::uint32_t search_index) {
     // Increment pool index
     return find_available_pool(++search_index);
 }
-}// namespace vox
+
+}
+}// namespace vox::core

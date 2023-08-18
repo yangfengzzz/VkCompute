@@ -9,6 +9,7 @@
 #include "device.h"
 
 namespace vox {
+namespace core {
 ScratchBuffer::ScratchBuffer(Device &device, VkDeviceSize size) : device{device},
                                                                   size{size} {
     VkBufferCreateInfo buffer_info{VK_STRUCTURE_TYPE_BUFFER_CREATE_INFO};
@@ -50,4 +51,5 @@ uint64_t ScratchBuffer::get_device_address() const {
     return device_address;
 }
 
-}// namespace vox
+}
+}// namespace vox::core

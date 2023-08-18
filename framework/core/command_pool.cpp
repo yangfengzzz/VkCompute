@@ -10,12 +10,14 @@
 #include "rendering/render_frame.h"
 
 namespace vox {
+namespace core {
 CommandPool::CommandPool(Device &d, uint32_t queue_family_index,
-                         RenderFrame *render_frame, size_t thread_index,
-                         CommandBuffer::ResetMode reset_mode) : device{d},
-                                                                render_frame{render_frame},
-                                                                thread_index{thread_index},
-                                                                reset_mode{reset_mode} {
+                         rendering::RenderFrame *render_frame, size_t thread_index,
+                         CommandBuffer::ResetMode reset_mode)
+    : device{d},
+      render_frame{render_frame},
+      thread_index{thread_index},
+      reset_mode{reset_mode} {
     VkCommandPoolCreateFlags flags;
     switch (reset_mode) {
         case CommandBuffer::ResetMode::ResetIndividually:
@@ -81,7 +83,7 @@ VkCommandPool CommandPool::get_handle() const {
     return handle;
 }
 
-RenderFrame *CommandPool::get_render_frame() {
+rendering::RenderFrame *CommandPool::get_render_frame() {
     return render_frame;
 }
 
@@ -178,4 +180,6 @@ CommandBuffer &CommandPool::request_command_buffer(VkCommandBufferLevel level) {
 CommandBuffer::ResetMode CommandPool::get_reset_mode() const {
     return reset_mode;
 }
-}// namespace vox
+
+}
+}// namespace vox::core

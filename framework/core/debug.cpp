@@ -13,6 +13,7 @@
 #include <unordered_map>
 
 namespace vox {
+namespace core {
 void DebugUtilsExtDebugUtils::set_debug_name(VkDevice device, VkObjectType object_type, uint64_t object_handle,
                                              const char *name) const {
     VkDebugUtilsObjectNameInfoEXT name_info{};
@@ -177,4 +178,5 @@ ScopedDebugLabel::~ScopedDebugLabel() {
     }
 }
 
-}// namespace vox
+}
+}// namespace vox::core

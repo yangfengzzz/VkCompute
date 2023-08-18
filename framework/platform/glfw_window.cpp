@@ -286,7 +286,7 @@ GlfwWindow::~GlfwWindow() {
     glfwTerminate();
 }
 
-VkSurfaceKHR GlfwWindow::create_surface(Instance &instance) {
+VkSurfaceKHR GlfwWindow::create_surface(core::Instance &instance) {
     return create_surface(instance.get_handle(), VK_NULL_HANDLE);
 }
 

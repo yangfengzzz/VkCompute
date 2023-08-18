@@ -9,6 +9,7 @@
 #include "common/helpers.h"
 
 namespace vox {
+namespace core {
 class Device;
 
 class FencePool {
@@ -38,4 +39,6 @@ private:
 
     uint32_t active_fence_count{0};
 };
-}// namespace vox
+
+}
+}// namespace vox::core

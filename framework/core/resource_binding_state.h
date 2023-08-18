@@ -12,6 +12,7 @@
 #include "core/sampler.h"
 
 namespace vox {
+namespace core {
 /**
  * @brief A resource info is a struct containing the actual resource data.
  *
@@ -98,4 +99,6 @@ private:
 
     std::unordered_map<uint32_t, ResourceSet> resource_sets;
 };
-}// namespace vox
+
+}
+}// namespace vox::core

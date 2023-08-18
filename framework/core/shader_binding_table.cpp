@@ -9,6 +9,7 @@
 #include "device.h"
 
 namespace vox {
+namespace core {
 ShaderBindingTable::ShaderBindingTable(Device &device,
                                        uint32_t handle_count,
                                        VkDeviceSize handle_size_aligned,
@@ -49,11 +50,12 @@ ShaderBindingTable::~ShaderBindingTable() {
     }
 }
 
-const VkStridedDeviceAddressRegionKHR *vox::ShaderBindingTable::get_strided_device_address_region() const {
+const VkStridedDeviceAddressRegionKHR *ShaderBindingTable::get_strided_device_address_region() const {
     return &strided_device_address_region;
 }
 uint8_t *ShaderBindingTable::get_data() const {
     return mapped_data;
 }
 
-}// namespace vox
+}
+}// namespace vox::core

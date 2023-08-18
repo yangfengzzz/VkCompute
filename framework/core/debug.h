@@ -11,6 +11,7 @@
 #include <cassert>
 
 namespace vox {
+namespace core {
 /**
  * @brief An interface over platform-specific debug extensions.
  */
@@ -136,4 +137,5 @@ private:
     VkCommandBuffer command_buffer;
 };
 
-}// namespace vox
+}
+}// namespace vox::core

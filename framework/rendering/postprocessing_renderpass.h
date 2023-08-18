@@ -6,12 +6,14 @@
 
 #pragma once
 
-#include "core/sampled_image.h"
-#include "postprocessing_pass.h"
-#include "render_pipeline.h"
-#include "subpass.h"
+#include "rendering/sampled_image.h"
+#include "rendering/postprocessing_pass.h"
+#include "rendering/render_pipeline.h"
+#include "rendering/subpass.h"
 
 namespace vox {
+namespace rendering {
+
 /**
  * @brief An utility struct for hashing pairs.
  */
@@ -37,7 +39,7 @@ using SampledMap = std::unordered_map<std::string, SampledImage>;
 /**
  * @brief Maps in-shader binding names to the ImageView to bind for storage images.
  */
-using StorageImageMap = std::unordered_map<std::string, const ImageView *>;
+using StorageImageMap = std::unordered_map<std::string, const core::ImageView *>;
 
 /**
  * @brief A list of indices into a RenderTarget's attachments.
@@ -56,8 +58,9 @@ class PostProcessingRenderPass;
  */
 class PostProcessingSubpass : public Subpass {
 public:
-    PostProcessingSubpass(PostProcessingRenderPass *parent, RenderContext &render_context, ShaderSource &&triangle_vs,
-                          ShaderSource &&fs, ShaderVariant &&fs_variant = {});
+    PostProcessingSubpass(PostProcessingRenderPass *parent, RenderContext &render_context,
+                          core::ShaderSource &&triangle_vs,
+                          core::ShaderSource &&fs, core::ShaderVariant &&fs_variant = {});
 
     PostProcessingSubpass(const PostProcessingSubpass &to_copy) = delete;
     PostProcessingSubpass &operator=(const PostProcessingSubpass &to_copy) = delete;
@@ -96,14 +99,14 @@ public:
     /**
 	 * @brief Returns the shader variant used for this postprocess' fragment shader.
 	 */
-    inline ShaderVariant &get_fs_variant() {
+    inline core::ShaderVariant &get_fs_variant() {
         return fs_variant;
     }
 
     /**
 	 * @brief Sets the shader variant that will be used for this postprocess' fragment shader.
 	 */
-    inline PostProcessingSubpass &set_fs_variant(ShaderVariant &&new_variant) {
+    inline PostProcessingSubpass &set_fs_variant(core::ShaderVariant &&new_variant) {
         fs_variant = std::move(new_variant);
 
         return *this;
@@ -133,7 +136,7 @@ public:
     /**
 	 * @brief Changes (or adds) the storage image at name for this step.
 	 */
-    PostProcessingSubpass &bind_storage_image(const std::string &name, const ImageView &new_image);
+    PostProcessingSubpass &bind_storage_image(const std::string &name, const core::ImageView &new_image);
 
     /**
 	 * @brief Removes the sampled image at name for this step.
@@ -161,7 +164,7 @@ public:
 	 * @brief A functor used to draw the primitives for a post-processing step.
 	 * @see default_draw_func()
 	 */
-    using DrawFunc = std::function<void(CommandBuffer &command_buffer, RenderTarget &render_target)>;
+    using DrawFunc = std::function<void(core::CommandBuffer &command_buffer, RenderTarget &render_target)>;
 
     /**
 	 * @brief Sets the function used to draw this postprocessing step.
@@ -172,12 +175,12 @@ public:
     /**
 	 * @brief The default function used to draw a step; it draws 1 instance with 3 vertices.
 	 */
-    static void default_draw_func(vox::CommandBuffer &command_buffer, vox::RenderTarget &render_target);
+    static void default_draw_func(vox::core::CommandBuffer &command_buffer, RenderTarget &render_target);
 
 private:
     PostProcessingRenderPass *parent;
 
-    ShaderVariant fs_variant{};
+    core::ShaderVariant fs_variant{};
 
     AttachmentMap input_attachments{};
     SampledMap sampled_images{};
@@ -188,7 +191,7 @@ private:
     DrawFunc draw_func{&PostProcessingSubpass::default_draw_func};
 
     void prepare() override;
-    void draw(CommandBuffer &command_buffer) override;
+    void draw(core::CommandBuffer &command_buffer) override;
 };
 
 /**
@@ -198,7 +201,7 @@ class PostProcessingRenderPass : public PostProcessingPass<PostProcessingRenderP
 public:
     friend class PostProcessingSubpass;
 
-    PostProcessingRenderPass(PostProcessingPipeline *parent, std::unique_ptr<Sampler> &&default_sampler = nullptr);
+    PostProcessingRenderPass(PostProcessingPipeline *parent, std::unique_ptr<core::Sampler> &&default_sampler = nullptr);
 
     PostProcessingRenderPass(const PostProcessingRenderPass &to_copy) = delete;
     PostProcessingRenderPass &operator=(const PostProcessingRenderPass &to_copy) = delete;
@@ -206,7 +209,7 @@ public:
     PostProcessingRenderPass(PostProcessingRenderPass &&to_move) = default;
     PostProcessingRenderPass &operator=(PostProcessingRenderPass &&to_move) = default;
 
-    void draw(CommandBuffer &command_buffer, RenderTarget &default_render_target) override;
+    void draw(core::CommandBuffer &command_buffer, RenderTarget &default_render_target) override;
 
     /**
 	 * @brief Gets the step at the given index.
@@ -223,7 +226,7 @@ public:
 	 */
     template<typename... ConstructorArgs>
     PostProcessingSubpass &add_subpass(ConstructorArgs &&...args) {
-        ShaderSource vs_copy = get_triangle_vs();
+        core::ShaderSource vs_copy = get_triangle_vs();
         auto new_subpass = std::make_unique<PostProcessingSubpass>(this, get_render_context(), std::move(vs_copy), std::forward<ConstructorArgs>(args)...);
         auto &new_subpass_ref = *new_subpass;
 
@@ -264,7 +267,7 @@ private:
     void transition_attachments(const AttachmentSet &input_attachments,
                                 const SampledAttachmentSet &sampled_attachments,
                                 const AttachmentSet &output_attachments,
-                                CommandBuffer &command_buffer,
+                                core::CommandBuffer &command_buffer,
                                 RenderTarget &fallback_render_target);
 
     /**
@@ -281,18 +284,19 @@ private:
     /**
 	 * @brief Transition images and prepare load/stores before draw()ing.
 	 */
-    void prepare_draw(CommandBuffer &command_buffer, RenderTarget &fallback_render_target);
+    void prepare_draw(core::CommandBuffer &command_buffer, RenderTarget &fallback_render_target);
 
     BarrierInfo get_src_barrier_info() const override;
     BarrierInfo get_dst_barrier_info() const override;
 
     RenderPipeline pipeline{};
-    std::unique_ptr<Sampler> default_sampler{};
+    std::unique_ptr<core::Sampler> default_sampler{};
     RenderTarget *draw_render_target{nullptr};
     std::vector<LoadStoreInfo> load_stores{};
     bool load_stores_dirty{true};
     std::vector<uint8_t> uniform_data{};
-    std::shared_ptr<BufferAllocation> uniform_buffer_alloc{};
+    std::shared_ptr<core::BufferAllocation> uniform_buffer_alloc{};
 };
 
-}// namespace vox
+}
+}// namespace vox::rendering

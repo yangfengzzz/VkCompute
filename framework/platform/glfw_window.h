@@ -23,7 +23,7 @@ public:
 
     ~GlfwWindow() override;
 
-    VkSurfaceKHR create_surface(Instance &instance) override;
+    VkSurfaceKHR create_surface(core::Instance &instance) override;
 
     VkSurfaceKHR create_surface(VkInstance instance, VkPhysicalDevice physical_device) override;
 

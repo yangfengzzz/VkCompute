@@ -4,11 +4,12 @@
 //  personal capacity and am not conveying any rights to any intellectual
 //  property of any third parties.
 
-#include "framebuffer.h"
-
-#include "device.h"
+#include "rendering/framebuffer.h"
+#include "core/device.h"
 
 namespace vox {
+namespace rendering {
+
 VkFramebuffer Framebuffer::get_handle() const {
     return handle;
 }
@@ -17,9 +18,9 @@ const VkExtent2D &Framebuffer::get_extent() const {
     return extent;
 }
 
-Framebuffer::Framebuffer(Device &device, const RenderTarget &render_target,
-                         const RenderPass &render_pass) : device{device},
-                                                          extent{render_target.get_extent()} {
+Framebuffer::Framebuffer(core::Device &device, const RenderTarget &render_target,
+                         const core::RenderPass &render_pass) : device{device},
+                                                                extent{render_target.get_extent()} {
     std::vector<VkImageView> attachments;
 
     for (auto &view : render_target.get_views()) {
@@ -53,4 +54,6 @@ Framebuffer::~Framebuffer() {
         vkDestroyFramebuffer(device.get_handle(), handle, nullptr);
     }
 }
-}// namespace vox
+
+}
+}// namespace vox::rendering

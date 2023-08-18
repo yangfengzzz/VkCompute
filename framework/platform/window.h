@@ -68,7 +68,7 @@ public:
 	 * @param instance A Vulkan instance
 	 * @returns A VkSurfaceKHR handle, for use by the application
 	 */
-    virtual VkSurfaceKHR create_surface(Instance &instance) = 0;
+    virtual VkSurfaceKHR create_surface(core::Instance &instance) = 0;
 
     /**
 	 * @brief Gets a handle from the platform's Vulkan surface

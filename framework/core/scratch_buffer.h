@@ -10,6 +10,7 @@
 #include "common/vk_common.h"
 
 namespace vox {
+namespace core {
 class Device;
 
 /**
@@ -52,4 +53,5 @@ private:
     VkDeviceSize size{0};
 };
 
-}// namespace vox
+}
+}// namespace vox::core

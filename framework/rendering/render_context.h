@@ -12,20 +12,22 @@
 #include "core/command_pool.h"
 #include "core/descriptor_set.h"
 #include "core/descriptor_set_layout.h"
-#include "core/framebuffer.h"
 #include "core/pipeline.h"
 #include "core/pipeline_layout.h"
 #include "core/queue.h"
 #include "core/render_pass.h"
 #include "core/shader_module.h"
-#include "core/swapchain.h"
-#include "rendering/pipeline_state.h"
+#include "core/pipeline_state.h"
+#include "core/resource_cache.h"
 #include "rendering/render_frame.h"
 #include "rendering/render_target.h"
-#include "resource_cache.h"
+#include "rendering/swapchain.h"
+#include "rendering/framebuffer.h"
 
 namespace vox {
 class Window;
+
+namespace rendering {
 
 /**
  * @brief RenderContext acts as a frame manager for the sample, with a lifetime that is the
@@ -56,7 +58,7 @@ public:
 	 * @param present_mode_priority_list The order in which the swapchain prioritizes selecting its present mode
 	 * @param surface_format_priority_list The order in which the swapchain prioritizes selecting its surface format
 	 */
-    RenderContext(Device &device,
+    RenderContext(core::Device &device,
                   VkSurfaceKHR surface,
                   const Window &window,
                   VkPresentModeKHR present_mode = VK_PRESENT_MODE_FIFO_KHR,
@@ -128,31 +130,32 @@ public:
 	 * @returns A valid command buffer to record commands to be submitted
 	 * Also ensures that there is an active frame if there is no existing active frame already
 	 */
-    CommandBuffer &begin(CommandBuffer::ResetMode reset_mode = CommandBuffer::ResetMode::ResetPool);
+    core::CommandBuffer &begin(core::CommandBuffer::ResetMode reset_mode = core::CommandBuffer::ResetMode::ResetPool);
 
     /**
 	 * @brief Submits the command buffer to the right queue
 	 * @param command_buffer A command buffer containing recorded commands
 	 */
-    void submit(CommandBuffer &command_buffer);
+    void submit(core::CommandBuffer &command_buffer);
 
     /**
 	 * @brief Submits multiple command buffers to the right queue
 	 * @param command_buffers Command buffers containing recorded commands
 	 */
-    void submit(const std::vector<CommandBuffer *> &command_buffers);
+    void submit(const std::vector<core::CommandBuffer *> &command_buffers);
 
     /**
 	 * @brief begin_frame
 	 */
     void begin_frame();
 
-    VkSemaphore submit(const Queue &queue, const std::vector<CommandBuffer *> &command_buffers, VkSemaphore wait_semaphore, VkPipelineStageFlags wait_pipeline_stage);
+    VkSemaphore submit(const core::Queue &queue, const std::vector<core::CommandBuffer *> &command_buffers,
+                       VkSemaphore wait_semaphore, VkPipelineStageFlags wait_pipeline_stage);
 
     /**
 	 * @brief Submits a command buffer related to a frame to a queue
 	 */
-    void submit(const Queue &queue, const std::vector<CommandBuffer *> &command_buffers);
+    void submit(const core::Queue &queue, const std::vector<core::CommandBuffer *> &command_buffers);
 
     /**
 	 * @brief Waits a frame to finish its rendering
@@ -186,7 +189,7 @@ public:
     VkSemaphore request_semaphore_with_ownership();
     void release_owned_semaphore(VkSemaphore semaphore);
 
-    Device &get_device();
+    core::Device &get_device();
 
     /**
 	 * @brief Returns the format that the RenderTargets are created with within the RenderContext
@@ -216,12 +219,12 @@ protected:
     VkExtent2D surface_extent;
 
 private:
-    Device &device;
+    core::Device &device;
 
     const Window &window;
 
     /// If swapchain exists, then this will be a present supported queue, else a graphics queue
-    const Queue &queue;
+    const core::Queue &queue;
 
     std::unique_ptr<Swapchain> swapchain;
 
@@ -246,4 +249,5 @@ private:
     size_t thread_count{1};
 };
 
+}// namespace rendering
 }// namespace vox

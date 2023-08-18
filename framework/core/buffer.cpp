@@ -9,6 +9,7 @@
 #include "device.h"
 
 namespace vox {
+namespace core {
 Buffer::Buffer(Device const &device, VkDeviceSize size, VkBufferUsageFlags buffer_usage,
                VmaMemoryUsage memory_usage, VmaAllocationCreateFlags flags,
                const std::vector<uint32_t> &queue_family_indices) : VulkanResource{VK_NULL_HANDLE, &device},
@@ -134,4 +135,5 @@ void Buffer::update(const uint8_t *data, const size_t size, const size_t offset)
     }
 }
 
-}// namespace vox
+}
+}// namespace vox::core

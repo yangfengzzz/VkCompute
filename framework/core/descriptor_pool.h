@@ -12,6 +12,7 @@
 #include "common/vk_common.h"
 
 namespace vox {
+namespace core {
 class Device;
 class DescriptorSetLayout;
 
@@ -72,4 +73,6 @@ private:
     // Find next pool index or create new pool
     uint32_t find_available_pool(uint32_t pool_index);
 };
-}// namespace vox
+
+}
+}// namespace vox::core

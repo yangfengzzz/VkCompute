@@ -13,6 +13,8 @@
 #include "core/render_pass.h"
 
 namespace vox {
+namespace core {
+
 struct VertexInputState {
     std::vector<VkVertexInputBindingDescription> bindings;
 
@@ -224,4 +226,6 @@ private:
 
     uint32_t subpass_index{0U};
 };
-}// namespace vox
+
+}
+}// namespace vox::core

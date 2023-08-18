@@ -12,10 +12,12 @@
 #include <functional>
 
 namespace vox {
+namespace core {
 namespace {
 #if defined(VKB_DEBUG) || defined(VKB_VALIDATION_LAYERS)
 
-VKAPI_ATTR VkBool32 VKAPI_CALL debug_utils_messenger_callback(VkDebugUtilsMessageSeverityFlagBitsEXT message_severity, VkDebugUtilsMessageTypeFlagsEXT message_type,
+VKAPI_ATTR VkBool32 VKAPI_CALL debug_utils_messenger_callback(VkDebugUtilsMessageSeverityFlagBitsEXT message_severity,
+                                                              VkDebugUtilsMessageTypeFlagsEXT message_type,
                                                               const VkDebugUtilsMessengerCallbackDataEXT *callback_data,
                                                               void *user_data) {
     // Log debug message
@@ -416,4 +418,6 @@ VkInstance Instance::get_handle() const {
 const std::vector<const char *> &Instance::get_extensions() {
     return enabled_extensions;
 }
-}// namespace vox
+
+}
+}// namespace vox::core

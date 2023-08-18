@@ -11,6 +11,8 @@
 #include <memory>
 
 namespace vox {
+namespace rendering {
+
 class RenderTarget;
 /**
 * @brief A reference to a vox::ImageView, plus an optional sampler for it
@@ -22,7 +24,7 @@ public:
 	* @brief Constructs a SampledImage referencing the given image and with the given sampler.
 	* @remarks If the sampler is null, a default sampler will be used.
 	*/
-    explicit SampledImage(const ImageView &image_view, Sampler *sampler = nullptr);
+    explicit SampledImage(const core::ImageView &image_view, core::Sampler *sampler = nullptr);
 
     /**
 	* @brief Constructs a SampledImage referencing a certain attachment of a render target.
@@ -30,7 +32,7 @@ public:
 	*          If the sampler is null, a default sampler is used.
 	*/
     explicit SampledImage(uint32_t target_attachment, RenderTarget *render_target = nullptr,
-                          Sampler *sampler = nullptr, bool isDepthResolve = false);
+                          core::Sampler *sampler = nullptr, bool isDepthResolve = false);
 
     SampledImage(const SampledImage &to_copy);
     SampledImage &operator=(const SampledImage &to_copy);
@@ -43,7 +45,7 @@ public:
     /**
 	 * @brief Replaces the current image view with the given one.
 	 */
-    inline void set_image_view(const ImageView &new_view) {
+    inline void set_image_view(const core::ImageView &new_view) {
         image_view = &new_view;
     }
 
@@ -66,19 +68,19 @@ public:
 	 * @brief Returns either the ImageView, if set, or the image view for the set target attachment.
 	 *        If the view has no render target associated with it, default_target is used.
 	 */
-    [[nodiscard]] const ImageView &get_image_view(const vox::RenderTarget &default_target) const;
+    [[nodiscard]] const core::ImageView &get_image_view(const RenderTarget &default_target) const;
 
     /**
 	 * @brief Returns the currently-set sampler, if any.
 	 */
-    [[nodiscard]] inline Sampler *get_sampler() const {
+    [[nodiscard]] inline core::Sampler *get_sampler() const {
         return sampler;
     }
 
     /**
 	 * @brief Sets the sampler for this SampledImage.
 	 */
-    inline void set_sampler(Sampler *new_sampler) {
+    inline void set_sampler(core::Sampler *new_sampler) {
         sampler = new_sampler;
     }
 
@@ -109,11 +111,12 @@ public:
     }
 
 private:
-    const ImageView *image_view;
+    const core::ImageView *image_view;
     uint32_t target_attachment;
     RenderTarget *render_target;
-    Sampler *sampler;
+    core::Sampler *sampler;
     bool isDepthResolve;
 };
 
-}// namespace vox
+}
+}// namespace vox::rendering

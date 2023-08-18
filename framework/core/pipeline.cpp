@@ -10,6 +10,7 @@
 #include "shader_module.h"
 
 namespace vox {
+namespace core {
 Pipeline::Pipeline(Device &device) : device{device} {}
 
 Pipeline::Pipeline(Pipeline &&other) noexcept : device{other.device},
@@ -268,4 +269,6 @@ GraphicsPipeline::GraphicsPipeline(Device &device,
 
     state = pipeline_state;
 }
-}// namespace vox
+
+}
+}// namespace vox::core

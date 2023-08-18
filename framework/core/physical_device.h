@@ -9,6 +9,7 @@
 #include "core/instance.h"
 
 namespace vox {
+namespace core {
 class Instance;
 
 /**
@@ -159,4 +160,6 @@ private:
 
     bool high_priority_graphics_queue{};
 };
-}// namespace vox
+
+}
+}// namespace vox::core

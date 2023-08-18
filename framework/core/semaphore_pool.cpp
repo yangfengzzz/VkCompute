@@ -9,6 +9,7 @@
 #include "core/device.h"
 
 namespace vox {
+namespace core {
 SemaphorePool::SemaphorePool(Device &device) : device{device} {
 }
 
@@ -87,4 +88,6 @@ void SemaphorePool::reset() {
 uint32_t SemaphorePool::get_active_semaphore_count() const {
     return active_semaphore_count;
 }
-}// namespace vox
+
+}
+}// namespace vox::core

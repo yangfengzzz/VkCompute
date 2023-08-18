@@ -7,11 +7,13 @@
 #pragma once
 
 #include "common/glm_common.h"
-#include "core/sampled_image.h"
+#include "rendering/sampled_image.h"
 #include "core/shader_module.h"
-#include "postprocessing_pass.h"
+#include "rendering/postprocessing_pass.h"
 
 namespace vox {
+namespace rendering {
+
 /**
  * @brief Maps in-shader binding names to the SampledImage to bind.
  */
@@ -22,8 +24,9 @@ using SampledImageMap = std::unordered_map<std::string, SampledImage>;
 */
 class PostProcessingComputePass : public PostProcessingPass<PostProcessingComputePass> {
 public:
-    PostProcessingComputePass(PostProcessingPipeline *parent, ShaderSource cs_source, const ShaderVariant &cs_variant = {},
-                              std::shared_ptr<Sampler> &&default_sampler = {});
+    PostProcessingComputePass(PostProcessingPipeline *parent, core::ShaderSource cs_source,
+                              const core::ShaderVariant &cs_variant = {},
+                              std::shared_ptr<core::Sampler> &&default_sampler = {});
 
     PostProcessingComputePass(const PostProcessingComputePass &to_copy) = delete;
     PostProcessingComputePass &operator=(const PostProcessingComputePass &to_copy) = delete;
@@ -31,8 +34,8 @@ public:
     PostProcessingComputePass(PostProcessingComputePass &&to_move) = default;
     PostProcessingComputePass &operator=(PostProcessingComputePass &&to_move) = default;
 
-    void prepare(CommandBuffer &command_buffer, RenderTarget &default_render_target) override;
-    void draw(CommandBuffer &command_buffer, RenderTarget &default_render_target) override;
+    void prepare(core::CommandBuffer &command_buffer, RenderTarget &default_render_target) override;
+    void draw(core::CommandBuffer &command_buffer, RenderTarget &default_render_target) override;
 
     /**
 	 * @brief Sets the number of workgroups to be dispatched each draw().
@@ -125,26 +128,27 @@ public:
     }
 
 private:
-    ShaderSource cs_source;
-    ShaderVariant cs_variant;
+    core::ShaderSource cs_source;
+    core::ShaderVariant cs_variant;
     glm::tvec3<uint32_t> n_workgroups{1, 1, 1};
 
-    std::shared_ptr<Sampler> default_sampler{};
+    std::shared_ptr<core::Sampler> default_sampler{};
     SampledImageMap sampled_images{};
     SampledImageMap storage_images{};
 
     std::vector<uint8_t> uniform_data{};
-    std::unique_ptr<BufferAllocation> uniform_alloc{};
+    std::unique_ptr<core::BufferAllocation> uniform_alloc{};
     std::vector<uint8_t> push_constants_data{};
 
     /**
 	 * @brief Transitions sampled_images (to SHADER_READ_ONLY_OPTIMAL)
 	 *        and storage_images (to GENERAL) as appropriate.
 	 */
-    void transition_images(CommandBuffer &command_buffer, RenderTarget &default_render_target);
+    void transition_images(core::CommandBuffer &command_buffer, RenderTarget &default_render_target);
 
     BarrierInfo get_src_barrier_info() const override;
     BarrierInfo get_dst_barrier_info() const override;
 };
 
-}// namespace vox
+}
+}// namespace vox::rendering

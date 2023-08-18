@@ -9,6 +9,8 @@
 #include "postprocessing_pass.h"
 
 namespace vox {
+namespace rendering {
+
 class PostProcessingRenderPass;
 
 /**
@@ -21,7 +23,7 @@ public:
     /**
     * @brief Creates a rendering pipeline entirely made of fullscreen post-processing subpasses.
     */
-    PostProcessingPipeline(RenderContext &render_context, ShaderSource triangle_vs);
+    PostProcessingPipeline(RenderContext &render_context, core::ShaderSource triangle_vs);
 
     PostProcessingPipeline(const PostProcessingPipeline &to_copy) = delete;
     PostProcessingPipeline &operator=(const PostProcessingPipeline &to_copy) = delete;
@@ -36,7 +38,7 @@ public:
 	 * @remarks vox::PostProcessingRenderpass that do not explicitly have a vox::RenderTarget set will render
 	 *          to default_render_target.
 	 */
-    void draw(CommandBuffer &command_buffer, RenderTarget &default_render_target);
+    void draw(core::CommandBuffer &command_buffer, RenderTarget &default_render_target);
 
     /**
 	 * @brief Gets all of the passes in the pipeline.
@@ -48,7 +50,7 @@ public:
     /**
 	 * @brief Get the pass at a certain index as a `TPass`.
 	 */
-    template<typename TPass = vox::PostProcessingRenderPass>
+    template<typename TPass = PostProcessingRenderPass>
     inline TPass &get_pass(size_t index) {
         return *dynamic_cast<TPass *>(passes[index].get());
     }
@@ -56,7 +58,7 @@ public:
     /**
 	 * @brief Adds a pass of the given type to the end of the pipeline by constructing it in-place.
 	 */
-    template<typename TPass = vox::PostProcessingRenderPass, typename... ConstructorArgs>
+    template<typename TPass = PostProcessingRenderPass, typename... ConstructorArgs>
     TPass &add_pass(ConstructorArgs &&...args) {
         passes.emplace_back(std::make_unique<TPass>(this, std::forward<ConstructorArgs>(args)...));
         auto &added_pass = *dynamic_cast<TPass *>(passes.back().get());
@@ -79,9 +81,10 @@ public:
 
 private:
     RenderContext *render_context{nullptr};
-    ShaderSource triangle_vs;
+    core::ShaderSource triangle_vs;
     std::vector<std::unique_ptr<PostProcessingPassBase>> passes{};
     size_t current_pass_index{0};
 };
 
-}// namespace vox
+}
+}// namespace vox::rendering

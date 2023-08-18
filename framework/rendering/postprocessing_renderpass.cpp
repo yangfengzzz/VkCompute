@@ -9,13 +9,18 @@
 #include "postprocessing_pipeline.h"
 
 namespace vox {
+namespace rendering {
+
 constexpr uint32_t DEPTH_RESOLVE_BITMASK = 0x80000000;
 constexpr uint32_t ATTACHMENT_BITMASK = 0x7FFFFFFF;
 
-PostProcessingSubpass::PostProcessingSubpass(PostProcessingRenderPass *parent, RenderContext &render_context, ShaderSource &&triangle_vs,
-                                             ShaderSource &&fs, ShaderVariant &&fs_variant) : Subpass(render_context, std::move(triangle_vs), std::move(fs)),
-                                                                                              parent{parent},
-                                                                                              fs_variant{std::move(fs_variant)} {
+PostProcessingSubpass::PostProcessingSubpass(PostProcessingRenderPass *parent, RenderContext &render_context,
+                                             core::ShaderSource &&triangle_vs,
+                                             core::ShaderSource &&fs,
+                                             core::ShaderVariant &&fs_variant)
+    : Subpass(render_context, std::move(triangle_vs), std::move(fs)),
+      parent{parent},
+      fs_variant{std::move(fs_variant)} {
     set_disable_depth_stencil_attachment(true);
 
     std::vector<uint32_t> input_attachments{};
@@ -25,11 +30,12 @@ PostProcessingSubpass::PostProcessingSubpass(PostProcessingRenderPass *parent, R
     set_input_attachments(input_attachments);
 }
 
-PostProcessingSubpass::PostProcessingSubpass(PostProcessingSubpass &&to_move) : Subpass{std::move(to_move)},
-                                                                                parent{std::move(to_move.parent)},
-                                                                                fs_variant{std::move(to_move.fs_variant)},
-                                                                                input_attachments{std::move(to_move.input_attachments)},
-                                                                                sampled_images{std::move(to_move.sampled_images)} {}
+PostProcessingSubpass::PostProcessingSubpass(PostProcessingSubpass &&to_move)
+    : Subpass{std::move(to_move)},
+      parent{std::move(to_move.parent)},
+      fs_variant{std::move(to_move.fs_variant)},
+      input_attachments{std::move(to_move.input_attachments)},
+      sampled_images{std::move(to_move.sampled_images)} {}
 
 PostProcessingSubpass &PostProcessingSubpass::bind_input_attachment(const std::string &name, uint32_t new_input_attachment) {
     input_attachments[name] = new_input_attachment;
@@ -60,7 +66,7 @@ PostProcessingSubpass &PostProcessingSubpass::bind_sampled_image(const std::stri
     return *this;
 }
 
-PostProcessingSubpass &PostProcessingSubpass::bind_storage_image(const std::string &name, const ImageView &new_image) {
+PostProcessingSubpass &PostProcessingSubpass::bind_storage_image(const std::string &name, const core::ImageView &new_image) {
     auto it = storage_images.find(name);
     if (it != storage_images.end()) {
         it->second = &new_image;
@@ -88,20 +94,20 @@ void PostProcessingSubpass::prepare() {
     resource_cache.request_shader_module(VK_SHADER_STAGE_FRAGMENT_BIT, get_fragment_shader(), fs_variant);
 }
 
-void PostProcessingSubpass::draw(CommandBuffer &command_buffer) {
+void PostProcessingSubpass::draw(core::CommandBuffer &command_buffer) {
     // Get shaders from cache
     auto &resource_cache = command_buffer.get_device().get_resource_cache();
     auto &vert_shader_module = resource_cache.request_shader_module(VK_SHADER_STAGE_VERTEX_BIT, get_vertex_shader());
     auto &frag_shader_module = resource_cache.request_shader_module(VK_SHADER_STAGE_FRAGMENT_BIT, get_fragment_shader(), fs_variant);
 
-    std::vector<ShaderModule *> shader_modules{&vert_shader_module, &frag_shader_module};
+    std::vector<core::ShaderModule *> shader_modules{&vert_shader_module, &frag_shader_module};
 
     // Create pipeline layout and bind it
     auto &pipeline_layout = resource_cache.request_pipeline_layout(shader_modules);
     command_buffer.bind_pipeline_layout(pipeline_layout);
 
     // Disable culling
-    RasterizationState rasterization_state;
+    core::RasterizationState rasterization_state;
     rasterization_state.cull_mode = VK_CULL_MODE_NONE;
     command_buffer.set_rasterization_state(rasterization_state);
 
@@ -148,12 +154,13 @@ void PostProcessingSubpass::draw(CommandBuffer &command_buffer) {
     draw_func(command_buffer, render_target);
 }
 
-void PostProcessingSubpass::default_draw_func(vox::CommandBuffer &command_buffer, vox::RenderTarget &) {
+void PostProcessingSubpass::default_draw_func(core::CommandBuffer &command_buffer, RenderTarget &) {
     command_buffer.draw(3, 1, 0, 0);
 }
 
-PostProcessingRenderPass::PostProcessingRenderPass(PostProcessingPipeline *parent, std::unique_ptr<Sampler> &&default_sampler) : PostProcessingPass{parent},
-                                                                                                                                 default_sampler{std::move(default_sampler)} {
+PostProcessingRenderPass::PostProcessingRenderPass(PostProcessingPipeline *parent, std::unique_ptr<core::Sampler> &&default_sampler)
+    : PostProcessingPass{parent},
+      default_sampler{std::move(default_sampler)} {
     if (this->default_sampler == nullptr) {
         // Setup a sane default sampler if none was passed
         VkSamplerCreateInfo sampler_info{VK_STRUCTURE_TYPE_SAMPLER_CREATE_INFO};
@@ -171,7 +178,7 @@ PostProcessingRenderPass::PostProcessingRenderPass(PostProcessingPipeline *paren
         sampler_info.maxAnisotropy = 0.0f;
         sampler_info.borderColor = VK_BORDER_COLOR_FLOAT_OPAQUE_WHITE;
 
-        this->default_sampler = std::make_unique<vox::Sampler>(get_render_context().get_device(), sampler_info);
+        this->default_sampler = std::make_unique<core::Sampler>(get_render_context().get_device(), sampler_info);
     }
 }
 
@@ -262,7 +269,7 @@ void PostProcessingRenderPass::transition_attachments(
     const AttachmentSet &input_attachments,
     const SampledAttachmentSet &sampled_attachments,
     const AttachmentSet &output_attachments,
-    CommandBuffer &command_buffer,
+    core::CommandBuffer &command_buffer,
     RenderTarget &fallback_render_target) {
     auto &render_target = this->render_target ? *this->render_target : fallback_render_target;
     const auto &views = render_target.get_views();
@@ -371,7 +378,7 @@ void PostProcessingRenderPass::transition_attachments(
     //       so we don't want to transition them to UNDEFINED layout here
 }
 
-void PostProcessingRenderPass::prepare_draw(CommandBuffer &command_buffer, RenderTarget &fallback_render_target) {
+void PostProcessingRenderPass::prepare_draw(core::CommandBuffer &command_buffer, RenderTarget &fallback_render_target) {
     // Collect all input, output, and sampled-from attachments from all subpasses (steps)
     AttachmentSet input_attachments, output_attachments;
     SampledAttachmentSet sampled_attachments;
@@ -408,13 +415,13 @@ void PostProcessingRenderPass::prepare_draw(CommandBuffer &command_buffer, Rende
                        fallback_render_target);
 }
 
-void PostProcessingRenderPass::draw(CommandBuffer &command_buffer, RenderTarget &default_render_target) {
+void PostProcessingRenderPass::draw(core::CommandBuffer &command_buffer, RenderTarget &default_render_target) {
     prepare_draw(command_buffer, default_render_target);
 
     if (!uniform_data.empty()) {
         // Allocate a buffer (using the buffer pool from the active frame to store uniform values) and bind it
         auto &render_frame = parent->get_render_context().get_active_frame();
-        uniform_buffer_alloc = std::make_shared<BufferAllocation>(render_frame.allocate_buffer(VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT, uniform_data.size()));
+        uniform_buffer_alloc = std::make_shared<core::BufferAllocation>(render_frame.allocate_buffer(VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT, uniform_data.size()));
         uniform_buffer_alloc->update(uniform_data);
     }
 
@@ -446,4 +453,5 @@ void PostProcessingRenderPass::draw(CommandBuffer &command_buffer, RenderTarget 
     }
 }
 
-}// namespace vox
+}
+}// namespace vox::rendering

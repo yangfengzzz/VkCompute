@@ -13,6 +13,7 @@
 #include "resource_cache.h"
 
 namespace vox {
+namespace core {
 namespace {
 inline void write_subpass_info(std::ostringstream &os, const std::vector<SubpassInfo> &value) {
     write(os, value.size());
@@ -69,7 +70,7 @@ size_t ResourceRecord::register_pipeline_layout(const std::vector<ShaderModule *
     return pipeline_layout_indices.back();
 }
 
-size_t ResourceRecord::register_render_pass(const std::vector<Attachment> &attachments,
+size_t ResourceRecord::register_render_pass(const std::vector<rendering::Attachment> &attachments,
                                             const std::vector<LoadStoreInfo> &load_store_infos,
                                             const std::vector<SubpassInfo> &subpasses) {
     render_pass_indices.push_back(render_pass_indices.size());
@@ -140,4 +141,5 @@ void ResourceRecord::set_graphics_pipeline(size_t index, const GraphicsPipeline 
     graphics_pipeline_to_index[&graphics_pipeline] = index;
 }
 
-}// namespace vox
+}
+}// namespace vox::core

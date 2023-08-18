@@ -7,11 +7,12 @@
 #include "shader_module.h"
 
 #include "common/logging.h"
-#include "device.h"
-#include "glsl_compiler.h"
+#include "common/glsl_compiler.h"
 #include "common/filesystem.h"
+#include "core/device.h"
 
 namespace vox {
+namespace core {
 /**
  * @brief Pre-compiles project shader files to include header code
  * @param source The shader file
@@ -243,4 +244,6 @@ void ShaderSource::set_source(const std::string &source_) {
 const std::string &ShaderSource::get_source() const {
     return source;
 }
-}// namespace vox
+
+}
+}// namespace vox::core

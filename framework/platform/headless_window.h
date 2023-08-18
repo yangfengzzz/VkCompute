@@ -22,7 +22,7 @@ public:
 	 * @brief A direct window doesn't have a surface
 	 * @returns VK_NULL_HANDLE
 	 */
-    VkSurfaceKHR create_surface(Instance &instance) override;
+    VkSurfaceKHR create_surface(core::Instance &instance) override;
 
     /**
 	 * @brief A direct window doesn't have a surface

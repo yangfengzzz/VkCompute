@@ -6,10 +6,11 @@
 
 #include "resource_cache.h"
 
-#include "common/resource_caching.h"
+#include "core/resource_caching.h"
 #include "core/device.h"
 
 namespace vox {
+namespace core {
 namespace {
 template<class T, class... A>
 T &request_resource(Device &device, ResourceRecord &recorder, std::mutex &resource_mutex,
@@ -74,13 +75,13 @@ DescriptorSet &ResourceCache::request_descriptor_set(DescriptorSetLayout &descri
     return request_resource(device, recorder, descriptor_set_mutex, state.descriptor_sets, descriptor_set_layout, descriptor_pool, buffer_infos, image_infos);
 }
 
-RenderPass &ResourceCache::request_render_pass(const std::vector<Attachment> &attachments,
+RenderPass &ResourceCache::request_render_pass(const std::vector<rendering::Attachment> &attachments,
                                                const std::vector<LoadStoreInfo> &load_store_infos,
                                                const std::vector<SubpassInfo> &subpasses) {
     return request_resource(device, recorder, render_pass_mutex, state.render_passes, attachments, load_store_infos, subpasses);
 }
 
-Framebuffer &ResourceCache::request_framebuffer(const RenderTarget &render_target, const RenderPass &render_pass) {
+rendering::Framebuffer &ResourceCache::request_framebuffer(const rendering::RenderTarget &render_target, const RenderPass &render_pass) {
     return request_resource(device, recorder, framebuffer_mutex, state.framebuffers, render_target, render_pass);
 }
 
@@ -180,4 +181,6 @@ void ResourceCache::clear() {
 const ResourceCacheState &ResourceCache::get_internal_state() const {
     return state;
 }
-}// namespace vox
+
+}
+}// namespace vox::core

@@ -10,7 +10,7 @@ namespace vox {
 HeadlessWindow::HeadlessWindow(const Window::Properties &properties) : Window(properties) {
 }
 
-VkSurfaceKHR HeadlessWindow::create_surface(Instance &instance) {
+VkSurfaceKHR HeadlessWindow::create_surface(core::Instance &instance) {
     return VK_NULL_HANDLE;
 }
 

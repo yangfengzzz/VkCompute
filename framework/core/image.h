@@ -13,6 +13,7 @@
 #include "core/vulkan_resource.h"
 
 namespace vox {
+namespace core {
 class Device;
 class ImageView;
 
@@ -107,4 +108,5 @@ private:
     bool mapped{false};
 };
 
-}// namespace vox
+}
+}// namespace vox::core

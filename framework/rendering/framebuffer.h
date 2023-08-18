@@ -12,11 +12,14 @@
 #include "rendering/render_target.h"
 
 namespace vox {
+namespace core {
 class Device;
+}// namespace core
+namespace rendering {
 
 class Framebuffer {
 public:
-    Framebuffer(Device &device, const RenderTarget &render_target, const RenderPass &render_pass);
+    Framebuffer(core::Device &device, const RenderTarget &render_target, const core::RenderPass &render_pass);
 
     Framebuffer(const Framebuffer &) = delete;
 
@@ -33,10 +36,12 @@ public:
     [[nodiscard]] const VkExtent2D &get_extent() const;
 
 private:
-    Device &device;
+    core::Device &device;
 
     VkFramebuffer handle{VK_NULL_HANDLE};
 
     VkExtent2D extent{};
 };
+
+}// namespace rendering
 }// namespace vox

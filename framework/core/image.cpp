@@ -10,6 +10,7 @@
 #include "image_view.h"
 
 namespace vox {
+namespace core {
 namespace {
 inline VkImageType find_image_type(VkExtent3D extent) {
     VkImageType result{};
@@ -204,4 +205,5 @@ std::unordered_set<ImageView *> &Image::get_views() {
     return views;
 }
 
-}// namespace vox
+}
+}// namespace vox::core

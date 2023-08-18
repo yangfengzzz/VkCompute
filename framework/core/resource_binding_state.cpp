@@ -7,6 +7,7 @@
 #include "resource_binding_state.h"
 
 namespace vox {
+namespace core {
 void ResourceBindingState::reset() {
     clear_dirty();
 
@@ -113,4 +114,5 @@ const BindingMap<ResourceInfo> &ResourceSet::get_resource_bindings() const {
     return resource_bindings;
 }
 
-}// namespace vox
+}
+}// namespace vox::core

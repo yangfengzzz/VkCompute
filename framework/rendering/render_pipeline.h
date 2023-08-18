@@ -13,6 +13,8 @@
 #include "rendering/subpass.h"
 
 namespace vox {
+namespace rendering {
+
 /**
  * @brief A RenderPipeline is a sequence of Subpass objects.
  * Subpass holds shaders and can draw the sg::Scene.
@@ -74,7 +76,7 @@ public:
     /**
 	 * @brief Record draw commands for each Subpass
 	 */
-    void draw(CommandBuffer &command_buffer, RenderTarget &render_target, VkSubpassContents contents = VK_SUBPASS_CONTENTS_INLINE);
+    void draw(core::CommandBuffer &command_buffer, RenderTarget &render_target, VkSubpassContents contents = VK_SUBPASS_CONTENTS_INLINE);
 
     /**
 	 * @return Subpass currently being recorded, or the first one
@@ -93,4 +95,6 @@ private:
 
     size_t active_subpass_index{0};
 };
-}// namespace vox
+
+}
+}// namespace vox::rendering

@@ -12,6 +12,7 @@
 #include <type_traits>
 
 namespace vox {
+namespace core {
 class Device;
 
 namespace detail {
@@ -22,7 +23,7 @@ void set_debug_name(const Device *device, VkObjectType object_type, uint64_t han
 ///
 /// This allows the derived class to store a Vulkan handle, and also a pointer to the parent Device.
 /// It also allow for adding debug data to any Vulkan object.
-template<typename THandle, VkObjectType OBJECT_TYPE, typename Device = vox::Device>
+template<typename THandle, VkObjectType OBJECT_TYPE, typename Device = vox::core::Device>
 class VulkanResource {
 public:
     explicit VulkanResource(THandle handle = VK_NULL_HANDLE, Device *device = nullptr) : handle{handle}, device{device} {
@@ -86,4 +87,5 @@ protected:
     std::string debug_name;
 };
 
-}// namespace vox
+}
+}// namespace vox::core

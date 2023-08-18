@@ -12,7 +12,10 @@
 #include "core/image_view.h"
 
 namespace vox {
+namespace core {
 class Device;
+}// namespace core
+namespace rendering {
 
 /**
  * @brief Description of render pass attachments.
@@ -43,13 +46,13 @@ struct Attachment {
  */
 class RenderTarget {
 public:
-    using CreateFunc = std::function<std::unique_ptr<RenderTarget>(Image &&)>;
+    using CreateFunc = std::function<std::unique_ptr<RenderTarget>(core::Image &&)>;
 
     static const CreateFunc DEFAULT_CREATE_FUNC;
 
-    explicit RenderTarget(std::vector<Image> &&images);
+    explicit RenderTarget(std::vector<core::Image> &&images);
 
-    explicit RenderTarget(std::vector<ImageView> &&image_views);
+    explicit RenderTarget(std::vector<core::ImageView> &&image_views);
 
     RenderTarget(const RenderTarget &) = delete;
 
@@ -61,7 +64,7 @@ public:
 
     [[nodiscard]] const VkExtent2D &get_extent() const;
 
-    [[nodiscard]] const std::vector<ImageView> &get_views() const;
+    [[nodiscard]] const std::vector<core::ImageView> &get_views() const;
 
     [[nodiscard]] const std::vector<Attachment> &get_attachments() const;
 
@@ -88,13 +91,13 @@ public:
     [[nodiscard]] VkImageLayout get_layout(uint32_t attachment) const;
 
 private:
-    Device const &device;
+    core::Device const &device;
 
     VkExtent2D extent{};
 
-    std::vector<Image> images;
+    std::vector<core::Image> images;
 
-    std::vector<ImageView> views;
+    std::vector<core::ImageView> views;
 
     std::vector<Attachment> attachments;
 
@@ -104,4 +107,6 @@ private:
     /// By default the output attachments is attachment 0
     std::vector<uint32_t> output_attachments = {0};
 };
+
+}// namespace rendering
 }// namespace vox

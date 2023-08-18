@@ -10,6 +10,7 @@
 #include "common/vk_common.h"
 
 namespace vox {
+namespace core {
 class Device;
 /**
  * @brief Extended buffer class to simplify ray tracing shader binding table usage
@@ -49,4 +50,6 @@ private:
 
     uint8_t *mapped_data{nullptr};
 };
-}// namespace vox
+
+}
+}// namespace vox::core

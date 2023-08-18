@@ -10,6 +10,7 @@
 #include "common/vk_common.h"
 
 namespace vox {
+namespace core {
 class DescriptorPool;
 class Device;
 class ShaderModule;
@@ -79,4 +80,6 @@ private:
 
     std::vector<ShaderModule *> shader_modules;
 };
-}// namespace vox
+
+}
+}// namespace vox::core

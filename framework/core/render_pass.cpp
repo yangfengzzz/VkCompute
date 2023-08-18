@@ -12,6 +12,7 @@
 #include "rendering/render_target.h"
 
 namespace vox {
+namespace core {
 namespace {
 inline void set_structure_type(VkAttachmentDescription &attachment) {
     // VkAttachmentDescription has no sType field
@@ -82,7 +83,7 @@ inline VkResult create_vk_renderpass(VkDevice device, VkRenderPassCreateInfo2KHR
 }// namespace
 
 template<typename T>
-std::vector<T> get_attachment_descriptions(const std::vector<Attachment> &attachments, const std::vector<LoadStoreInfo> &load_store_infos) {
+std::vector<T> get_attachment_descriptions(const std::vector<rendering::Attachment> &attachments, const std::vector<LoadStoreInfo> &load_store_infos) {
     std::vector<T> attachment_descriptions;
 
     for (size_t i = 0U; i < attachments.size(); ++i) {
@@ -226,7 +227,9 @@ T get_attachment_reference(const uint32_t attachment, const VkImageLayout layout
 }
 
 template<typename T_SubpassDescription, typename T_AttachmentDescription, typename T_AttachmentReference, typename T_SubpassDependency, typename T_RenderPassCreateInfo>
-void RenderPass::create_renderpass(const std::vector<Attachment> &attachments, const std::vector<LoadStoreInfo> &load_store_infos, const std::vector<SubpassInfo> &subpasses) {
+void RenderPass::create_renderpass(const std::vector<rendering::Attachment> &attachments,
+                                   const std::vector<LoadStoreInfo> &load_store_infos,
+                                   const std::vector<SubpassInfo> &subpasses) {
     auto attachment_descriptions = get_attachment_descriptions<T_AttachmentDescription>(attachments, load_store_infos);
 
     // Store attachments for every subpass
@@ -272,7 +275,7 @@ void RenderPass::create_renderpass(const std::vector<Attachment> &attachments, c
 
         if (!subpass.disable_depth_stencil_attachment) {
             // Assumption: depth stencil attachment appears in the list before any depth stencil resolve attachment
-            auto it = find_if(attachments.begin(), attachments.end(), [](const Attachment attachment) { return is_depth_stencil_format(attachment.format); });
+            auto it = find_if(attachments.begin(), attachments.end(), [](const rendering::Attachment attachment) { return is_depth_stencil_format(attachment.format); });
             if (it != attachments.end()) {
                 auto i_depth_stencil = vox::to_u32(std::distance(attachments.begin(), it));
                 auto initial_layout = it->initial_layout == VK_IMAGE_LAYOUT_UNDEFINED ? VK_IMAGE_LAYOUT_DEPTH_STENCIL_ATTACHMENT_OPTIMAL : it->initial_layout;
@@ -386,11 +389,12 @@ void RenderPass::create_renderpass(const std::vector<Attachment> &attachments, c
     }
 }
 
-RenderPass::RenderPass(Device &device, const std::vector<Attachment> &attachments,
+RenderPass::RenderPass(Device &device, const std::vector<rendering::Attachment> &attachments,
                        const std::vector<LoadStoreInfo> &load_store_infos,
-                       const std::vector<SubpassInfo> &subpasses) : VulkanResource{VK_NULL_HANDLE, &device},
-                                                                    subpass_count{std::max<size_t>(1, subpasses.size())},// At least 1 subpass
-                                                                    color_output_count{} {
+                       const std::vector<SubpassInfo> &subpasses)
+    : VulkanResource{VK_NULL_HANDLE, &device},
+      subpass_count{std::max<size_t>(1, subpasses.size())},// At least 1 subpass
+      color_output_count{} {
     if (device.is_enabled(VK_KHR_CREATE_RENDERPASS_2_EXTENSION_NAME)) {
         create_renderpass<VkSubpassDescription2KHR, VkAttachmentDescription2KHR, VkAttachmentReference2KHR,
                           VkSubpassDependency2KHR, VkRenderPassCreateInfo2KHR>(attachments, load_store_infos, subpasses);
@@ -423,4 +427,6 @@ VkExtent2D RenderPass::get_render_area_granularity() const {
 
     return render_area_granularity;
 }
-}// namespace vox
+
+}
+}// namespace vox::core

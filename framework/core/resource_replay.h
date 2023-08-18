@@ -9,6 +9,7 @@
 #include "resource_record.h"
 
 namespace vox {
+namespace core {
 class ResourceCache;
 
 /**
@@ -42,4 +43,6 @@ private:
 
     std::vector<const GraphicsPipeline *> graphics_pipelines;
 };
-}// namespace vox
+
+}
+}// namespace vox::core

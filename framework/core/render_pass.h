@@ -11,7 +11,10 @@
 #include "core/vulkan_resource.h"
 
 namespace vox {
+namespace rendering {
 struct Attachment;
+}// namespace rendering
+namespace core {
 class Device;
 
 struct SubpassInfo {
@@ -33,7 +36,7 @@ struct SubpassInfo {
 class RenderPass : public VulkanResource<VkRenderPass, VK_OBJECT_TYPE_RENDER_PASS> {
 public:
     RenderPass(Device &device,
-               const std::vector<Attachment> &attachments,
+               const std::vector<rendering::Attachment> &attachments,
                const std::vector<LoadStoreInfo> &load_store_infos,
                const std::vector<SubpassInfo> &subpasses);
 
@@ -56,10 +59,12 @@ private:
 
     template<typename T_SubpassDescription, typename T_AttachmentDescription,
              typename T_AttachmentReference, typename T_SubpassDependency, typename T_RenderPassCreateInfo>
-    void create_renderpass(const std::vector<Attachment> &attachments,
+    void create_renderpass(const std::vector<rendering::Attachment> &attachments,
                            const std::vector<LoadStoreInfo> &load_store_infos,
                            const std::vector<SubpassInfo> &subpasses);
 
     std::vector<uint32_t> color_output_count;
 };
+
+}// namespace core
 }// namespace vox

@@ -7,6 +7,8 @@
 #include "render_pipeline.h"
 
 namespace vox {
+namespace rendering {
+
 RenderPipeline::RenderPipeline(std::vector<std::unique_ptr<Subpass>> &&subpasses_) : subpasses{std::move(subpasses_)} {
     prepare();
 
@@ -46,7 +48,7 @@ void RenderPipeline::set_clear_value(const std::vector<VkClearValue> &cv) {
     clear_value = cv;
 }
 
-void RenderPipeline::draw(CommandBuffer &command_buffer, RenderTarget &render_target, VkSubpassContents contents) {
+void RenderPipeline::draw(core::CommandBuffer &command_buffer, RenderTarget &render_target, VkSubpassContents contents) {
     assert(!subpasses.empty() && "Render pipeline should contain at least one sub-pass");
 
     // Pad clear values if they're less than render target attachments
@@ -70,7 +72,7 @@ void RenderPipeline::draw(CommandBuffer &command_buffer, RenderTarget &render_ta
         if (subpass->get_debug_name().empty()) {
             subpass->set_debug_name(fmt::format("RP subpass #{}", i));
         }
-        ScopedDebugLabel subpass_debug_label{command_buffer, subpass->get_debug_name().c_str()};
+        core::ScopedDebugLabel subpass_debug_label{command_buffer, subpass->get_debug_name().c_str()};
 
         subpass->draw(command_buffer);
     }
@@ -81,4 +83,6 @@ void RenderPipeline::draw(CommandBuffer &command_buffer, RenderTarget &render_ta
 std::unique_ptr<Subpass> &RenderPipeline::get_active_subpass() {
     return subpasses[active_subpass_index];
 }
-}// namespace vox
+
+}
+}// namespace vox::rendering

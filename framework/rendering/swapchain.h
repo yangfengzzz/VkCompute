@@ -10,7 +10,10 @@
 #include "common/vk_common.h"
 
 namespace vox {
+namespace core {
 class Device;
+}// namespace core
+namespace rendering {
 
 enum ImageFormat {
     sRGB,
@@ -58,7 +61,7 @@ public:
     /**
 	 * @brief Constructor to create a swapchain.
 	 */
-    Swapchain(Device &device,
+    Swapchain(core::Device &device,
               VkSurfaceKHR surface,
               VkPresentModeKHR present_mode,
               const std::vector<VkPresentModeKHR> &present_mode_priority_list = {VK_PRESENT_MODE_FIFO_KHR,
@@ -75,7 +78,7 @@ public:
 	 *        by configuring all parameters.
 	 */
     Swapchain(Swapchain &old_swapchain,
-              Device &device,
+              core::Device &device,
               VkSurfaceKHR surface,
               VkPresentModeKHR present_mode,
               const std::vector<VkPresentModeKHR> &present_mode_priority_list = {VK_PRESENT_MODE_FIFO_KHR, VK_PRESENT_MODE_MAILBOX_KHR},
@@ -98,7 +101,7 @@ public:
 
     [[nodiscard]] bool is_valid() const;
 
-    Device &get_device();
+    core::Device &get_device();
 
     [[nodiscard]] VkSwapchainKHR get_handle() const;
 
@@ -119,7 +122,7 @@ public:
     [[nodiscard]] VkPresentModeKHR get_present_mode() const;
 
 private:
-    Device &device;
+    core::Device &device;
 
     VkSurfaceKHR surface{VK_NULL_HANDLE};
 
@@ -145,4 +148,6 @@ private:
 
     std::set<VkImageUsageFlagBits> image_usage_flags;
 };
+
+}// namespace rendering
 }// namespace vox

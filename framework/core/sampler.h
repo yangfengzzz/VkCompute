@@ -11,6 +11,7 @@
 #include "core/vulkan_resource.h"
 
 namespace vox {
+namespace core {
 class Device;
 
 /**
@@ -36,4 +37,5 @@ public:
     Sampler &operator=(Sampler &&) = delete;
 };
 
-}// namespace vox
+}
+}// namespace vox::core

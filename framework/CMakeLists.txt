@@ -44,7 +44,6 @@ set(COMMON_FILES
 
 set(RENDERING_FILES
         # Header files
-        rendering/pipeline_state.h
         rendering/postprocessing_pipeline.h
         rendering/postprocessing_pass.h
         rendering/postprocessing_renderpass.h
@@ -54,8 +53,10 @@ set(RENDERING_FILES
         rendering/render_pipeline.h
         rendering/render_target.h
         rendering/subpass.h
+        rendering/framebuffer.h
+        rendering/sampled_image.h
+        rendering/swapchain.h
         # Source files
-        rendering/pipeline_state.cpp
         rendering/postprocessing_pipeline.cpp
         rendering/postprocessing_pass.cpp
         rendering/postprocessing_renderpass.cpp
@@ -64,75 +65,11 @@ set(RENDERING_FILES
         rendering/render_frame.cpp
         rendering/render_pipeline.cpp
         rendering/render_target.cpp
-        rendering/subpass.cpp)
-
-set(RENDERING_SUBPASSES_FILES
-        # Header files
-        rendering/subpasses/forward_subpass.h
-        rendering/subpasses/lighting_subpass.h
-        rendering/subpasses/geometry_subpass.h
-        # Source files
-        rendering/subpasses/forward_subpass.cpp
-        rendering/subpasses/lighting_subpass.cpp
-        rendering/subpasses/geometry_subpass.cpp)
-
-set(SCENE_GRAPH_FILES
-        # Header Files
-        scene_graph/component.h
-        scene_graph/node.h
-        scene_graph/scene.h
-        scene_graph/script.h
-        # Source Files
-        scene_graph/component.cpp
-        scene_graph/node.cpp
-        scene_graph/scene.cpp
-        scene_graph/script.cpp)
-
-set(SCENE_GRAPH_COMPONENT_FILES
-        # Header Files
-        scene_graph/components/aabb.h
-        scene_graph/components/camera.h
-        scene_graph/components/perspective_camera.h
-        scene_graph/components/orthographic_camera.h
-        scene_graph/components/image.h
-        scene_graph/components/light.h
-        scene_graph/components/material.h
-        scene_graph/components/mesh.h
-        scene_graph/components/pbr_material.h
-        scene_graph/components/sampler.h
-        scene_graph/components/sub_mesh.h
-        scene_graph/components/texture.h
-        scene_graph/components/transform.h
-        scene_graph/components/image/astc.h
-        scene_graph/components/image/ktx.h
-        scene_graph/components/image/stb.h
-        # Source Files
-        scene_graph/components/aabb.cpp
-        scene_graph/components/camera.cpp
-        scene_graph/components/perspective_camera.cpp
-        scene_graph/components/orthographic_camera.cpp
-        scene_graph/components/image.cpp
-        scene_graph/components/light.cpp
-        scene_graph/components/material.cpp
-        scene_graph/components/mesh.cpp
-        scene_graph/components/pbr_material.cpp
-        scene_graph/components/sampler.cpp
-        scene_graph/components/sub_mesh.cpp
-        scene_graph/components/texture.cpp
-        scene_graph/components/transform.cpp
-        scene_graph/components/image/astc.cpp
-        scene_graph/components/image/ktx.cpp
-        scene_graph/components/image/stb.cpp)
-
-set(SCENE_GRAPH_SCRIPTS_FILES
-        # Header Files
-        scene_graph/scripts/free_camera.h
-        scene_graph/scripts/node_animation.h
-        scene_graph/scripts/animation.h
-        # Source Files
-        scene_graph/scripts/free_camera.cpp
-        scene_graph/scripts/node_animation.cpp
-        scene_graph/scripts/animation.cpp)
+        rendering/subpass.cpp
+        rendering/framebuffer.cpp
+        rendering/sampled_image.cpp
+        rendering/swapchain.cpp
+        )
 
 set(STATS_FILES
         # Header Files
@@ -164,21 +101,26 @@ set(CORE_FILES
         core/descriptor_set.h
         core/queue.h
         core/command_pool.h
-        core/swapchain.h
         core/command_buffer.h
         core/buffer.h
+        core/buffer_pool.h
         core/image.h
         core/image_view.h
-        core/sampled_image.h
         core/instance.h
         core/sampler.h
-        core/framebuffer.h
         core/render_pass.h
         core/query_pool.h
         core/scratch_buffer.h
         core/acceleration_structure.h
         core/shader_binding_table.h
         core/vulkan_resource.h
+        core/resource_binding_state.h
+        core/pipeline_state.h
+        core/fence_pool.h
+        core/resource_record.h
+        core/resource_replay.h
+        core/semaphore_pool.h
+        core/resource_cache.h
         # Source Files
         core/instance.cpp
         core/physical_device.cpp
@@ -193,28 +135,32 @@ set(CORE_FILES
         core/descriptor_set.cpp
         core/queue.cpp
         core/command_pool.cpp
-        core/swapchain.cpp
         core/command_buffer.cpp
         core/buffer.cpp
+        core/buffer_pool.cpp
         core/image.cpp
         core/image_view.cpp
-        core/sampled_image.cpp
         core/instance.cpp
         core/sampler.cpp
-        core/framebuffer.cpp
         core/render_pass.cpp
         core/query_pool.cpp
         core/scratch_buffer.cpp
         core/acceleration_structure.cpp
         core/shader_binding_table.cpp
         core/vulkan_resource.cpp
+        core/resource_binding_state.cpp
+        core/pipeline_state.cpp
+        core/fence_pool.cpp
+        core/resource_record.cpp
+        core/resource_replay.cpp
+        core/semaphore_pool.cpp
+        core/resource_cache.cpp
         )
 
 set(PLATFORM_FILES
         # Header Files
         platform/platform.h
         platform/window.h
-        platform/filesystem.h
         platform/input_events.h
         platform/headless_window.h
 
@@ -222,7 +168,6 @@ set(PLATFORM_FILES
         platform/headless_window.cpp
         platform/platform.cpp
         platform/window.cpp
-        platform/filesystem.cpp
         platform/input_events.cpp
         )
 
@@ -273,33 +218,21 @@ set(LINUX_D2D_FILES
 source_group("\\" FILES ${FRAMEWORK_FILES})
 source_group("common\\" FILES ${COMMON_FILES})
 source_group("platform\\" FILES ${PLATFORM_FILES})
-#source_group("platform\\" FILES ${GLFW_FILES})
-#source_group("platform\\parsers" FILES ${PARSER_FILES})
+source_group("platform\\" FILES ${GLFW_FILES})
+source_group("platform\\parsers" FILES ${PARSER_FILES})
 source_group("platform\\windows" FILES ${WINDOWS_FILES})
 source_group("platform\\android" FILES ${ANDROID_FILES})
 source_group("platform\\unix" FILES ${UNIX_FILES})
 source_group("platform\\unix" FILES ${LINUX_D2D_FILES})
-#source_group("core\\" FILES ${CORE_FILES})
-#source_group("geometry\\" FILES ${GEOMETRY_FILES})
+source_group("core\\" FILES ${CORE_FILES})
 source_group("rendering\\" FILES ${RENDERING_FILES})
-#source_group("rendering\\subpasses" FILES ${RENDERING_SUBPASSES_FILES})
-#source_group("scene_graph\\" FILES ${SCENE_GRAPH_FILES})
-#source_group("scene_graph\\components\\" FILES ${SCENE_GRAPH_COMPONENT_FILES})
-#source_group("scene_graph\\scripts\\" FILES ${SCENE_GRAPH_SCRIPTS_FILES})
-#source_group("stats\\" FILES ${STATS_FILES})
+source_group("stats\\" FILES ${STATS_FILES})
 
 set(PROJECT_FILES
-#        ${PLATFORM_FILES}
-        #    ${PARSER_FILES}
         ${COMMON_FILES}
-#        ${FRAMEWORK_FILES}
-#        ${CORE_FILES}
-        #    ${GEOMETRY_FILES}
-#        ${RENDERING_FILES}
-        #    ${RENDERING_SUBPASSES_FILES}
-        #    ${SCENE_GRAPH_FILES}
-        #    ${SCENE_GRAPH_COMPONENT_FILES}
-        #    ${SCENE_GRAPH_SCRIPTS_FILES}
+        ${PLATFORM_FILES}
+        ${CORE_FILES}
+        ${RENDERING_FILES}
         #    ${STATS_FILES}
         )
 

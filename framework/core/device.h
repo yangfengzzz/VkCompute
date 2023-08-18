@@ -14,7 +14,6 @@
 #include "core/debug.h"
 #include "core/descriptor_set.h"
 #include "core/descriptor_set_layout.h"
-#include "core/framebuffer.h"
 #include "core/instance.h"
 #include "core/physical_device.h"
 #include "core/pipeline.h"
@@ -22,14 +21,17 @@
 #include "core/queue.h"
 #include "core/render_pass.h"
 #include "core/shader_module.h"
-#include "core/swapchain.h"
 #include "core/vulkan_resource.h"
-#include "fence_pool.h"
-#include "rendering/pipeline_state.h"
+#include "core/fence_pool.h"
+#include "core/pipeline_state.h"
+#include "core/resource_cache.h"
+
 #include "rendering/render_target.h"
-#include "resource_cache.h"
+#include "rendering/framebuffer.h"
+#include "rendering/swapchain.h"
 
 namespace vox {
+namespace core {
 struct DriverVersion {
     uint16_t major;
     uint16_t minor;
@@ -150,7 +152,7 @@ public:
 	* @param queue The queue to submit the copy command to
 	* @param copy_region The amount to copy, if null copies the entire buffer
 	*/
-    void copy_buffer(vox::Buffer &src, vox::Buffer &dst, VkQueue queue, VkBufferCopy *copy_region = nullptr) const;
+    void copy_buffer(Buffer &src, Buffer &dst, VkQueue queue, VkBufferCopy *copy_region = nullptr) const;
 
     /**
 	 * @brief Creates a command pool
@@ -234,4 +236,6 @@ private:
 
     ResourceCache resource_cache;
 };
-}// namespace vox
+
+}
+}// namespace vox::core

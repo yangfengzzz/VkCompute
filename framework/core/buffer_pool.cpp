@@ -12,6 +12,7 @@
 #include "core/device.h"
 
 namespace vox {
+namespace core {
 BufferBlock::BufferBlock(Device &device, VkDeviceSize size, VkBufferUsageFlags usage, VmaMemoryUsage memory_usage) : buffer{device, size, usage, memory_usage} {
     if (usage == VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT) {
         alignment = device.get_gpu().get_properties().limits.minUniformBufferOffsetAlignment;
@@ -120,4 +121,5 @@ Buffer &BufferAllocation::get_buffer() {
     return *buffer;
 }
 
-}// namespace vox
+}
+}// namespace vox::core

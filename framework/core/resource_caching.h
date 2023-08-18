@@ -9,18 +9,18 @@
 #include "core/descriptor_pool.h"
 #include "core/descriptor_set.h"
 #include "core/descriptor_set_layout.h"
-#include "core/framebuffer.h"
 #include "core/pipeline.h"
-#include "rendering/pipeline_state.h"
+#include "core/pipeline_state.h"
+#include "core/resource_record.h"
+#include "rendering/framebuffer.h"
 #include "rendering/render_target.h"
-#include "resource_record.h"
 
 #include "common/helpers.h"
 
 namespace std {
 template<>
-struct hash<vox::ShaderSource> {
-    std::size_t operator()(const vox::ShaderSource &shader_source) const {
+struct hash<vox::core::ShaderSource> {
+    std::size_t operator()(const vox::core::ShaderSource &shader_source) const {
         std::size_t result = 0;
 
         vox::hash_combine(result, shader_source.get_id());
@@ -30,8 +30,8 @@ struct hash<vox::ShaderSource> {
 };
 
 template<>
-struct hash<vox::ShaderVariant> {
-    std::size_t operator()(const vox::ShaderVariant &shader_variant) const {
+struct hash<vox::core::ShaderVariant> {
+    std::size_t operator()(const vox::core::ShaderVariant &shader_variant) const {
         std::size_t result = 0;
 
         vox::hash_combine(result, shader_variant.get_id());
@@ -41,8 +41,8 @@ struct hash<vox::ShaderVariant> {
 };
 
 template<>
-struct hash<vox::ShaderModule> {
-    std::size_t operator()(const vox::ShaderModule &shader_module) const {
+struct hash<vox::core::ShaderModule> {
+    std::size_t operator()(const vox::core::ShaderModule &shader_module) const {
         std::size_t result = 0;
 
         vox::hash_combine(result, shader_module.get_id());
@@ -52,8 +52,8 @@ struct hash<vox::ShaderModule> {
 };
 
 template<>
-struct hash<vox::DescriptorSetLayout> {
-    std::size_t operator()(const vox::DescriptorSetLayout &descriptor_set_layout) const {
+struct hash<vox::core::DescriptorSetLayout> {
+    std::size_t operator()(const vox::core::DescriptorSetLayout &descriptor_set_layout) const {
         std::size_t result = 0;
 
         vox::hash_combine(result, descriptor_set_layout.get_handle());
@@ -63,8 +63,8 @@ struct hash<vox::DescriptorSetLayout> {
 };
 
 template<>
-struct hash<vox::DescriptorPool> {
-    std::size_t operator()(const vox::DescriptorPool &descriptor_pool) const {
+struct hash<vox::core::DescriptorPool> {
+    std::size_t operator()(const vox::core::DescriptorPool &descriptor_pool) const {
         std::size_t result = 0;
 
         vox::hash_combine(result, descriptor_pool.get_descriptor_set_layout());
@@ -74,8 +74,8 @@ struct hash<vox::DescriptorPool> {
 };
 
 template<>
-struct hash<vox::PipelineLayout> {
-    std::size_t operator()(const vox::PipelineLayout &pipeline_layout) const {
+struct hash<vox::core::PipelineLayout> {
+    std::size_t operator()(const vox::core::PipelineLayout &pipeline_layout) const {
         std::size_t result = 0;
 
         vox::hash_combine(result, pipeline_layout.get_handle());
@@ -85,8 +85,8 @@ struct hash<vox::PipelineLayout> {
 };
 
 template<>
-struct hash<vox::RenderPass> {
-    std::size_t operator()(const vox::RenderPass &render_pass) const {
+struct hash<vox::core::RenderPass> {
+    std::size_t operator()(const vox::core::RenderPass &render_pass) const {
         std::size_t result = 0;
 
         vox::hash_combine(result, render_pass.get_handle());
@@ -96,8 +96,8 @@ struct hash<vox::RenderPass> {
 };
 
 template<>
-struct hash<vox::Attachment> {
-    std::size_t operator()(const vox::Attachment &attachment) const {
+struct hash<vox::rendering::Attachment> {
+    std::size_t operator()(const vox::rendering::Attachment &attachment) const {
         std::size_t result = 0;
 
         vox::hash_combine(result, static_cast<std::underlying_type<VkFormat>::type>(attachment.format));
@@ -122,8 +122,8 @@ struct hash<vox::LoadStoreInfo> {
 };
 
 template<>
-struct hash<vox::SubpassInfo> {
-    std::size_t operator()(const vox::SubpassInfo &subpass_info) const {
+struct hash<vox::core::SubpassInfo> {
+    std::size_t operator()(const vox::core::SubpassInfo &subpass_info) const {
         std::size_t result = 0;
 
         for (uint32_t output_attachment : subpass_info.output_attachments) {
@@ -147,8 +147,8 @@ struct hash<vox::SubpassInfo> {
 };
 
 template<>
-struct hash<vox::SpecializationConstantState> {
-    std::size_t operator()(const vox::SpecializationConstantState &specialization_constant_state) const {
+struct hash<vox::core::SpecializationConstantState> {
+    std::size_t operator()(const vox::core::SpecializationConstantState &specialization_constant_state) const {
         std::size_t result = 0;
 
         for (auto constants : specialization_constant_state.get_specialization_constant_state()) {
@@ -163,14 +163,14 @@ struct hash<vox::SpecializationConstantState> {
 };
 
 template<>
-struct hash<vox::ShaderResource> {
-    std::size_t operator()(const vox::ShaderResource &shader_resource) const {
+struct hash<vox::core::ShaderResource> {
+    std::size_t operator()(const vox::core::ShaderResource &shader_resource) const {
         std::size_t result = 0;
 
-        if (shader_resource.type == vox::ShaderResourceType::Input ||
-            shader_resource.type == vox::ShaderResourceType::Output ||
-            shader_resource.type == vox::ShaderResourceType::PushConstant ||
-            shader_resource.type == vox::ShaderResourceType::SpecializationConstant) {
+        if (shader_resource.type == vox::core::ShaderResourceType::Input ||
+            shader_resource.type == vox::core::ShaderResourceType::Output ||
+            shader_resource.type == vox::core::ShaderResourceType::PushConstant ||
+            shader_resource.type == vox::core::ShaderResourceType::SpecializationConstant) {
             return result;
         }
 
@@ -284,8 +284,8 @@ struct hash<VkVertexInputBindingDescription> {
 };
 
 template<>
-struct hash<vox::StencilOpState> {
-    std::size_t operator()(const vox::StencilOpState &stencil) const {
+struct hash<vox::core::StencilOpState> {
+    std::size_t operator()(const vox::core::StencilOpState &stencil) const {
         std::size_t result = 0;
 
         vox::hash_combine(result, static_cast<std::underlying_type<VkCompareOp>::type>(stencil.compare_op));
@@ -350,8 +350,8 @@ struct hash<VkViewport> {
 };
 
 template<>
-struct hash<vox::ColorBlendAttachmentState> {
-    std::size_t operator()(const vox::ColorBlendAttachmentState &color_blend_attachment) const {
+struct hash<vox::core::ColorBlendAttachmentState> {
+    std::size_t operator()(const vox::core::ColorBlendAttachmentState &color_blend_attachment) const {
         std::size_t result = 0;
 
         vox::hash_combine(result, static_cast<std::underlying_type<VkBlendOp>::type>(color_blend_attachment.alpha_blend_op));
@@ -368,8 +368,8 @@ struct hash<vox::ColorBlendAttachmentState> {
 };
 
 template<>
-struct hash<vox::RenderTarget> {
-    std::size_t operator()(const vox::RenderTarget &render_target) const {
+struct hash<vox::rendering::RenderTarget> {
+    std::size_t operator()(const vox::rendering::RenderTarget &render_target) const {
         std::size_t result = 0;
 
         for (auto &view : render_target.get_views()) {
@@ -382,8 +382,8 @@ struct hash<vox::RenderTarget> {
 };
 
 template<>
-struct hash<vox::PipelineState> {
-    std::size_t operator()(const vox::PipelineState &pipeline_state) const {
+struct hash<vox::core::PipelineState> {
+    std::size_t operator()(const vox::core::PipelineState &pipeline_state) const {
         std::size_t result = 0;
 
         vox::hash_combine(result, pipeline_state.get_pipeline_layout().get_handle());
@@ -457,6 +457,7 @@ struct hash<vox::PipelineState> {
 }// namespace std
 
 namespace vox {
+namespace core {
 namespace {
 template<typename T>
 inline void hash_param(size_t &seed, const T &value) {
@@ -475,9 +476,9 @@ inline void hash_param<std::vector<uint8_t>>(
 }
 
 template<>
-inline void hash_param<std::vector<Attachment>>(
+inline void hash_param<std::vector<rendering::Attachment>>(
     size_t &seed,
-    const std::vector<Attachment> &value) {
+    const std::vector<rendering::Attachment> &value) {
     for (auto &attachment : value) {
         hash_combine(seed, attachment);
     }
@@ -655,4 +656,6 @@ T &request_resource(Device &device, ResourceRecord *recorder, std::unordered_map
 
     return res_it->second;
 }
-}// namespace vox
+
+}
+}// namespace vox::core

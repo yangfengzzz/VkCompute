@@ -11,6 +11,7 @@
 #include "core/vulkan_resource.h"
 
 namespace vox {
+namespace core {
 class Device;
 
 class Buffer : public VulkanResource<VkBuffer, VK_OBJECT_TYPE_BUFFER, const Device> {
@@ -42,7 +43,7 @@ public:
     Buffer &operator=(Buffer &&) = delete;
 
     template<typename T>
-    static std::vector<T> copy(std::unordered_map<std::string, vox::Buffer> &buffers, const char *buffer_name) {
+    static std::vector<T> copy(std::unordered_map<std::string, Buffer> &buffers, const char *buffer_name) {
         auto iter = buffers.find(buffer_name);
         if (iter == buffers.cend()) {
             return {};
@@ -149,4 +150,5 @@ private:
     bool mapped{false};
 };
 
-}// namespace vox
+}
+}// namespace vox::core

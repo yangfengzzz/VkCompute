@@ -8,9 +8,10 @@
 
 #include <vector>
 
-#include "rendering/pipeline_state.h"
+#include "core/pipeline_state.h"
 
 namespace vox {
+namespace core {
 class GraphicsPipeline;
 class PipelineLayout;
 class RenderPass;
@@ -41,7 +42,7 @@ public:
 
     size_t register_pipeline_layout(const std::vector<ShaderModule *> &shader_modules);
 
-    size_t register_render_pass(const std::vector<Attachment> &attachments,
+    size_t register_render_pass(const std::vector<rendering::Attachment> &attachments,
                                 const std::vector<LoadStoreInfo> &load_store_infos,
                                 const std::vector<SubpassInfo> &subpasses);
 
@@ -75,4 +76,6 @@ private:
 
     std::unordered_map<const GraphicsPipeline *, size_t> graphics_pipeline_to_index;
 };
-}// namespace vox
+
+}
+}// namespace vox::core

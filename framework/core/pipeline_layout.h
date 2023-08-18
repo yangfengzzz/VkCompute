@@ -12,6 +12,7 @@
 #include "core/shader_module.h"
 
 namespace vox {
+namespace core {
 class Device;
 class ShaderModule;
 class DescriptorSetLayout;
@@ -62,4 +63,6 @@ private:
     // The different descriptor set layouts for this pipeline layout
     std::vector<DescriptorSetLayout *> descriptor_set_layouts;
 };
-}// namespace vox
+
+}
+}// namespace vox::core

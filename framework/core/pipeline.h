@@ -8,9 +8,10 @@
 
 #include "common/helpers.h"
 #include "common/vk_common.h"
-#include "rendering/pipeline_state.h"
+#include "core/pipeline_state.h"
 
 namespace vox {
+namespace core {
 class Device;
 
 class Pipeline {
@@ -60,4 +61,6 @@ public:
                      VkPipelineCache pipeline_cache,
                      PipelineState &pipeline_state);
 };
-}// namespace vox
+
+}
+}// namespace vox::core

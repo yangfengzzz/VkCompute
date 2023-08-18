@@ -7,12 +7,13 @@
 #include "descriptor_set.h"
 
 #include "common/logging.h"
-#include "common/resource_caching.h"
+#include "core/resource_caching.h"
 #include "descriptor_pool.h"
 #include "descriptor_set_layout.h"
 #include "device.h"
 
 namespace vox {
+namespace core {
 DescriptorSet::DescriptorSet(Device &device,
                              const DescriptorSetLayout &descriptor_set_layout,
                              DescriptorPool &descriptor_pool,
@@ -207,4 +208,5 @@ BindingMap<VkDescriptorImageInfo> &DescriptorSet::get_image_infos() {
     return image_infos;
 }
 
-}// namespace vox
+}
+}// namespace vox::core

@@ -12,6 +12,7 @@ VKBP_DISABLE_WARNINGS()
 VKBP_ENABLE_WARNINGS()
 
 namespace vox {
+namespace core {
 Device::Device(PhysicalDevice &gpu,
                VkSurfaceKHR surface,
                std::unique_ptr<DebugUtils> &&debug_utils,
@@ -440,7 +441,7 @@ VkBuffer Device::create_buffer(VkBufferUsageFlags usage, VkMemoryPropertyFlags p
     return buffer;
 }
 
-void Device::copy_buffer(vox::Buffer &src, vox::Buffer &dst, VkQueue queue, VkBufferCopy *copy_region) const {
+void Device::copy_buffer(Buffer &src, Buffer &dst, VkQueue queue, VkBufferCopy *copy_region) const {
     assert(dst.get_size() <= src.get_size());
     assert(src.get_handle());
 
@@ -604,4 +605,6 @@ VkResult Device::wait_idle() const {
 ResourceCache &Device::get_resource_cache() {
     return resource_cache;
 }
-}// namespace vox
+
+}
+}// namespace vox::core

@@ -12,6 +12,8 @@
 #include <functional>
 
 namespace vox {
+namespace rendering {
+
 class PostProcessingPipeline;
 
 /**
@@ -37,7 +39,7 @@ protected:
 	 * @remarks Passes that that do not explicitly have a vox::RenderTarget set will render
 	 *          to default_render_target.
 	 */
-    virtual void prepare(CommandBuffer &command_buffer, RenderTarget &default_render_target) {
+    virtual void prepare(core::CommandBuffer &command_buffer, RenderTarget &default_render_target) {
         prepared = true;
     }
 
@@ -46,7 +48,7 @@ protected:
 	 * @remarks Passes that that do not explicitly have a vox::RenderTarget set will render
 	 *          to default_render_target.
 	 */
-    virtual void draw(CommandBuffer &command_buffer, RenderTarget &default_render_target) {}
+    virtual void draw(core::CommandBuffer &command_buffer, RenderTarget &default_render_target) {}
 
     /**
 	 * @brief A functor ran in the context of this renderpass.
@@ -61,7 +63,7 @@ protected:
     std::string debug_name{};
 
     RenderTarget *render_target{nullptr};
-    std::shared_ptr<Sampler> default_sampler{};
+    std::shared_ptr<core::Sampler> default_sampler{};
 
     HookFunc pre_draw{};
     HookFunc post_draw{};
@@ -74,7 +76,7 @@ protected:
     /**
 	 * @brief Returns the parent's fullscreen triangle vertex shader source.
 	 */
-    [[nodiscard]] ShaderSource &get_triangle_vs() const;
+    [[nodiscard]] core::ShaderSource &get_triangle_vs() const;
 
     struct BarrierInfo {
         VkPipelineStageFlags pipeline_stage;// Pipeline stage of this pass' inputs/outputs
@@ -180,4 +182,5 @@ public:
     }
 };
 
-}// namespace vox
+}
+}// namespace vox::rendering

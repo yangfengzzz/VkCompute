@@ -10,6 +10,7 @@
 #include "common/vk_common.h"
 
 namespace vox {
+namespace core {
 class Device;
 class DescriptorSetLayout;
 class DescriptorPool;
@@ -104,4 +105,6 @@ private:
     // Each binding number is mapped to a hash of the binding description that it will be updated to.
     std::unordered_map<uint32_t, size_t> updated_bindings;
 };
-}// namespace vox
+
+}
+}// namespace vox::core
