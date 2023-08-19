@@ -14,7 +14,8 @@ namespace rendering {
 constexpr uint32_t DEPTH_RESOLVE_BITMASK = 0x80000000;
 constexpr uint32_t ATTACHMENT_BITMASK = 0x7FFFFFFF;
 
-PostProcessingSubpass::PostProcessingSubpass(PostProcessingRenderPass *parent, RenderContext &render_context,
+PostProcessingSubpass::PostProcessingSubpass(PostProcessingRenderPass *parent,
+                                             RenderContext &render_context,
                                              ShaderSource &&triangle_vs,
                                              ShaderSource &&fs,
                                              ShaderVariant &&fs_variant)
@@ -54,7 +55,7 @@ void PostProcessingSubpass::unbind_sampled_image(const std::string &name) {
     sampled_images.erase(name);
 }
 
-PostProcessingSubpass &PostProcessingSubpass::bind_sampled_image(const std::string &name, SampledImage &&new_image) {
+PostProcessingSubpass &PostProcessingSubpass::bind_sampled_image(const std::string &name, core::SampledImage &&new_image) {
     auto it = sampled_images.find(name);
     if (it != sampled_images.end()) {
         it->second = std::move(new_image);

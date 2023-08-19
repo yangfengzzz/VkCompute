@@ -6,7 +6,7 @@
 
 #pragma once
 
-#include "rendering/sampled_image.h"
+#include "core/sampled_image.h"
 #include "shader/shader_module.h"
 #include "rendering/postprocessing_pass.h"
 
@@ -16,7 +16,7 @@ namespace rendering {
 /**
  * @brief Maps in-shader binding names to the SampledImage to bind.
  */
-using SampledImageMap = std::unordered_map<std::string, SampledImage>;
+using SampledImageMap = std::unordered_map<std::string, core::SampledImage>;
 
 /**
 * @brief A compute pass in a vox::PostProcessingPipeline.
@@ -76,13 +76,13 @@ public:
 	 *          it will default to sample in the RenderTarget currently bound for drawing in the parent PostProcessingRenderpass.
 	 * @remarks Images from RenderTarget attachments are automatically transitioned to SHADER_READ_ONLY_OPTIMAL layout if needed.
 	 */
-    PostProcessingComputePass &bind_sampled_image(const std::string &name, SampledImage &&new_image);
+    PostProcessingComputePass &bind_sampled_image(const std::string &name, core::SampledImage &&new_image);
 
     /**
 	 * @brief Changes (or adds) the storage image at name for this step.
 	 * @remarks Images from RenderTarget attachments are automatically transitioned to GENERAL layout if needed.
 	 */
-    PostProcessingComputePass &bind_storage_image(const std::string &name, SampledImage &&new_image);
+    PostProcessingComputePass &bind_storage_image(const std::string &name, core::SampledImage &&new_image);
 
     /**
 	 * @brief Set the uniform data to be bound at set 0, binding 0.

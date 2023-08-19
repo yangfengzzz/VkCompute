@@ -4,19 +4,19 @@
 //  personal capacity and am not conveying any rights to any intellectual
 //  property of any third parties.
 
-#include "sampled_image.h"
+#include "core/sampled_image.h"
 
 #include "rendering/render_target.h"
 
-namespace vox::rendering {
-SampledImage::SampledImage(const core::ImageView &image_view, core::Sampler *sampler)
+namespace vox::core {
+SampledImage::SampledImage(const ImageView &image_view, Sampler *sampler)
     : image_view{&image_view},
       target_attachment{0},
       render_target{nullptr},
       sampler{sampler},
       isDepthResolve{false} {}
 
-SampledImage::SampledImage(uint32_t target_attachment, RenderTarget *render_target, core::Sampler *sampler, bool isDepthResolve)
+SampledImage::SampledImage(uint32_t target_attachment, rendering::RenderTarget *render_target, Sampler *sampler, bool isDepthResolve)
     : image_view{nullptr},
       target_attachment{target_attachment},
       render_target{render_target},
@@ -48,13 +48,21 @@ SampledImage &SampledImage::operator=(SampledImage &&to_move) noexcept {
     return *this;
 }
 
-const core::ImageView &SampledImage::get_image_view(const RenderTarget &default_target) const {
+const ImageView &SampledImage::get_image_view(const rendering::RenderTarget &default_target) const {
     if (image_view != nullptr) {
         return *image_view;
     } else {
         const auto &target = render_target ? *render_target : default_target;
         assert(target_attachment < target.get_views().size());
         return target.get_views()[target_attachment];
+    }
+}
+
+const ImageView &SampledImage::get_image_view() const {
+    if (image_view != nullptr) {
+        return *image_view;
+    } else {
+        throw std::runtime_error("provide default render target instead!.");
     }
 }
 
@@ -66,4 +74,4 @@ const uint32_t *SampledImage::get_target_attachment() const {
     }
 }
 
-}// namespace vox::rendering
+}// namespace vox::core

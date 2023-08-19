@@ -93,14 +93,15 @@ ShaderModule::ShaderModule(core::Device &device, VkShaderStageFlagBits stage, co
                             reinterpret_cast<const char *>(spirv.data() + spirv.size())});
 }
 
-ShaderModule::ShaderModule(ShaderModule &&other) : device{other.device},
-                                                   id{other.id},
-                                                   stage{other.stage},
-                                                   entry_point{other.entry_point},
-                                                   debug_name{other.debug_name},
-                                                   spirv{other.spirv},
-                                                   resources{other.resources},
-                                                   info_log{other.info_log} {
+ShaderModule::ShaderModule(ShaderModule &&other)
+    : device{other.device},
+      id{other.id},
+      stage{other.stage},
+      entry_point{other.entry_point},
+      debug_name{other.debug_name},
+      spirv{other.spirv},
+      resources{other.resources},
+      info_log{other.info_log} {
     other.stage = {};
 }
 
@@ -144,81 +145,6 @@ void ShaderModule::set_resource_mode(const std::string &resource_name, const Sha
     } else {
         LOGW("Resource `{}` not found for shader.", resource_name)
     }
-}
-
-ShaderVariant::ShaderVariant(std::string &&preamble, std::vector<std::string> &&processes) : preamble{std::move(preamble)},
-                                                                                             processes{std::move(processes)} {
-    update_id();
-}
-
-size_t ShaderVariant::get_id() const {
-    return id;
-}
-
-void ShaderVariant::add_definitions(const std::vector<std::string> &definitions) {
-    for (auto &definition : definitions) {
-        add_define(definition);
-    }
-}
-
-void ShaderVariant::add_define(const std::string &def) {
-    processes.push_back("D" + def);
-
-    std::string tmp_def = def;
-
-    // The "=" needs to turn into a space
-    size_t pos_equal = tmp_def.find_first_of("=");
-    if (pos_equal != std::string::npos) {
-        tmp_def[pos_equal] = ' ';
-    }
-
-    preamble.append("#define " + tmp_def + "\n");
-
-    update_id();
-}
-
-void ShaderVariant::add_undefine(const std::string &undef) {
-    processes.push_back("U" + undef);
-
-    preamble.append("#undef " + undef + "\n");
-
-    update_id();
-}
-
-void ShaderVariant::add_runtime_array_size(const std::string &runtime_array_name, size_t size) {
-    if (runtime_array_sizes.find(runtime_array_name) == runtime_array_sizes.end()) {
-        runtime_array_sizes.insert({runtime_array_name, size});
-    } else {
-        runtime_array_sizes[runtime_array_name] = size;
-    }
-}
-
-void ShaderVariant::set_runtime_array_sizes(const std::unordered_map<std::string, size_t> &sizes) {
-    this->runtime_array_sizes = sizes;
-}
-
-const std::string &ShaderVariant::get_preamble() const {
-    return preamble;
-}
-
-const std::vector<std::string> &ShaderVariant::get_processes() const {
-    return processes;
-}
-
-const std::unordered_map<std::string, size_t> &ShaderVariant::get_runtime_array_sizes() const {
-    return runtime_array_sizes;
-}
-
-void ShaderVariant::clear() {
-    preamble.clear();
-    processes.clear();
-    runtime_array_sizes.clear();
-    update_id();
-}
-
-void ShaderVariant::update_id() {
-    std::hash<std::string> hasher{};
-    id = hasher(preamble);
 }
 
 ShaderSource::ShaderSource(const std::string &filename) : filename{filename},

@@ -47,7 +47,7 @@ void PostProcessingComputePass::prepare(core::CommandBuffer &command_buffer, Ren
     resource_cache.request_shader_module(VK_SHADER_STAGE_COMPUTE_BIT, cs_source, cs_variant);
 }
 
-PostProcessingComputePass &PostProcessingComputePass::bind_sampled_image(const std::string &name, SampledImage &&new_image) {
+PostProcessingComputePass &PostProcessingComputePass::bind_sampled_image(const std::string &name, core::SampledImage &&new_image) {
     auto it = sampled_images.find(name);
     if (it != sampled_images.end()) {
         it->second = new_image;
@@ -58,7 +58,7 @@ PostProcessingComputePass &PostProcessingComputePass::bind_sampled_image(const s
     return *this;
 }
 
-PostProcessingComputePass &PostProcessingComputePass::bind_storage_image(const std::string &name, SampledImage &&new_image) {
+PostProcessingComputePass &PostProcessingComputePass::bind_storage_image(const std::string &name, core::SampledImage &&new_image) {
     auto it = storage_images.find(name);
     if (it != storage_images.end()) {
         it->second = new_image;

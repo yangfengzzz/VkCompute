@@ -6,7 +6,7 @@
 
 #pragma once
 
-#include "rendering/sampled_image.h"
+#include "core/sampled_image.h"
 #include "rendering/postprocessing_pass.h"
 #include "rendering/render_pipeline.h"
 #include "rendering/subpass.h"
@@ -33,7 +33,7 @@ using AttachmentMap = std::unordered_map<std::string, uint32_t>;
 /**
  * @brief Maps in-shader binding names to the SampledImage to bind.
  */
-using SampledMap = std::unordered_map<std::string, SampledImage>;
+using SampledMap = std::unordered_map<std::string, core::SampledImage>;
 
 /**
  * @brief Maps in-shader binding names to the ImageView to bind for storage images.
@@ -130,7 +130,7 @@ public:
 	 * @remarks If no RenderTarget is specifically set for the SampledImage,
 	 *          it will default to sample in the RenderTarget currently bound for drawing in the parent PostProcessingRenderpass.
 	 */
-    PostProcessingSubpass &bind_sampled_image(const std::string &name, SampledImage &&new_image);
+    PostProcessingSubpass &bind_sampled_image(const std::string &name, core::SampledImage &&new_image);
 
     /**
 	 * @brief Changes (or adds) the storage image at name for this step.

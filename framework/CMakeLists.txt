@@ -44,10 +44,14 @@ set(SHADER_FILES
         shader/glsl_compiler.h
         shader/spirv_reflection.h
         shader/shader_module.h
+        shader/shader_data.h
+        shader/shader_variant.h
         # Source Files
         shader/glsl_compiler.cpp
         shader/spirv_reflection.cpp
         shader/shader_module.cpp
+        shader/shader_data.cpp
+        shader/shader_variant.cpp
         )
 
 set(COMPUTE_FILES
@@ -66,7 +70,6 @@ set(RENDERING_FILES
         rendering/render_target.h
         rendering/subpass.h
         rendering/framebuffer.h
-        rendering/sampled_image.h
         rendering/swapchain.h
         # Source files
         rendering/postprocessing_pipeline.cpp
@@ -79,7 +82,6 @@ set(RENDERING_FILES
         rendering/render_target.cpp
         rendering/subpass.cpp
         rendering/framebuffer.cpp
-        rendering/sampled_image.cpp
         rendering/swapchain.cpp
         )
 
@@ -133,6 +135,7 @@ set(CORE_FILES
         core/semaphore_pool.h
         core/resource_cache.h
         core/frame_resource.h
+        core/sampled_image.h
         # Source Files
         core/instance.cpp
         core/physical_device.cpp
@@ -167,6 +170,7 @@ set(CORE_FILES
         core/semaphore_pool.cpp
         core/resource_cache.cpp
         core/frame_resource.cpp
+        core/sampled_image.cpp
         )
 
 set(PLATFORM_FILES

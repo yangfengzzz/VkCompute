@@ -10,9 +10,11 @@
 #include "core/sampler.h"
 #include <memory>
 
-namespace vox::rendering {
-
+namespace vox {
+namespace rendering {
 class RenderTarget;
+}// namespace rendering
+namespace core {
 /**
 * @brief A reference to a vox::ImageView, plus an optional sampler for it
 *        - either coming from a vox::RenderTarget or from a user-created Image.
@@ -23,15 +25,15 @@ public:
 	* @brief Constructs a SampledImage referencing the given image and with the given sampler.
 	* @remarks If the sampler is null, a default sampler will be used.
 	*/
-    explicit SampledImage(const core::ImageView &image_view, core::Sampler *sampler = nullptr);
+    explicit SampledImage(const ImageView &image_view, Sampler *sampler = nullptr);
 
     /**
 	* @brief Constructs a SampledImage referencing a certain attachment of a render target.
 	* @remarks If the render target is null, the default is assumed.
 	*          If the sampler is null, a default sampler is used.
 	*/
-    explicit SampledImage(uint32_t target_attachment, RenderTarget *render_target = nullptr,
-                          core::Sampler *sampler = nullptr, bool isDepthResolve = false);
+    explicit SampledImage(uint32_t target_attachment, rendering::RenderTarget *render_target = nullptr,
+                          Sampler *sampler = nullptr, bool isDepthResolve = false);
 
     SampledImage(const SampledImage &to_copy);
     SampledImage &operator=(const SampledImage &to_copy);
@@ -44,7 +46,7 @@ public:
     /**
 	 * @brief Replaces the current image view with the given one.
 	 */
-    inline void set_image_view(const core::ImageView &new_view) {
+    inline void set_image_view(const ImageView &new_view) {
         image_view = &new_view;
     }
 
@@ -67,33 +69,35 @@ public:
 	 * @brief Returns either the ImageView, if set, or the image view for the set target attachment.
 	 *        If the view has no render target associated with it, default_target is used.
 	 */
-    [[nodiscard]] const core::ImageView &get_image_view(const RenderTarget &default_target) const;
+    [[nodiscard]] const ImageView &get_image_view(const rendering::RenderTarget &default_target) const;
+
+    [[nodiscard]] const ImageView &get_image_view() const;
 
     /**
 	 * @brief Returns the currently-set sampler, if any.
 	 */
-    [[nodiscard]] inline core::Sampler *get_sampler() const {
+    [[nodiscard]] inline Sampler *get_sampler() const {
         return sampler;
     }
 
     /**
 	 * @brief Sets the sampler for this SampledImage.
 	 */
-    inline void set_sampler(core::Sampler *new_sampler) {
+    inline void set_sampler(Sampler *new_sampler) {
         sampler = new_sampler;
     }
 
     /**
 	 * @brief Returns the RenderTarget, if set.
 	 */
-    [[nodiscard]] inline RenderTarget *get_render_target() const {
+    [[nodiscard]] inline rendering::RenderTarget *get_render_target() const {
         return render_target;
     }
 
     /**
 	 * @brief Returns either the RenderTarget, if set, or - if not - the given fallback render target.
 	 */
-    inline RenderTarget &get_render_target(RenderTarget &fallback) const {
+    inline rendering::RenderTarget &get_render_target(rendering::RenderTarget &fallback) const {
         return render_target ? *render_target : fallback;
     }
 
@@ -101,7 +105,7 @@ public:
 	 * @brief Sets the sampler for this SampledImage.
 	 *        Setting it to null will make it use the default instead.
 	 */
-    inline void set_render_target(RenderTarget *new_render_target) {
+    inline void set_render_target(rendering::RenderTarget *new_render_target) {
         render_target = new_render_target;
     }
 
@@ -110,11 +114,12 @@ public:
     }
 
 private:
-    const core::ImageView *image_view;
+    const ImageView *image_view;
     uint32_t target_attachment;
-    RenderTarget *render_target;
-    core::Sampler *sampler;
+    rendering::RenderTarget *render_target;
+    Sampler *sampler;
     bool isDepthResolve;
 };
 
-}// namespace vox::rendering
+}// namespace core
+}// namespace vox
