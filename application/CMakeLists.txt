@@ -25,6 +25,8 @@ set(COMMON_FILES
         application.cpp
         debug_info.h
         debug_info.cpp
+        graphics_application.h
+        graphics_application.cpp
         )
 
 source_group("\\" FILES ${FRAMEWORK_FILES})

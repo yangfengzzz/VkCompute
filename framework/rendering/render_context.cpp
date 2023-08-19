@@ -447,10 +447,6 @@ VkExtent2D const &RenderContext::get_surface_extent() const {
     return surface_extent;
 }
 
-uint32_t RenderContext::get_active_frame_index() const {
-    return active_frame_index;
-}
-
 std::vector<std::unique_ptr<RenderFrame>> &RenderContext::get_render_frames() {
     return frames;
 }

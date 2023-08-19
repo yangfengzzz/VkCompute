@@ -200,8 +200,6 @@ public:
 
     [[nodiscard]] VkExtent2D const &get_surface_extent() const;
 
-    [[nodiscard]] uint32_t get_active_frame_index() const;
-
     std::vector<std::unique_ptr<RenderFrame>> &get_render_frames();
 
     /**
