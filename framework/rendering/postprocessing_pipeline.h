@@ -23,7 +23,7 @@ public:
     /**
     * @brief Creates a rendering pipeline entirely made of fullscreen post-processing subpasses.
     */
-    PostProcessingPipeline(RenderContext &render_context, core::ShaderSource triangle_vs);
+    PostProcessingPipeline(RenderContext &render_context, ShaderSource triangle_vs);
 
     PostProcessingPipeline(const PostProcessingPipeline &to_copy) = delete;
     PostProcessingPipeline &operator=(const PostProcessingPipeline &to_copy) = delete;
@@ -81,7 +81,7 @@ public:
 
 private:
     RenderContext *render_context{nullptr};
-    core::ShaderSource triangle_vs;
+    ShaderSource triangle_vs;
     std::vector<std::unique_ptr<PostProcessingPassBase>> passes{};
     size_t current_pass_index{0};
 };

@@ -30,15 +30,24 @@ set(COMMON_FILES
         common/utils.h
         common/vk_common.h
         common/vk_initializers.h
-        common/glsl_compiler.h
         common/filesystem.h
         # Source Files
         common/error.cpp
         common/timer.cpp
         common/utils.cpp
         common/vk_common.cpp
-        common/glsl_compiler.cpp
         common/filesystem.cpp
+        )
+
+set(SHADER_FILES
+        # Header Files
+        shader/glsl_compiler.h
+        shader/spirv_reflection.h
+        shader/shader_module.h
+        # Source Files
+        shader/glsl_compiler.cpp
+        shader/spirv_reflection.cpp
+        shader/shader_module.cpp
         )
 
 set(RENDERING_FILES
@@ -92,7 +101,6 @@ set(CORE_FILES
         core/physical_device.h
         core/device.h
         core/debug.h
-        core/shader_module.h
         core/pipeline_layout.h
         core/pipeline.h
         core/descriptor_set_layout.h
@@ -126,7 +134,6 @@ set(CORE_FILES
         core/device.cpp
         core/debug.cpp
         core/image.cpp
-        core/shader_module.cpp
         core/pipeline_layout.cpp
         core/pipeline.cpp
         core/descriptor_set_layout.cpp
@@ -233,6 +240,7 @@ set(PROJECT_FILES
         ${CORE_FILES}
         ${RENDERING_FILES}
         ${STATS_FILES}
+        ${SHADER_FILES}
         )
 
 # Add files based on platform
@@ -326,6 +334,7 @@ target_link_libraries(${PROJECT_NAME} PUBLIC
         SPIRV
         vma
         hwcpipe
+        spirv-cross-glsl
         glslang-default-resource-limits
         spdlog
         )

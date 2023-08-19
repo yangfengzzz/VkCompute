@@ -19,8 +19,8 @@
 
 namespace std {
 template<>
-struct hash<vox::core::ShaderSource> {
-    std::size_t operator()(const vox::core::ShaderSource &shader_source) const {
+struct hash<vox::ShaderSource> {
+    std::size_t operator()(const vox::ShaderSource &shader_source) const {
         std::size_t result = 0;
 
         vox::hash_combine(result, shader_source.get_id());
@@ -30,8 +30,8 @@ struct hash<vox::core::ShaderSource> {
 };
 
 template<>
-struct hash<vox::core::ShaderVariant> {
-    std::size_t operator()(const vox::core::ShaderVariant &shader_variant) const {
+struct hash<vox::ShaderVariant> {
+    std::size_t operator()(const vox::ShaderVariant &shader_variant) const {
         std::size_t result = 0;
 
         vox::hash_combine(result, shader_variant.get_id());
@@ -41,8 +41,8 @@ struct hash<vox::core::ShaderVariant> {
 };
 
 template<>
-struct hash<vox::core::ShaderModule> {
-    std::size_t operator()(const vox::core::ShaderModule &shader_module) const {
+struct hash<vox::ShaderModule> {
+    std::size_t operator()(const vox::ShaderModule &shader_module) const {
         std::size_t result = 0;
 
         vox::hash_combine(result, shader_module.get_id());
@@ -163,14 +163,14 @@ struct hash<vox::core::SpecializationConstantState> {
 };
 
 template<>
-struct hash<vox::core::ShaderResource> {
-    std::size_t operator()(const vox::core::ShaderResource &shader_resource) const {
+struct hash<vox::ShaderResource> {
+    std::size_t operator()(const vox::ShaderResource &shader_resource) const {
         std::size_t result = 0;
 
-        if (shader_resource.type == vox::core::ShaderResourceType::Input ||
-            shader_resource.type == vox::core::ShaderResourceType::Output ||
-            shader_resource.type == vox::core::ShaderResourceType::PushConstant ||
-            shader_resource.type == vox::core::ShaderResourceType::SpecializationConstant) {
+        if (shader_resource.type == vox::ShaderResourceType::Input ||
+            shader_resource.type == vox::ShaderResourceType::Output ||
+            shader_resource.type == vox::ShaderResourceType::PushConstant ||
+            shader_resource.type == vox::ShaderResourceType::SpecializationConstant) {
             return result;
         }
 

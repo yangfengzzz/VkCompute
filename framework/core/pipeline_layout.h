@@ -9,11 +9,12 @@
 #include "common/helpers.h"
 #include "common/vk_common.h"
 #include "core/descriptor_set_layout.h"
-#include "core/shader_module.h"
+#include "shader/shader_module.h"
 
-namespace vox::core {
-class Device;
+namespace vox {
 class ShaderModule;
+namespace core {
+class Device;
 class DescriptorSetLayout;
 
 class PipelineLayout {
@@ -63,4 +64,5 @@ private:
     std::vector<DescriptorSetLayout *> descriptor_set_layouts;
 };
 
+}
 }// namespace vox::core

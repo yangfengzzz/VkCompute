@@ -13,8 +13,10 @@
 #undef None
 #endif
 
-namespace vox::core {
+namespace vox {
+namespace core {
 class Device;
+}
 
 /// Types of shader resources
 enum class ShaderResourceType {
@@ -175,7 +177,7 @@ private:
  */
 class ShaderModule {
 public:
-    ShaderModule(Device &device,
+    ShaderModule(core::Device &device,
                  VkShaderStageFlagBits stage,
                  const ShaderSource &glsl_source,
                  const std::string &entry_point,
@@ -217,7 +219,7 @@ public:
     void set_resource_mode(const std::string &resource_name, const ShaderResourceMode &resource_mode);
 
 private:
-    Device &device;
+    core::Device &device;
 
     /// Shader unique id
     size_t id;

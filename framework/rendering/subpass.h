@@ -8,7 +8,7 @@
 
 #include "common/helpers.h"
 #include "core/buffer_pool.h"
-#include "core/shader_module.h"
+#include "shader/shader_module.h"
 #include "core/pipeline_state.h"
 #include "rendering/render_context.h"
 #include "rendering/render_frame.h"
@@ -26,7 +26,7 @@ namespace rendering {
  */
 class Subpass {
 public:
-    Subpass(RenderContext &render_context, core::ShaderSource &&vertex_shader, core::ShaderSource &&fragment_shader);
+    Subpass(RenderContext &render_context, ShaderSource &&vertex_shader, ShaderSource &&fragment_shader);
 
     Subpass(const Subpass &) = delete;
 
@@ -58,9 +58,9 @@ public:
 
     RenderContext &get_render_context();
 
-    [[nodiscard]] const core::ShaderSource &get_vertex_shader() const;
+    [[nodiscard]] const ShaderSource &get_vertex_shader() const;
 
-    [[nodiscard]] const core::ShaderSource &get_fragment_shader() const;
+    [[nodiscard]] const ShaderSource &get_fragment_shader() const;
 
     core::DepthStencilState &get_depth_stencil_state();
 
@@ -100,14 +100,14 @@ protected:
     VkSampleCountFlagBits sample_count{VK_SAMPLE_COUNT_1_BIT};
 
     // A map of shader resource names and the mode of constant data
-    std::unordered_map<std::string, core::ShaderResourceMode> resource_mode_map;
+    std::unordered_map<std::string, ShaderResourceMode> resource_mode_map;
 
 private:
     std::string debug_name{};
 
-    core::ShaderSource vertex_shader;
+    ShaderSource vertex_shader;
 
-    core::ShaderSource fragment_shader;
+    ShaderSource fragment_shader;
 
     core::DepthStencilState depth_stencil_state{};
 

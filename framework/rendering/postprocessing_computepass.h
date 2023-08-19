@@ -7,7 +7,7 @@
 #pragma once
 
 #include "rendering/sampled_image.h"
-#include "core/shader_module.h"
+#include "shader/shader_module.h"
 #include "rendering/postprocessing_pass.h"
 
 namespace vox {
@@ -23,8 +23,8 @@ using SampledImageMap = std::unordered_map<std::string, SampledImage>;
 */
 class PostProcessingComputePass : public PostProcessingPass<PostProcessingComputePass> {
 public:
-    PostProcessingComputePass(PostProcessingPipeline *parent, core::ShaderSource cs_source,
-                              const core::ShaderVariant &cs_variant = {},
+    PostProcessingComputePass(PostProcessingPipeline *parent, ShaderSource cs_source,
+                              const ShaderVariant &cs_variant = {},
                               std::shared_ptr<core::Sampler> &&default_sampler = {});
 
     PostProcessingComputePass(const PostProcessingComputePass &to_copy) = delete;
@@ -127,8 +127,8 @@ public:
     }
 
 private:
-    core::ShaderSource cs_source;
-    core::ShaderVariant cs_variant;
+    ShaderSource cs_source;
+    ShaderVariant cs_variant;
     std::array<uint32_t, 3> n_workgroups{1, 1, 1};
 
     std::shared_ptr<core::Sampler> default_sampler{};

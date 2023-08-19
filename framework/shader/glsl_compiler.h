@@ -16,7 +16,7 @@ VKBP_DISABLE_WARNINGS()
 VKBP_ENABLE_WARNINGS()
 
 #include "common/vk_common.h"
-#include "core/shader_module.h"
+#include "shader/shader_module.h"
 
 namespace vox {
 /// Helper class to generate SPIRV code from GLSL source
@@ -52,7 +52,7 @@ public:
     bool compile_to_spirv(VkShaderStageFlagBits stage,
                           const std::vector<uint8_t> &glsl_source,
                           const std::string &entry_point,
-                          const core::ShaderVariant &shader_variant,
+                          const ShaderVariant &shader_variant,
                           std::vector<std::uint32_t> &spirv,
                           std::string &info_log);
 };

@@ -4,14 +4,14 @@
 //  personal capacity and am not conveying any rights to any intellectual
 //  property of any third parties.
 
-#include "shader_module.h"
+#include "shader/shader_module.h"
 
 #include "common/logging.h"
-#include "common/glsl_compiler.h"
 #include "common/filesystem.h"
+#include "shader/glsl_compiler.h"
 #include "core/device.h"
 
-namespace vox::core {
+namespace vox {
 /**
  * @brief Pre-compiles project shader files to include header code
  * @param source The shader file
@@ -55,10 +55,11 @@ inline std::vector<uint8_t> convert_to_bytes(std::vector<std::string> &lines) {
     return bytes;
 }
 
-ShaderModule::ShaderModule(Device &device, VkShaderStageFlagBits stage, const ShaderSource &glsl_source,
-                           const std::string &entry_point, const ShaderVariant &shader_variant) : device{device},
-                                                                                                  stage{stage},
-                                                                                                  entry_point{entry_point} {
+ShaderModule::ShaderModule(core::Device &device, VkShaderStageFlagBits stage, const ShaderSource &glsl_source,
+                           const std::string &entry_point, const ShaderVariant &shader_variant)
+    : device{device},
+      stage{stage},
+      entry_point{entry_point} {
     debug_name = fmt::format("{} [variant {:X}] [entrypoint {}]",
                              glsl_source.get_filename(), shader_variant.get_id(), entry_point);
 
@@ -244,4 +245,4 @@ const std::string &ShaderSource::get_source() const {
     return source;
 }
 
-}// namespace vox::core
+}// namespace vox

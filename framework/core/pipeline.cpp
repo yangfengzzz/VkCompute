@@ -7,7 +7,7 @@
 #include "pipeline.h"
 
 #include "device.h"
-#include "shader_module.h"
+#include "shader/shader_module.h"
 
 namespace vox::core {
 Pipeline::Pipeline(Device &device) : device{device} {}

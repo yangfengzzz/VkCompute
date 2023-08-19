@@ -59,8 +59,8 @@ class PostProcessingRenderPass;
 class PostProcessingSubpass : public Subpass {
 public:
     PostProcessingSubpass(PostProcessingRenderPass *parent, RenderContext &render_context,
-                          core::ShaderSource &&triangle_vs,
-                          core::ShaderSource &&fs, core::ShaderVariant &&fs_variant = {});
+                          ShaderSource &&triangle_vs,
+                          ShaderSource &&fs, ShaderVariant &&fs_variant = {});
 
     PostProcessingSubpass(const PostProcessingSubpass &to_copy) = delete;
     PostProcessingSubpass &operator=(const PostProcessingSubpass &to_copy) = delete;
@@ -99,14 +99,14 @@ public:
     /**
 	 * @brief Returns the shader variant used for this postprocess' fragment shader.
 	 */
-    inline core::ShaderVariant &get_fs_variant() {
+    inline ShaderVariant &get_fs_variant() {
         return fs_variant;
     }
 
     /**
 	 * @brief Sets the shader variant that will be used for this postprocess' fragment shader.
 	 */
-    inline PostProcessingSubpass &set_fs_variant(core::ShaderVariant &&new_variant) {
+    inline PostProcessingSubpass &set_fs_variant(ShaderVariant &&new_variant) {
         fs_variant = std::move(new_variant);
 
         return *this;
@@ -180,7 +180,7 @@ public:
 private:
     PostProcessingRenderPass *parent;
 
-    core::ShaderVariant fs_variant{};
+    ShaderVariant fs_variant{};
 
     AttachmentMap input_attachments{};
     SampledMap sampled_images{};
@@ -226,7 +226,7 @@ public:
 	 */
     template<typename... ConstructorArgs>
     PostProcessingSubpass &add_subpass(ConstructorArgs &&...args) {
-        core::ShaderSource vs_copy = get_triangle_vs();
+        ShaderSource vs_copy = get_triangle_vs();
         auto new_subpass = std::make_unique<PostProcessingSubpass>(this, get_render_context(), std::move(vs_copy), std::forward<ConstructorArgs>(args)...);
         auto &new_subpass_ref = *new_subpass;
 

@@ -14,8 +14,8 @@ namespace vox {
 namespace rendering {
 
 PostProcessingComputePass::PostProcessingComputePass(PostProcessingPipeline *parent,
-                                                     core::ShaderSource cs_source,
-                                                     const core::ShaderVariant &cs_variant,
+                                                     ShaderSource cs_source,
+                                                     const ShaderVariant &cs_variant,
                                                      std::shared_ptr<core::Sampler> &&default_sampler)
     : PostProcessingPass{parent},
       cs_source{std::move(cs_source)},
@@ -129,8 +129,8 @@ void PostProcessingComputePass::transition_images(core::CommandBuffer &command_b
                 continue;
             }
 
-            const bool readable = !(resource->qualifiers & core::ShaderResourceQualifiers::NonReadable);
-            const bool writable = !(resource->qualifiers & core::ShaderResourceQualifiers::NonReadable);
+            const bool readable = !(resource->qualifiers & ShaderResourceQualifiers::NonReadable);
+            const bool writable = !(resource->qualifiers & ShaderResourceQualifiers::NonReadable);
 
             vox::ImageMemoryBarrier barrier;
             barrier.old_layout = storage_rt->get_layout(*attachment);

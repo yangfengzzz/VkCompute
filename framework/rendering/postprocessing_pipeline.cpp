@@ -10,7 +10,7 @@ namespace vox {
 namespace rendering {
 
 PostProcessingPipeline::PostProcessingPipeline(RenderContext &render_context,
-                                               core::ShaderSource triangle_vs)
+                                               ShaderSource triangle_vs)
     : render_context{&render_context},
       triangle_vs{std::move(triangle_vs)} {}
 

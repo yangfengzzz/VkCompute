@@ -10,11 +10,12 @@
 
 #include "core/pipeline_state.h"
 
-namespace vox::core {
+namespace vox {
+class ShaderModule;
+namespace core {
 class GraphicsPipeline;
 class PipelineLayout;
 class RenderPass;
-class ShaderModule;
 
 enum class ResourceType {
     ShaderModule,
@@ -76,4 +77,5 @@ private:
     std::unordered_map<const GraphicsPipeline *, size_t> graphics_pipeline_to_index;
 };
 
+}
 }// namespace vox::core

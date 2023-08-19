@@ -16,13 +16,13 @@
 #include "core/pipeline_layout.h"
 #include "core/queue.h"
 #include "core/render_pass.h"
-#include "core/shader_module.h"
 #include "core/pipeline_state.h"
 #include "core/resource_cache.h"
 #include "rendering/render_frame.h"
 #include "rendering/render_target.h"
 #include "rendering/swapchain.h"
 #include "rendering/framebuffer.h"
+#include "shader/shader_module.h"
 
 namespace vox {
 class Window;

@@ -17,7 +17,7 @@ RenderContext &PostProcessingPassBase::get_render_context() const {
     return *parent->render_context;
 }
 
-core::ShaderSource &PostProcessingPassBase::get_triangle_vs() const {
+ShaderSource &PostProcessingPassBase::get_triangle_vs() const {
     return parent->triangle_vs;
 }
 

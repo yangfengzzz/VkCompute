@@ -8,7 +8,7 @@
 
 #include <spdlog/fmt/fmt.h>
 
-#include "common/glsl_compiler.h"
+#include "shader/glsl_compiler.h"
 #include "common/filesystem.h"
 
 std::ostream &operator<<(std::ostream &os, const VkResult result) {

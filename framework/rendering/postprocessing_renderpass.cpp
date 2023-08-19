@@ -15,9 +15,9 @@ constexpr uint32_t DEPTH_RESOLVE_BITMASK = 0x80000000;
 constexpr uint32_t ATTACHMENT_BITMASK = 0x7FFFFFFF;
 
 PostProcessingSubpass::PostProcessingSubpass(PostProcessingRenderPass *parent, RenderContext &render_context,
-                                             core::ShaderSource &&triangle_vs,
-                                             core::ShaderSource &&fs,
-                                             core::ShaderVariant &&fs_variant)
+                                             ShaderSource &&triangle_vs,
+                                             ShaderSource &&fs,
+                                             ShaderVariant &&fs_variant)
     : Subpass(render_context, std::move(triangle_vs), std::move(fs)),
       parent{parent},
       fs_variant{std::move(fs_variant)} {
@@ -100,7 +100,7 @@ void PostProcessingSubpass::draw(core::CommandBuffer &command_buffer) {
     auto &vert_shader_module = resource_cache.request_shader_module(VK_SHADER_STAGE_VERTEX_BIT, get_vertex_shader());
     auto &frag_shader_module = resource_cache.request_shader_module(VK_SHADER_STAGE_FRAGMENT_BIT, get_fragment_shader(), fs_variant);
 
-    std::vector<core::ShaderModule *> shader_modules{&vert_shader_module, &frag_shader_module};
+    std::vector<ShaderModule *> shader_modules{&vert_shader_module, &frag_shader_module};
 
     // Create pipeline layout and bind it
     auto &pipeline_layout = resource_cache.request_pipeline_layout(shader_modules);

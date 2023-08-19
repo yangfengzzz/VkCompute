@@ -9,12 +9,12 @@
 #include "common/helpers.h"
 #include "common/vk_common.h"
 
-namespace vox::core {
+namespace vox {
+class ShaderModule;
+struct ShaderResource;
+namespace core {
 class DescriptorPool;
 class Device;
-class ShaderModule;
-
-struct ShaderResource;
 
 /**
  * @brief Caches DescriptorSet objects for the shader's set index.
@@ -80,4 +80,5 @@ private:
     std::vector<ShaderModule *> shader_modules;
 };
 
+}
 }// namespace vox::core

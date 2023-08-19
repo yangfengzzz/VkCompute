@@ -4,11 +4,11 @@
 //  personal capacity and am not conveying any rights to any intellectual
 //  property of any third parties.
 
-#include "descriptor_set_layout.h"
+#include "core/descriptor_set_layout.h"
 
-#include "device.h"
-#include "physical_device.h"
-#include "shader_module.h"
+#include "core/device.h"
+#include "core/physical_device.h"
+#include "shader/shader_module.h"
 
 namespace vox::core {
 namespace {
