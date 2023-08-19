@@ -69,6 +69,9 @@ add_subdirectory(third_party)
 
 vkb__enable_testing()
 
+add_subdirectory(math)
+add_subdirectory(test.math)
+
 # Add vulkan framework
 add_subdirectory(framework)
 
