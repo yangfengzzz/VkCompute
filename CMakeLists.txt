@@ -72,8 +72,8 @@ vkb__enable_testing()
 add_subdirectory(math)
 add_subdirectory(test.math)
 
-# Add vulkan framework
 add_subdirectory(framework)
+add_subdirectory(application)
 
 if(VKB_BUILD_TESTS)
     # Add vulkan tests

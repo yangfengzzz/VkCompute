@@ -8,8 +8,7 @@
 
 #include "rendering/render_target.h"
 
-namespace vox {
-namespace rendering {
+namespace vox::rendering {
 SampledImage::SampledImage(const core::ImageView &image_view, core::Sampler *sampler)
     : image_view{&image_view},
       target_attachment{0},
@@ -67,5 +66,4 @@ const uint32_t *SampledImage::get_target_attachment() const {
     }
 }
 
-}
 }// namespace vox::rendering

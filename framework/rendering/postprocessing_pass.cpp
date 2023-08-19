@@ -8,8 +8,7 @@
 
 #include "postprocessing_pipeline.h"
 
-namespace vox {
-namespace rendering {
+namespace vox::rendering {
 
 PostProcessingPassBase::PostProcessingPassBase(PostProcessingPipeline *parent) : parent{parent} {}
 
@@ -31,5 +30,4 @@ PostProcessingPassBase::BarrierInfo PostProcessingPassBase::get_predecessor_src_
     }
 }
 
-}
 }// namespace vox::rendering

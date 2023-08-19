@@ -9,8 +9,7 @@
 #include "common/logging.h"
 #include "core/device.h"
 
-namespace vox {
-namespace rendering {
+namespace vox::rendering {
 
 namespace {
 inline uint32_t choose_image_count(
@@ -435,5 +434,4 @@ VkPresentModeKHR Swapchain::get_present_mode() const {
     return properties.present_mode;
 }
 
-}
 }// namespace vox::rendering

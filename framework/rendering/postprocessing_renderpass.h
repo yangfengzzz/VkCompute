@@ -11,8 +11,7 @@
 #include "rendering/render_pipeline.h"
 #include "rendering/subpass.h"
 
-namespace vox {
-namespace rendering {
+namespace vox::rendering {
 
 /**
  * @brief An utility struct for hashing pairs.
@@ -65,16 +64,16 @@ public:
     PostProcessingSubpass(const PostProcessingSubpass &to_copy) = delete;
     PostProcessingSubpass &operator=(const PostProcessingSubpass &to_copy) = delete;
 
-    PostProcessingSubpass(PostProcessingSubpass &&to_move);
+    PostProcessingSubpass(PostProcessingSubpass &&to_move) noexcept;
     PostProcessingSubpass &operator=(PostProcessingSubpass &&to_move) = delete;
 
-    ~PostProcessingSubpass() = default;
+    ~PostProcessingSubpass() override = default;
 
     /**
 	 * @brief Maps the names of input attachments in the shader to indices into the render target's images.
 	 *        These are given as `subpassInput`s to the subpass, at set 0; they are bound automatically according to their name.
 	 */
-    inline const AttachmentMap &get_input_attachments() const {
+    [[nodiscard]] inline const AttachmentMap &get_input_attachments() const {
         return input_attachments;
     }
 
@@ -84,7 +83,7 @@ public:
 	 * @remarks PostProcessingPipeline::get_sampler() is used as the default sampler if none is specified.
 	 *          The RenderTarget for the current PostProcessingSubpass is used if none is specified for attachment images.
 	 */
-    inline const SampledMap &get_sampled_images() const {
+    [[nodiscard]] inline const SampledMap &get_sampled_images() const {
         return sampled_images;
     }
 
@@ -92,7 +91,7 @@ public:
 	 * @brief Maps the names of storage images in the shader to vox::ImageView.
 	 *        These are given as image2D[Array] to the subpass, at set 0; they are bound automatically according to their name.
 	 */
-    inline const StorageImageMap &get_storage_images() const {
+    [[nodiscard]] inline const StorageImageMap &get_storage_images() const {
         return storage_images;
     }
 
@@ -201,7 +200,7 @@ class PostProcessingRenderPass : public PostProcessingPass<PostProcessingRenderP
 public:
     friend class PostProcessingSubpass;
 
-    PostProcessingRenderPass(PostProcessingPipeline *parent, std::unique_ptr<core::Sampler> &&default_sampler = nullptr);
+    explicit PostProcessingRenderPass(PostProcessingPipeline *parent, std::unique_ptr<core::Sampler> &&default_sampler = nullptr);
 
     PostProcessingRenderPass(const PostProcessingRenderPass &to_copy) = delete;
     PostProcessingRenderPass &operator=(const PostProcessingRenderPass &to_copy) = delete;
@@ -286,8 +285,8 @@ private:
 	 */
     void prepare_draw(core::CommandBuffer &command_buffer, RenderTarget &fallback_render_target);
 
-    BarrierInfo get_src_barrier_info() const override;
-    BarrierInfo get_dst_barrier_info() const override;
+    [[nodiscard]] BarrierInfo get_src_barrier_info() const override;
+    [[nodiscard]] BarrierInfo get_dst_barrier_info() const override;
 
     RenderPipeline pipeline{};
     std::unique_ptr<core::Sampler> default_sampler{};
@@ -298,5 +297,4 @@ private:
     std::shared_ptr<core::BufferAllocation> uniform_buffer_alloc{};
 };
 
-}
 }// namespace vox::rendering

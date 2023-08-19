@@ -10,16 +10,15 @@
 
 #include "postprocessing_pipeline.h"
 
-namespace vox {
-namespace rendering {
+namespace vox::rendering {
 
 PostProcessingComputePass::PostProcessingComputePass(PostProcessingPipeline *parent,
                                                      ShaderSource cs_source,
-                                                     const ShaderVariant &cs_variant,
+                                                     ShaderVariant cs_variant,
                                                      std::shared_ptr<core::Sampler> &&default_sampler)
     : PostProcessingPass{parent},
       cs_source{std::move(cs_source)},
-      cs_variant{cs_variant},
+      cs_variant{std::move(cs_variant)},
       default_sampler{std::move(default_sampler)} {
     if (this->default_sampler == nullptr) {
         // Setup a sane default sampler if none was passed
@@ -225,5 +224,4 @@ PostProcessingComputePass::BarrierInfo PostProcessingComputePass::get_dst_barrie
     return info;
 }
 
-}
 }// namespace vox::rendering

@@ -8,8 +8,7 @@
 
 #include "postprocessing_pass.h"
 
-namespace vox {
-namespace rendering {
+namespace vox::rendering {
 
 class PostProcessingRenderPass;
 
@@ -86,5 +85,4 @@ private:
     size_t current_pass_index{0};
 };
 
-}
 }// namespace vox::rendering

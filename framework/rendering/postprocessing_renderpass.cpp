@@ -30,7 +30,7 @@ PostProcessingSubpass::PostProcessingSubpass(PostProcessingRenderPass *parent, R
     set_input_attachments(input_attachments);
 }
 
-PostProcessingSubpass::PostProcessingSubpass(PostProcessingSubpass &&to_move)
+PostProcessingSubpass::PostProcessingSubpass(PostProcessingSubpass &&to_move) noexcept
     : Subpass{std::move(to_move)},
       parent{std::move(to_move.parent)},
       fs_variant{std::move(to_move.fs_variant)},

@@ -82,7 +82,7 @@ public:
 	 * @param thread_count The number of threads in the application, necessary to allocate this many resource pools for each RenderFrame
 	 * @param create_render_target_func A function delegate, used to create a RenderTarget
 	 */
-    void prepare(size_t thread_count = 1, RenderTarget::CreateFunc create_render_target_func = RenderTarget::DEFAULT_CREATE_FUNC);
+    void prepare(size_t thread_count = 1, const RenderTarget::CreateFunc &create_render_target_func = RenderTarget::DEFAULT_CREATE_FUNC);
 
     /**
 	 * @brief Updates the swapchains extent, if a swapchain exists
@@ -94,7 +94,7 @@ public:
 	 * @brief Updates the swapchains image count, if a swapchain exists
 	 * @param image_count The amount of images in the new swapchain
 	 */
-    void update_swapchain(const uint32_t image_count);
+    void update_swapchain(uint32_t image_count);
 
     /**
 	 * @brief Updates the swapchains image usage, if a swapchain exists
@@ -107,7 +107,7 @@ public:
 	 * @param extent The width and height of the new swapchain images
 	 * @param transform The surface transform flags
 	 */
-    void update_swapchain(const VkExtent2D &extent, const VkSurfaceTransformFlagBitsKHR transform);
+    void update_swapchain(const VkExtent2D &extent, VkSurfaceTransformFlagBitsKHR transform);
 
     /**
 	 * @returns True if a valid swapchain exists in the RenderContext
@@ -176,7 +176,7 @@ public:
 	 *        A frame is active after @ref begin_frame has been called.
 	 * @return The current active frame index
 	 */
-    uint32_t get_active_frame_index();
+    uint32_t get_active_frame_index() const;
 
     /**
 	 * @brief An error should be raised if a frame is active.
@@ -194,13 +194,13 @@ public:
     /**
 	 * @brief Returns the format that the RenderTargets are created with within the RenderContext
 	 */
-    VkFormat get_format() const;
+    [[nodiscard]] VkFormat get_format() const;
 
-    Swapchain const &get_swapchain() const;
+    [[nodiscard]] Swapchain const &get_swapchain() const;
 
-    VkExtent2D const &get_surface_extent() const;
+    [[nodiscard]] VkExtent2D const &get_surface_extent() const;
 
-    uint32_t get_active_frame_index() const;
+    [[nodiscard]] uint32_t get_active_frame_index() const;
 
     std::vector<std::unique_ptr<RenderFrame>> &get_render_frames();
 
@@ -232,7 +232,7 @@ private:
 
     std::vector<std::unique_ptr<RenderFrame>> frames;
 
-    VkSemaphore acquired_semaphore;
+    VkSemaphore acquired_semaphore{};
 
     bool prepared{false};
 

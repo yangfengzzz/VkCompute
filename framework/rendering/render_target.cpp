@@ -8,8 +8,7 @@
 
 #include "core/device.h"
 
-namespace vox {
-namespace rendering {
+namespace vox::rendering {
 
 namespace {
 struct CompareExtent2D {
@@ -65,7 +64,7 @@ RenderTarget::RenderTarget(std::vector<core::Image> &&images) : device{images.ba
 
         views.emplace_back(image, VK_IMAGE_VIEW_TYPE_2D);
 
-        attachments.emplace_back(Attachment{image.get_format(), image.get_sample_count(), image.get_usage()});
+        attachments.emplace_back(image.get_format(), image.get_sample_count(), image.get_usage());
     }
 }
 
@@ -94,7 +93,7 @@ RenderTarget::RenderTarget(std::vector<core::ImageView> &&image_views)
 
     for (auto &view : views) {
         const auto &image = view.get_image();
-        attachments.emplace_back(Attachment{image.get_format(), image.get_sample_count(), image.get_usage()});
+        attachments.emplace_back(image.get_format(), image.get_sample_count(), image.get_usage());
     }
 }
 
@@ -134,5 +133,4 @@ VkImageLayout RenderTarget::get_layout(uint32_t attachment) const {
     return attachments[attachment].initial_layout;
 }
 
-}
 }// namespace vox::rendering

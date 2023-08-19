@@ -22,7 +22,7 @@ public:
 	 * @brief Constructor
 	 * @param device A valid device
 	 */
-    ComputeContext(core::Device &device);
+    explicit ComputeContext(core::Device &device);
 
     ComputeContext(const ComputeContext &) = delete;
 
@@ -108,7 +108,7 @@ private:
 
     std::unique_ptr<core::FrameResource> frames;
 
-    VkSemaphore acquired_semaphore;
+    VkSemaphore acquired_semaphore{};
 
     bool prepared{false};
 

@@ -10,8 +10,7 @@
 
 #include "render_context.h"
 
-namespace vox {
-namespace rendering {
+namespace vox::rendering {
 
 Subpass::Subpass(RenderContext &render_context, ShaderSource &&vertex_source,
                  ShaderSource &&fragment_source) : render_context{render_context},
@@ -100,5 +99,4 @@ void Subpass::set_debug_name(const std::string &name) {
     debug_name = name;
 }
 
-}
 }// namespace vox::rendering

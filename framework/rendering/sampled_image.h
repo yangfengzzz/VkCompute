@@ -10,8 +10,7 @@
 #include "core/sampler.h"
 #include <memory>
 
-namespace vox {
-namespace rendering {
+namespace vox::rendering {
 
 class RenderTarget;
 /**
@@ -118,5 +117,4 @@ private:
     bool isDepthResolve;
 };
 
-}
 }// namespace vox::rendering

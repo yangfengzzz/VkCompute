@@ -6,8 +6,7 @@
 
 #include "render_pipeline.h"
 
-namespace vox {
-namespace rendering {
+namespace vox::rendering {
 
 RenderPipeline::RenderPipeline(std::vector<std::unique_ptr<Subpass>> &&subpasses_) : subpasses{std::move(subpasses_)} {
     prepare();
@@ -84,5 +83,4 @@ std::unique_ptr<Subpass> &RenderPipeline::get_active_subpass() {
     return subpasses[active_subpass_index];
 }
 
-}
 }// namespace vox::rendering

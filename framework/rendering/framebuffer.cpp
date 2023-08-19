@@ -7,8 +7,7 @@
 #include "rendering/framebuffer.h"
 #include "core/device.h"
 
-namespace vox {
-namespace rendering {
+namespace vox::rendering {
 
 VkFramebuffer Framebuffer::get_handle() const {
     return handle;
@@ -55,5 +54,4 @@ Framebuffer::~Framebuffer() {
     }
 }
 
-}
 }// namespace vox::rendering

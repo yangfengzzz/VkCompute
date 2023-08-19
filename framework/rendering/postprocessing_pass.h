@@ -11,8 +11,7 @@
 #include "render_target.h"
 #include <functional>
 
-namespace vox {
-namespace rendering {
+namespace vox::rendering {
 
 class PostProcessingPipeline;
 
@@ -23,7 +22,7 @@ class PostProcessingPassBase {
     friend class PostProcessingPipeline;
 
 public:
-    PostProcessingPassBase(PostProcessingPipeline *parent);
+    explicit PostProcessingPassBase(PostProcessingPipeline *parent);
 
     PostProcessingPassBase(const PostProcessingPassBase &to_copy) = delete;
     PostProcessingPassBase &operator=(const PostProcessingPassBase &to_copy) = delete;
@@ -182,5 +181,4 @@ public:
     }
 };
 
-}
 }// namespace vox::rendering

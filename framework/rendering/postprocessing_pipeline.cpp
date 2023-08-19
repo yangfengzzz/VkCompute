@@ -6,8 +6,7 @@
 
 #include "postprocessing_pipeline.h"
 
-namespace vox {
-namespace rendering {
+namespace vox::rendering {
 
 PostProcessingPipeline::PostProcessingPipeline(RenderContext &render_context,
                                                ShaderSource triangle_vs)
@@ -48,5 +47,4 @@ void PostProcessingPipeline::draw(core::CommandBuffer &command_buffer, RenderTar
     current_pass_index = 0;
 }
 
-}
 }// namespace vox::rendering

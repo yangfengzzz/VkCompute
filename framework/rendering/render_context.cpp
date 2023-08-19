@@ -8,8 +8,7 @@
 
 #include "platform/window.h"
 
-namespace vox {
-namespace rendering {
+namespace vox::rendering {
 
 VkFormat RenderContext::DEFAULT_VK_FORMAT = VK_FORMAT_R8G8B8A8_SRGB;
 
@@ -18,10 +17,11 @@ RenderContext::RenderContext(core::Device &device,
                              const Window &window,
                              VkPresentModeKHR present_mode,
                              const std::vector<VkPresentModeKHR> &present_mode_priority_list,
-                             const std::vector<VkSurfaceFormatKHR> &surface_format_priority_list) : device{device}, window{window},
-                                                                                                    queue{device.get_suitable_graphics_queue()},
-                                                                                                    surface_extent{window.get_extent().width,
-                                                                                                                   window.get_extent().height} {
+                             const std::vector<VkSurfaceFormatKHR> &surface_format_priority_list)
+    : device{device}, window{window},
+      queue{device.get_suitable_graphics_queue()},
+      surface_extent{window.get_extent().width,
+                     window.get_extent().height} {
     if (surface != VK_NULL_HANDLE) {
         VkSurfaceCapabilitiesKHR surface_properties;
         VK_CHECK(vkGetPhysicalDeviceSurfaceCapabilitiesKHR(device.get_gpu().get_handle(),
@@ -36,7 +36,7 @@ RenderContext::RenderContext(core::Device &device,
     }
 }
 
-void RenderContext::prepare(size_t thread_count, RenderTarget::CreateFunc create_render_target_func) {
+void RenderContext::prepare(size_t thread_count, const RenderTarget::CreateFunc &create_render_target_func) {
     device.wait_idle();
 
     if (swapchain) {
@@ -382,7 +382,7 @@ RenderFrame &RenderContext::get_active_frame() {
     return *frames[active_frame_index];
 }
 
-uint32_t RenderContext::get_active_frame_index() {
+uint32_t RenderContext::get_active_frame_index() const {
     assert(frame_active && "Frame is not active, please call begin_frame");
     return active_frame_index;
 }
@@ -455,5 +455,4 @@ std::vector<std::unique_ptr<RenderFrame>> &RenderContext::get_render_frames() {
     return frames;
 }
 
-}
 }// namespace vox::rendering
