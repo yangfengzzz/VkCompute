@@ -13,10 +13,6 @@
 #include "rendering/render_context.h"
 #include "rendering/render_frame.h"
 
-VKBP_DISABLE_WARNINGS()
-#include "common/glm_common.h"
-VKBP_ENABLE_WARNINGS()
-
 namespace vox {
 namespace core {
 class CommandBuffer;

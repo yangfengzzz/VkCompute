@@ -9,7 +9,6 @@
 #include "core/command_buffer.h"
 #include "core/device.h"
 
-#include <glm/gtc/type_ptr.hpp>
 #include <unordered_map>
 
 namespace vox::core {
@@ -40,11 +39,11 @@ void DebugUtilsExtDebugUtils::set_debug_tag(VkDevice device, VkObjectType object
 }
 
 void DebugUtilsExtDebugUtils::cmd_begin_label(VkCommandBuffer command_buffer,
-                                              const char *name, glm::vec4 color) const {
+                                              const char *name, std::array<float, 4> color) const {
     VkDebugUtilsLabelEXT label_info{};
     label_info.sType = VK_STRUCTURE_TYPE_DEBUG_UTILS_LABEL_EXT;
     label_info.pLabelName = name;
-    memcpy(label_info.color, glm::value_ptr(color), sizeof(glm::vec4));
+    memcpy(label_info.color, color.data(), sizeof(std::array<float, 4>));
 
     assert(vkCmdBeginDebugUtilsLabelEXT);
     vkCmdBeginDebugUtilsLabelEXT(command_buffer, &label_info);
@@ -56,11 +55,11 @@ void DebugUtilsExtDebugUtils::cmd_end_label(VkCommandBuffer command_buffer) cons
 }
 
 void DebugUtilsExtDebugUtils::cmd_insert_label(VkCommandBuffer command_buffer,
-                                               const char *name, glm::vec4 color) const {
+                                               const char *name, std::array<float, 4> color) const {
     VkDebugUtilsLabelEXT label_info{};
     label_info.sType = VK_STRUCTURE_TYPE_DEBUG_UTILS_LABEL_EXT;
     label_info.pLabelName = name;
-    memcpy(label_info.color, glm::value_ptr(color), sizeof(glm::vec4));
+    memcpy(label_info.color, color.data(), sizeof(std::array<float, 4>));
 
     assert(vkCmdInsertDebugUtilsLabelEXT);
     vkCmdInsertDebugUtilsLabelEXT(command_buffer, &label_info);
@@ -129,11 +128,11 @@ void DebugMarkerExtDebugUtils::set_debug_tag(VkDevice device, VkObjectType objec
 }
 
 void DebugMarkerExtDebugUtils::cmd_begin_label(VkCommandBuffer command_buffer,
-                                               const char *name, glm::vec4 color) const {
+                                               const char *name, std::array<float, 4> color) const {
     VkDebugMarkerMarkerInfoEXT marker_info{};
     marker_info.sType = VK_STRUCTURE_TYPE_DEBUG_MARKER_MARKER_INFO_EXT;
     marker_info.pMarkerName = name;
-    memcpy(marker_info.color, glm::value_ptr(color), sizeof(glm::vec4));
+    memcpy(marker_info.color, color.data(), sizeof(std::array<float, 4>));
 
     assert(vkCmdDebugMarkerBeginEXT);
     vkCmdDebugMarkerBeginEXT(command_buffer, &marker_info);
@@ -145,19 +144,20 @@ void DebugMarkerExtDebugUtils::cmd_end_label(VkCommandBuffer command_buffer) con
 }
 
 void DebugMarkerExtDebugUtils::cmd_insert_label(VkCommandBuffer command_buffer,
-                                                const char *name, glm::vec4 color) const {
+                                                const char *name, std::array<float, 4> color) const {
     VkDebugMarkerMarkerInfoEXT marker_info{};
     marker_info.sType = VK_STRUCTURE_TYPE_DEBUG_MARKER_MARKER_INFO_EXT;
     marker_info.pMarkerName = name;
-    memcpy(marker_info.color, glm::value_ptr(color), sizeof(glm::vec4));
+    memcpy(marker_info.color, color.data(), sizeof(std::array<float, 4>));
 
     assert(vkCmdDebugMarkerInsertEXT);
     vkCmdDebugMarkerInsertEXT(command_buffer, &marker_info);
 }
 
 ScopedDebugLabel::ScopedDebugLabel(const DebugUtils &debug_utils, VkCommandBuffer command_buffer,
-                                   const char *name, glm::vec4 color) : debug_utils{&debug_utils},
-                                                                        command_buffer{VK_NULL_HANDLE} {
+                                   const char *name, std::array<float, 4> color)
+    : debug_utils{&debug_utils},
+      command_buffer{VK_NULL_HANDLE} {
     if (name && *name != '\0') {
         assert(command_buffer != VK_NULL_HANDLE);
         this->command_buffer = command_buffer;
@@ -167,8 +167,9 @@ ScopedDebugLabel::ScopedDebugLabel(const DebugUtils &debug_utils, VkCommandBuffe
 }
 
 ScopedDebugLabel::ScopedDebugLabel(const CommandBuffer &command_buffer,
-                                   const char *name, glm::vec4 color) : ScopedDebugLabel{command_buffer.get_device().get_debug_utils(),
-                                                                                         command_buffer.get_handle(), name, color} {
+                                   const char *name, std::array<float, 4> color)
+    : ScopedDebugLabel{command_buffer.get_device().get_debug_utils(),
+                       command_buffer.get_handle(), name, color} {
 }
 
 ScopedDebugLabel::~ScopedDebugLabel() {

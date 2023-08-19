@@ -25,11 +25,6 @@
 
 #include "common/error.h"
 
-VKBP_DISABLE_WARNINGS()
-#include "common/glm_common.h"
-#include <glm/gtx/hash.hpp>
-VKBP_ENABLE_WARNINGS()
-
 namespace vox {
 template<typename T>
 inline void read(std::istringstream &is, T &value) {
@@ -141,7 +136,9 @@ inline void write(std::ostringstream &os, const T &first_arg, const Args &...arg
 template<class T>
 inline void hash_combine(size_t &seed, const T &v) {
     std::hash<T> hasher;
-    glm::detail::hash_combine(seed, hasher(v));
+    size_t hash = hasher(v);
+    hash += 0x9e3779b9 + (seed << 6) + (seed >> 2);
+    seed ^= hash;
 }
 
 /**

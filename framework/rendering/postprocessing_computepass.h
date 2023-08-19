@@ -6,7 +6,6 @@
 
 #pragma once
 
-#include "common/glm_common.h"
 #include "rendering/sampled_image.h"
 #include "core/shader_module.h"
 #include "rendering/postprocessing_pass.h"
@@ -40,7 +39,7 @@ public:
     /**
 	 * @brief Sets the number of workgroups to be dispatched each draw().
 	 */
-    inline PostProcessingComputePass &set_dispatch_size(glm::tvec3<uint32_t> new_size) {
+    inline PostProcessingComputePass &set_dispatch_size(std::array<uint32_t, 3> new_size) {
         n_workgroups = new_size;
         return *this;
     }
@@ -48,7 +47,7 @@ public:
     /**
 	 * @brief Gets the number of workgroups that will be dispatched each draw().
 	 */
-    inline glm::tvec3<uint32_t> get_dispatch_size() const {
+    inline std::array<uint32_t, 3> get_dispatch_size() const {
         return n_workgroups;
     }
 
@@ -130,7 +129,7 @@ public:
 private:
     core::ShaderSource cs_source;
     core::ShaderVariant cs_variant;
-    glm::tvec3<uint32_t> n_workgroups{1, 1, 1};
+    std::array<uint32_t, 3> n_workgroups{1, 1, 1};
 
     std::shared_ptr<core::Sampler> default_sampler{};
     SampledImageMap sampled_images{};

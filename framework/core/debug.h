@@ -6,7 +6,6 @@
 
 #pragma once
 
-#include "common/glm_common.h"
 #include "common/vk_common.h"
 #include <cassert>
 
@@ -34,7 +33,7 @@ public:
      * @brief Inserts a command to begin a new debug label/marker scope.
      */
     virtual void cmd_begin_label(VkCommandBuffer command_buffer,
-                                 const char *name, glm::vec4 color = {}) const = 0;
+                                 const char *name, std::array<float, 4> color = {}) const = 0;
 
     /**
      * @brief Inserts a command to end the current debug label/marker scope.
@@ -45,7 +44,7 @@ public:
      * @brief Inserts a (non-scoped) debug label/marker in the command buffer.
      */
     virtual void cmd_insert_label(VkCommandBuffer command_buffer,
-                                  const char *name, glm::vec4 color = {}) const = 0;
+                                  const char *name, std::array<float, 4> color = {}) const = 0;
 };
 
 /**
@@ -62,12 +61,12 @@ public:
                        uint64_t tag_name, const void *tag_data, size_t tag_data_size) const override;
 
     void cmd_begin_label(VkCommandBuffer command_buffer,
-                         const char *name, glm::vec4 color) const override;
+                         const char *name, std::array<float, 4> color) const override;
 
     void cmd_end_label(VkCommandBuffer command_buffer) const override;
 
     void cmd_insert_label(VkCommandBuffer command_buffer,
-                          const char *name, glm::vec4 color) const override;
+                          const char *name, std::array<float, 4> color) const override;
 };
 
 /**
@@ -84,12 +83,12 @@ public:
                        uint64_t tag_name, const void *tag_data, size_t tag_data_size) const override;
 
     void cmd_begin_label(VkCommandBuffer command_buffer,
-                         const char *name, glm::vec4 color) const override;
+                         const char *name, std::array<float, 4> color) const override;
 
     void cmd_end_label(VkCommandBuffer command_buffer) const override;
 
     void cmd_insert_label(VkCommandBuffer command_buffer,
-                          const char *name, glm::vec4 color) const override;
+                          const char *name, std::array<float, 4> color) const override;
 };
 
 /**
@@ -105,12 +104,12 @@ public:
                               uint64_t, const void *, size_t) const override {}
 
     inline void cmd_begin_label(VkCommandBuffer,
-                                const char *, glm::vec4) const override {}
+                                const char *, std::array<float, 4>) const override {}
 
     inline void cmd_end_label(VkCommandBuffer) const override {}
 
     inline void cmd_insert_label(VkCommandBuffer,
-                                 const char *, glm::vec4) const override {}
+                                 const char *, std::array<float, 4>) const override {}
 };
 
 class CommandBuffer;
@@ -124,10 +123,10 @@ class CommandBuffer;
 class ScopedDebugLabel final {
 public:
     ScopedDebugLabel(const DebugUtils &debug_utils, VkCommandBuffer command_buffer,
-                     const char *name, glm::vec4 color = {});
+                     const char *name, std::array<float, 4> color = {});
 
     ScopedDebugLabel(const CommandBuffer &command_buffer,
-                     const char *name, glm::vec4 color = {});
+                     const char *name, std::array<float, 4> color = {});
 
     ~ScopedDebugLabel();
 

@@ -206,7 +206,7 @@ void PostProcessingComputePass::draw(core::CommandBuffer &command_buffer, Render
     }
 
     // Dispatch compute
-    command_buffer.dispatch(n_workgroups.x, n_workgroups.y, n_workgroups.z);
+    command_buffer.dispatch(n_workgroups[0], n_workgroups[1], n_workgroups[2]);
 }
 
 PostProcessingComputePass::BarrierInfo PostProcessingComputePass::get_src_barrier_info() const {

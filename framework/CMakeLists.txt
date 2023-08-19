@@ -22,7 +22,6 @@ project(framework LANGUAGES C CXX)
 set(COMMON_FILES
         # Header Files
         common/error.h
-        common/glm_common.h
         common/helpers.h
         common/logging.h
         common/strings.h
@@ -323,7 +322,6 @@ target_link_libraries(${PROJECT_NAME} PUBLIC
         vkb__core
         volk
         stb
-        glm
         glslang
         SPIRV
         vma
