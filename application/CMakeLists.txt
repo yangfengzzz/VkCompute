@@ -29,11 +29,22 @@ set(COMMON_FILES
         graphics_application.cpp
         )
 
+set(TEXTURE_FILES
+        texture/texture.h
+        texture/texture.cpp
+        texture/stb.h
+        texture/stb.cpp
+        texture/ktx.h
+        texture/ktx.cpp
+        texture/astc.h
+        texture/astc.cpp)
+
 source_group("\\" FILES ${FRAMEWORK_FILES})
 source_group("common\\" FILES ${COMMON_FILES})
 
 set(PROJECT_FILES
         ${COMMON_FILES}
+        ${TEXTURE_FILES}
         )
 
 # mask out the min/max macros from minwindef.h
@@ -104,7 +115,6 @@ target_link_libraries(${PROJECT_NAME} PUBLIC
         math
         framework
         volk
-        stb
         glslang
         SPIRV
         vma
@@ -112,6 +122,9 @@ target_link_libraries(${PROJECT_NAME} PUBLIC
         spirv-cross-glsl
         glslang-default-resource-limits
         spdlog
+        stb
+        astc
+        ktx
         )
 
 if (${NEED_LINK_ATOMIC})

@@ -79,8 +79,6 @@ bool GraphicsApplication::prepare(const ApplicationOptions &options) {
     }
 #endif
 
-    create_instance();
-
     if (!instance) {
         instance = std::make_unique<core::Instance>(get_name(), get_instance_extensions(), get_validation_layers(), headless, api_version);
     }
@@ -139,8 +137,6 @@ bool GraphicsApplication::prepare(const ApplicationOptions &options) {
         debug_utils = std::make_unique<core::DummyDebugUtils>();
     }
 
-    create_device();// create_custom_device? better way than override?
-
     if (!device) {
         device = std::make_unique<core::Device>(gpu, surface, std::move(debug_utils), get_device_extensions());
     }
@@ -153,14 +149,9 @@ bool GraphicsApplication::prepare(const ApplicationOptions &options) {
     return true;
 }
 
-void GraphicsApplication::create_device() {
-}
-
-void GraphicsApplication::create_instance() {
-}
-
 void GraphicsApplication::create_render_context() {
-    auto surface_priority_list = std::vector<VkSurfaceFormatKHR>{{VK_FORMAT_R8G8B8A8_SRGB, VK_COLOR_SPACE_SRGB_NONLINEAR_KHR}, {VK_FORMAT_B8G8R8A8_SRGB, VK_COLOR_SPACE_SRGB_NONLINEAR_KHR}};
+    auto surface_priority_list = std::vector<VkSurfaceFormatKHR>{{VK_FORMAT_R8G8B8A8_SRGB, VK_COLOR_SPACE_SRGB_NONLINEAR_KHR},
+                                                                 {VK_FORMAT_B8G8R8A8_SRGB, VK_COLOR_SPACE_SRGB_NONLINEAR_KHR}};
     create_render_context(surface_priority_list);
 }
 
@@ -173,7 +164,8 @@ void GraphicsApplication::create_render_context(const std::vector<VkSurfaceForma
     std::vector<VkPresentModeKHR> present_mode_priority_list{VK_PRESENT_MODE_MAILBOX_KHR, VK_PRESENT_MODE_FIFO_KHR, VK_PRESENT_MODE_IMMEDIATE_KHR};
 #endif
 
-    render_context = std::make_unique<rendering::RenderContext>(get_device(), surface, *window, present_mode, present_mode_priority_list, surface_priority_list);
+    render_context = std::make_unique<rendering::RenderContext>(get_device(), surface, *window, present_mode,
+                                                                present_mode_priority_list, surface_priority_list);
 }
 
 void GraphicsApplication::prepare_render_context() {
@@ -295,9 +287,6 @@ void GraphicsApplication::finish() {
 
 core::Device &GraphicsApplication::get_device() {
     return *device;
-}
-
-void GraphicsApplication::draw_gui() {
 }
 
 void GraphicsApplication::update_debug_window() {

@@ -80,91 +80,91 @@ target_include_directories(vma INTERFACE ${VMA_DIR})
 target_link_libraries(vma INTERFACE vulkan)
 
 # libktx
-#set(KTX_DIR ${CMAKE_CURRENT_SOURCE_DIR}/ktx)
-#
-#set(KTX_SOURCES
-#    ${KTX_DIR}/lib/checkheader.c
-#    ${KTX_DIR}/lib/dfdutils/createdfd.c
-#    ${KTX_DIR}/lib/dfdutils/colourspaces.c
-#    ${KTX_DIR}/lib/dfdutils/dfd.h
-#    ${KTX_DIR}/lib/dfdutils/dfd2vk.inl
-#    ${KTX_DIR}/lib/dfdutils/interpretdfd.c
-#    ${KTX_DIR}/lib/dfdutils/printdfd.c
-#    ${KTX_DIR}/lib/dfdutils/queries.c
-#    ${KTX_DIR}/lib/dfdutils/vk2dfd.c
-#    ${KTX_DIR}/lib/etcdec.cxx
-#    ${KTX_DIR}/lib/etcunpack.cxx
-#    ${KTX_DIR}/lib/filestream.c
-#    ${KTX_DIR}/lib/filestream.h
-#    ${KTX_DIR}/lib/formatsize.h
-#    ${KTX_DIR}/lib/hashlist.c
-#    ${KTX_DIR}/lib/info.c
-#    ${KTX_DIR}/lib/ktxint.h
-#    ${KTX_DIR}/lib/memstream.c
-#    ${KTX_DIR}/lib/memstream.h
-#    ${KTX_DIR}/lib/stream.h
-#    ${KTX_DIR}/lib/strings.c
-#    ${KTX_DIR}/lib/swap.c
-#    ${KTX_DIR}/lib/uthash.h
-#    ${KTX_DIR}/lib/texture.c
-#    ${KTX_DIR}/lib/texture.h
-#
-#    # Basis Universal
-#    ${KTX_DIR}/lib/basis_sgd.h
-#    ${KTX_DIR}/lib/basis_transcode.cpp
-#    ${KTX_DIR}/lib/basisu/transcoder/basisu_containers.h
-#    ${KTX_DIR}/lib/basisu/transcoder/basisu_containers_impl.h
-#    ${KTX_DIR}/lib/basisu/transcoder/basisu_file_headers.h
-#    ${KTX_DIR}/lib/basisu/transcoder/basisu_global_selector_cb.h
-#    ${KTX_DIR}/lib/basisu/transcoder/basisu_global_selector_palette.h
-#    ${KTX_DIR}/lib/basisu/transcoder/basisu_transcoder_internal.h
-#    ${KTX_DIR}/lib/basisu/transcoder/basisu_transcoder_uastc.h
-#    ${KTX_DIR}/lib/basisu/transcoder/basisu_transcoder.cpp
-#    ${KTX_DIR}/lib/basisu/transcoder/basisu_transcoder.h
-#    ${KTX_DIR}/lib/basisu/transcoder/basisu.h
-#    ${KTX_DIR}/lib/basisu/zstd/zstd.c
-#
-#    # KT1
-#    ${KTX_DIR}/lib/texture1.c
-#    ${KTX_DIR}/lib/texture1.h
-#
-#    # KTX2
-#    ${KTX_DIR}/lib/texture2.c
-#    ${KTX_DIR}/lib/texture2.h
-#
-#    # Vulkan support
-#    ${KTX_DIR}/lib/vk_format.h
-#    ${KTX_DIR}/lib/vkformat_check.c
-#    ${KTX_DIR}/lib/vkformat_enum.h
-#    ${KTX_DIR}/lib/vkformat_str.c
-#    ${KTX_DIR}/lib/vk_funcs.c
-#    ${KTX_DIR}/lib/vk_funcs.h
-#    ${KTX_DIR}/lib/vkloader.c
-#)
-#
-#set(KTX_INCLUDE_DIRS
-#    ${KTX_DIR}/include
-#    ${KTX_DIR}/lib
-#    ${KTX_DIR}/lib/basisu/zstd
-#    ${KTX_DIR}/lib/basisu/transcoder
-#    ${KTX_DIR}/other_include
-#)
-#
-#add_library(ktx STATIC ${KTX_SOURCES})
-#
-#target_compile_definitions(ktx PUBLIC LIBKTX)
-#if (WIN32)
-#target_compile_definitions(ktx PUBLIC "KTX_API=__declspec(dllexport)")
-#endif()
-#target_compile_definitions(ktx PUBLIC KTX_FEATURE_WRITE=0)
-#target_compile_definitions(ktx PUBLIC BASISD_SUPPORT_KTX2_ZSTD=0)
-#target_compile_definitions(ktx PUBLIC BASISU_NO_ITERATOR_DEBUG_LEVEL)
-#
-#target_include_directories(ktx PUBLIC ${KTX_INCLUDE_DIRS})
-#
-#target_link_libraries(ktx PUBLIC vulkan)
-#
-#set_target_properties(ktx PROPERTIES FOLDER "ThirdParty" POSITION_INDEPENDENT_CODE ON)
+set(KTX_DIR ${CMAKE_CURRENT_SOURCE_DIR}/ktx)
+
+set(KTX_SOURCES
+    ${KTX_DIR}/lib/checkheader.c
+    ${KTX_DIR}/lib/dfdutils/createdfd.c
+    ${KTX_DIR}/lib/dfdutils/colourspaces.c
+    ${KTX_DIR}/lib/dfdutils/dfd.h
+    ${KTX_DIR}/lib/dfdutils/dfd2vk.inl
+    ${KTX_DIR}/lib/dfdutils/interpretdfd.c
+    ${KTX_DIR}/lib/dfdutils/printdfd.c
+    ${KTX_DIR}/lib/dfdutils/queries.c
+    ${KTX_DIR}/lib/dfdutils/vk2dfd.c
+    ${KTX_DIR}/lib/etcdec.cxx
+    ${KTX_DIR}/lib/etcunpack.cxx
+    ${KTX_DIR}/lib/filestream.c
+    ${KTX_DIR}/lib/filestream.h
+    ${KTX_DIR}/lib/formatsize.h
+    ${KTX_DIR}/lib/hashlist.c
+    ${KTX_DIR}/lib/info.c
+    ${KTX_DIR}/lib/ktxint.h
+    ${KTX_DIR}/lib/memstream.c
+    ${KTX_DIR}/lib/memstream.h
+    ${KTX_DIR}/lib/stream.h
+    ${KTX_DIR}/lib/strings.c
+    ${KTX_DIR}/lib/swap.c
+    ${KTX_DIR}/lib/uthash.h
+    ${KTX_DIR}/lib/texture.c
+    ${KTX_DIR}/lib/texture.h
+
+    # Basis Universal
+    ${KTX_DIR}/lib/basis_sgd.h
+    ${KTX_DIR}/lib/basis_transcode.cpp
+    ${KTX_DIR}/lib/basisu/transcoder/basisu_containers.h
+    ${KTX_DIR}/lib/basisu/transcoder/basisu_containers_impl.h
+    ${KTX_DIR}/lib/basisu/transcoder/basisu_file_headers.h
+    ${KTX_DIR}/lib/basisu/transcoder/basisu_global_selector_cb.h
+    ${KTX_DIR}/lib/basisu/transcoder/basisu_global_selector_palette.h
+    ${KTX_DIR}/lib/basisu/transcoder/basisu_transcoder_internal.h
+    ${KTX_DIR}/lib/basisu/transcoder/basisu_transcoder_uastc.h
+    ${KTX_DIR}/lib/basisu/transcoder/basisu_transcoder.cpp
+    ${KTX_DIR}/lib/basisu/transcoder/basisu_transcoder.h
+    ${KTX_DIR}/lib/basisu/transcoder/basisu.h
+    ${KTX_DIR}/lib/basisu/zstd/zstd.c
+
+    # KT1
+    ${KTX_DIR}/lib/texture1.c
+    ${KTX_DIR}/lib/texture1.h
+
+    # KTX2
+    ${KTX_DIR}/lib/texture2.c
+    ${KTX_DIR}/lib/texture2.h
+
+    # Vulkan support
+    ${KTX_DIR}/lib/vk_format.h
+    ${KTX_DIR}/lib/vkformat_check.c
+    ${KTX_DIR}/lib/vkformat_enum.h
+    ${KTX_DIR}/lib/vkformat_str.c
+    ${KTX_DIR}/lib/vk_funcs.c
+    ${KTX_DIR}/lib/vk_funcs.h
+    ${KTX_DIR}/lib/vkloader.c
+)
+
+set(KTX_INCLUDE_DIRS
+    ${KTX_DIR}/include
+    ${KTX_DIR}/lib
+    ${KTX_DIR}/lib/basisu/zstd
+    ${KTX_DIR}/lib/basisu/transcoder
+    ${KTX_DIR}/other_include
+)
+
+add_library(ktx STATIC ${KTX_SOURCES})
+
+target_compile_definitions(ktx PUBLIC LIBKTX)
+if (WIN32)
+target_compile_definitions(ktx PUBLIC "KTX_API=__declspec(dllexport)")
+endif()
+target_compile_definitions(ktx PUBLIC KTX_FEATURE_WRITE=0)
+target_compile_definitions(ktx PUBLIC BASISD_SUPPORT_KTX2_ZSTD=0)
+target_compile_definitions(ktx PUBLIC BASISU_NO_ITERATOR_DEBUG_LEVEL)
+
+target_include_directories(ktx PUBLIC ${KTX_INCLUDE_DIRS})
+
+target_link_libraries(ktx PUBLIC vulkan)
+
+set_target_properties(ktx PROPERTIES FOLDER "ThirdParty" POSITION_INDEPENDENT_CODE ON)
 
 # volk
 set(VOLK_DIR "${CMAKE_CURRENT_SOURCE_DIR}/volk")
@@ -264,43 +264,43 @@ add_library(stb INTERFACE)
 target_include_directories(stb INTERFACE "${CMAKE_CURRENT_SOURCE_DIR}/stb")
 
 # astc
-#set(ASTC_DIR ${CMAKE_CURRENT_SOURCE_DIR}/astc)
-#set(ASTC_INCLUDE_DIR ${ASTC_DIR}/Source)
-#set(ASTC_SOURCE_DIR ${ASTC_DIR}/Source)
-#
-#set(ASTC_SOURCES
-#    ${ASTC_SOURCE_DIR}/astc_image_load_store.cpp
-#    ${ASTC_SOURCE_DIR}/astc_pick_best_endpoint_format.cpp
-#    ${ASTC_SOURCE_DIR}/astc_color_quantize.cpp
-#    ${ASTC_SOURCE_DIR}/astc_weight_align.cpp
-#    ${ASTC_SOURCE_DIR}/astc_integer_sequence.cpp
-#    ${ASTC_SOURCE_DIR}/astc_ideal_endpoints_and_weights.cpp
-#    ${ASTC_SOURCE_DIR}/astc_find_best_partitioning.cpp
-#    ${ASTC_SOURCE_DIR}/astc_compress_symbolic.cpp
-#    ${ASTC_SOURCE_DIR}/astc_decompress_symbolic.cpp
-#    ${ASTC_SOURCE_DIR}/astc_symbolic_physical.cpp
-#    ${ASTC_SOURCE_DIR}/astc_toplevel.cpp
-#    ${ASTC_SOURCE_DIR}/astc_stb_tga.cpp
-#    ${ASTC_SOURCE_DIR}/softfloat.cpp
-#    ${ASTC_SOURCE_DIR}/mathlib.cpp
-#    ${ASTC_SOURCE_DIR}/astc_quantization.cpp
-#    ${ASTC_SOURCE_DIR}/astc_block_sizes2.cpp
-#    ${ASTC_SOURCE_DIR}/astc_percentile_tables.cpp
-#    ${ASTC_SOURCE_DIR}/astc_averages_and_directions.cpp
-#    ${ASTC_SOURCE_DIR}/astc_partition_tables.cpp
-#    ${ASTC_SOURCE_DIR}/astc_color_unquantize.cpp
-#    ${ASTC_SOURCE_DIR}/astc_encoding_choice_error.cpp
-#    ${ASTC_SOURCE_DIR}/astc_kmeans_partitioning.cpp
-#    ${ASTC_SOURCE_DIR}/astc_weight_quant_xfer_tables.cpp
-#    ${ASTC_SOURCE_DIR}/astc_compute_variance.cpp
-#    ${ASTC_SOURCE_DIR}/astc_ktx_dds.cpp
-#)
-#
-#add_library(astc STATIC ${ASTC_SOURCES})
-#target_include_directories(astc PUBLIC ${ASTC_INCLUDE_DIR})
-#target_compile_definitions(astc PRIVATE -DNO_STB_IMAGE_IMPLEMENTATION)
-#set_target_properties(astc PROPERTIES FOLDER "ThirdParty" POSITION_INDEPENDENT_CODE ON)
-#target_link_libraries(astc PUBLIC stb)
+set(ASTC_DIR ${CMAKE_CURRENT_SOURCE_DIR}/astc)
+set(ASTC_INCLUDE_DIR ${ASTC_DIR}/Source)
+set(ASTC_SOURCE_DIR ${ASTC_DIR}/Source)
+
+set(ASTC_SOURCES
+    ${ASTC_SOURCE_DIR}/astc_image_load_store.cpp
+    ${ASTC_SOURCE_DIR}/astc_pick_best_endpoint_format.cpp
+    ${ASTC_SOURCE_DIR}/astc_color_quantize.cpp
+    ${ASTC_SOURCE_DIR}/astc_weight_align.cpp
+    ${ASTC_SOURCE_DIR}/astc_integer_sequence.cpp
+    ${ASTC_SOURCE_DIR}/astc_ideal_endpoints_and_weights.cpp
+    ${ASTC_SOURCE_DIR}/astc_find_best_partitioning.cpp
+    ${ASTC_SOURCE_DIR}/astc_compress_symbolic.cpp
+    ${ASTC_SOURCE_DIR}/astc_decompress_symbolic.cpp
+    ${ASTC_SOURCE_DIR}/astc_symbolic_physical.cpp
+    ${ASTC_SOURCE_DIR}/astc_toplevel.cpp
+    ${ASTC_SOURCE_DIR}/astc_stb_tga.cpp
+    ${ASTC_SOURCE_DIR}/softfloat.cpp
+    ${ASTC_SOURCE_DIR}/mathlib.cpp
+    ${ASTC_SOURCE_DIR}/astc_quantization.cpp
+    ${ASTC_SOURCE_DIR}/astc_block_sizes2.cpp
+    ${ASTC_SOURCE_DIR}/astc_percentile_tables.cpp
+    ${ASTC_SOURCE_DIR}/astc_averages_and_directions.cpp
+    ${ASTC_SOURCE_DIR}/astc_partition_tables.cpp
+    ${ASTC_SOURCE_DIR}/astc_color_unquantize.cpp
+    ${ASTC_SOURCE_DIR}/astc_encoding_choice_error.cpp
+    ${ASTC_SOURCE_DIR}/astc_kmeans_partitioning.cpp
+    ${ASTC_SOURCE_DIR}/astc_weight_quant_xfer_tables.cpp
+    ${ASTC_SOURCE_DIR}/astc_compute_variance.cpp
+    ${ASTC_SOURCE_DIR}/astc_ktx_dds.cpp
+)
+
+add_library(astc STATIC ${ASTC_SOURCES})
+target_include_directories(astc PUBLIC ${ASTC_INCLUDE_DIR})
+target_compile_definitions(astc PRIVATE -DNO_STB_IMAGE_IMPLEMENTATION)
+set_target_properties(astc PROPERTIES FOLDER "ThirdParty" POSITION_INDEPENDENT_CODE ON)
+target_link_libraries(astc PUBLIC stb)
 
 # glfw
 if(NOT ANDROID)
@@ -343,14 +343,3 @@ add_subdirectory(spdlog)
 #set(CLI11_CUDA_TESTS OFF)
 #set(CLI11_CLANG_TIDY OFF)
 #add_subdirectory(cli11)
-
-# OpenCL
-#add_library(opencl INTERFACE)
-#set(OPENCL_INCLUDE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/opencl)
-#target_sources(opencl INTERFACE ${OPENCL_INCLUDE_DIR}/CL/opencl.h)
-#target_include_directories(opencl INTERFACE ${OPENCL_INCLUDE_DIR})
-
-# Catch2
-#add_subdirectory(catch2)
-#set_property(TARGET Catch2 PROPERTY FOLDER "ThirdParty")
-#set_property(TARGET Catch2WithMain PROPERTY FOLDER "ThirdParty")

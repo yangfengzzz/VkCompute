@@ -38,10 +38,7 @@ namespace vox {
  * - creating the Swapchain
  * - creating the RenderContext (or child class)
  * - preparing the RenderContext
- * - loading the sg::Scene
  * - creating the RenderPipeline with ShaderModule (s)
- * - creating the sg::Camera
- * - creating the Gui
  *
  * @section frame_rendering Frame rendering
  *
@@ -54,11 +51,10 @@ namespace vox {
  * A series of steps are performed, some of which can be customized (it will be
  * highlighted when that's the case):
  *
- * - calling sg::Script::update() for all sg::Script (s)
  * - beginning a frame in RenderContext (does the necessary waiting on fences and
  *   acquires an core::Image)
  * - requesting a CommandBuffer
- * - updating Stats and Gui
+ * - updating Stats
  * - getting an active RenderTarget constructed by the factory function of the RenderFrame
  * - setting up barriers for color and depth, note that these are only for the default RenderTarget
  * - calling GraphicsApplication::draw_swapchain_renderpass (see below)
@@ -87,24 +83,12 @@ class GraphicsApplication : public Application {
 public:
     GraphicsApplication() = default;
 
-    virtual ~GraphicsApplication();
+    ~GraphicsApplication() override;
 
     /**
 	 * @brief Additional sample initialization
 	 */
     bool prepare(const ApplicationOptions &options) override;
-
-    /**
-	 * @brief Create the Vulkan device used by this sample
-	 * @note Can be overridden to implement custom device creation
-	 */
-    virtual void create_device();
-
-    /**
-	 * @brief Create the Vulkan instance used by this sample
-	 * @note Can be overridden to implement custom instance creation
-	 */
-    virtual void create_instance();
 
     /**
 	 * @brief Main loop sample events
@@ -121,7 +105,7 @@ public:
 
     core::Device &get_device();
 
-    inline bool has_render_context() const {
+    [[nodiscard]] inline bool has_render_context() const {
         return render_context != nullptr;
     }
 
@@ -241,11 +225,6 @@ protected:
 	 *        know which configuration is resource demanding
 	 */
     virtual void reset_stats_view(){};
-
-    /**
-	 * @brief Samples should override this function to draw their interface
-	 */
-    virtual void draw_gui();
 
     /**
 	 * @brief Updates the debug window, samples can override this to insert their own data elements
