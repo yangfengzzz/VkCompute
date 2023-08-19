@@ -50,6 +50,10 @@ set(SHADER_FILES
         shader/shader_module.cpp
         )
 
+set(COMPUTE_FILES
+        compute/compute_context.h
+        compute/compute_context.cpp)
+
 set(RENDERING_FILES
         # Header files
         rendering/postprocessing_pipeline.h
@@ -241,6 +245,7 @@ set(PROJECT_FILES
         ${PLATFORM_FILES}
         ${CORE_FILES}
         ${RENDERING_FILES}
+        ${COMPUTE_FILES}
         ${STATS_FILES}
         ${SHADER_FILES}
         )
