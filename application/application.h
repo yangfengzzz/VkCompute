@@ -8,7 +8,7 @@
 
 #include <string>
 
-#include "debug_info.h"
+#include "base/debug_info.h"
 #include "framework/platform/input_events.h"
 #include "framework/common/timer.h"
 

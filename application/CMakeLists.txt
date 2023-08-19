@@ -23,11 +23,17 @@ set(COMMON_FILES
         # Header Files
         application.h
         application.cpp
-        debug_info.h
-        debug_info.cpp
         graphics_application.h
         graphics_application.cpp
         )
+
+set(BASE_FILES
+        base/debug_info.h
+        base/debug_info.cpp
+        base/update_flag.h
+        base/update_flag.cpp
+        base/update_flag_manager.h
+        base/update_flag_manager.cpp)
 
 set(TEXTURE_FILES
         texture/texture.h
@@ -39,12 +45,29 @@ set(TEXTURE_FILES
         texture/astc.h
         texture/astc.cpp)
 
+set(MESH_FILES
+        mesh/index_buffer_binding.h
+        mesh/index_buffer_binding.cpp
+        mesh/sub_mesh.h
+        mesh/sub_mesh.cpp
+        mesh/mesh_manager.h
+        mesh/mesh_manager.cpp
+        mesh/mesh.h
+        mesh/mesh.cpp
+        mesh/model_mesh.h
+        mesh/model_mesh.cpp
+        mesh/primitive_mesh.h
+        mesh/primitive_mesh.cpp
+        )
+
 source_group("\\" FILES ${FRAMEWORK_FILES})
 source_group("common\\" FILES ${COMMON_FILES})
 
 set(PROJECT_FILES
         ${COMMON_FILES}
+        ${BASE_FILES}
         ${TEXTURE_FILES}
+        ${MESH_FILES}
         )
 
 # mask out the min/max macros from minwindef.h
