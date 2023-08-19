@@ -167,13 +167,15 @@ const std::vector<std::vector<VkDeviceSize>> &Texture::get_offsets() const {
     return offsets;
 }
 
-void Texture::create_vk_image(core::Device const &device, VkImageViewType image_view_type, VkImageCreateFlags flags) {
-    assert(!vk_image && !vk_image_view && "Vulkan image already constructed");
+void Texture::create_vk_image(core::Device const &device,
+                              VkImageCreateFlags flags,
+                              VkImageUsageFlags image_usage) {
+    assert(!vk_image && vk_image_views.empty() && "Vulkan image already constructed");
 
     vk_image = std::make_unique<core::Image>(device,
                                              get_extent(),
                                              format,
-                                             VK_IMAGE_USAGE_SAMPLED_BIT | VK_IMAGE_USAGE_TRANSFER_DST_BIT,
+                                             image_usage,
                                              VMA_MEMORY_USAGE_GPU_ONLY,
                                              VK_SAMPLE_COUNT_1_BIT,
                                              to_u32(mipmaps.size()),
@@ -181,9 +183,6 @@ void Texture::create_vk_image(core::Device const &device, VkImageViewType image_
                                              VK_IMAGE_TILING_OPTIMAL,
                                              flags);
     vk_image->set_debug_name(name);
-
-    vk_image_view = std::make_unique<core::ImageView>(*vk_image, image_view_type);
-    vk_image_view->set_debug_name("View on " + name);
 }
 
 const core::Image &Texture::get_vk_image() const {
@@ -191,9 +190,25 @@ const core::Image &Texture::get_vk_image() const {
     return *vk_image;
 }
 
-const core::ImageView &Texture::get_vk_image_view() const {
-    assert(vk_image_view && "Vulkan image view was not created");
-    return *vk_image_view;
+const core::ImageView &Texture::get_vk_image_view(VkImageViewType view_type,
+                                                  uint32_t base_mip_level,
+                                                  uint32_t base_array_layer,
+                                                  uint32_t n_mip_levels,
+                                                  uint32_t n_array_layers) {
+    std::size_t key = 0;
+    vox::hash_combine(key, view_type);
+    vox::hash_combine(key, base_mip_level);
+    vox::hash_combine(key, base_array_layer);
+    vox::hash_combine(key, n_mip_levels);
+    vox::hash_combine(key, n_array_layers);
+    auto iter = vk_image_views.find(key);
+    if (iter == vk_image_views.end()) {
+        vk_image_views.insert(std::make_pair(
+            key, std::make_unique<core::ImageView>(*vk_image, view_type, get_format(), base_mip_level,
+                                                   base_array_layer, n_mip_levels, n_array_layers)));
+    }
+
+    return *vk_image_views.find(key)->second.get();
 }
 
 Mipmap &Texture::get_mipmap(const size_t index) {
@@ -287,9 +302,9 @@ void Texture::coerce_format_to_srgb() {
     format = maybe_coerce_to_srgb(format);
 }
 
-std::unique_ptr<Texture> Texture::load(const std::string &name, const std::string &uri,
+std::shared_ptr<Texture> Texture::load(const std::string &name, const std::string &uri,
                                        ContentType content_type) {
-    std::unique_ptr<Texture> image{nullptr};
+    std::shared_ptr<Texture> image{nullptr};
 
     auto data = fs::read_asset(uri);
 
@@ -297,13 +312,13 @@ std::unique_ptr<Texture> Texture::load(const std::string &name, const std::strin
     auto extension = get_extension(uri);
 
     if (extension == "png" || extension == "jpg") {
-        image = std::make_unique<Stb>(name, data, content_type);
+        image = std::make_shared<Stb>(name, data, content_type);
     } else if (extension == "astc") {
-        image = std::make_unique<Astc>(name, data);
+        image = std::make_shared<Astc>(name, data);
     } else if (extension == "ktx") {
-        image = std::make_unique<Ktx>(name, data, content_type);
+        image = std::make_shared<Ktx>(name, data, content_type);
     } else if (extension == "ktx2") {
-        image = std::make_unique<Ktx>(name, data, content_type);
+        image = std::make_shared<Ktx>(name, data, content_type);
     }
 
     return image;

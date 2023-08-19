@@ -54,9 +54,10 @@ public:
         Other
     };
 
-    Texture(const std::string &name, std::vector<uint8_t> &&data = {}, std::vector<Mipmap> &&mipmaps = {{}});
+    explicit Texture(const std::string &name, std::vector<uint8_t> &&data = {}, std::vector<Mipmap> &&mipmaps = {{}});
 
-    static std::unique_ptr<Texture> load(const std::string &name, const std::string &uri, ContentType content_type);
+    static std::shared_ptr<Texture> load(const std::string &name, const std::string &uri,
+                                         ContentType content_type = Unknown);
 
     virtual ~Texture() = default;
 
@@ -76,15 +77,23 @@ public:
 
     void generate_mipmaps();
 
-    void create_vk_image(core::Device const &device, VkImageViewType image_view_type = VK_IMAGE_VIEW_TYPE_2D, VkImageCreateFlags flags = 0);
+    void create_vk_image(core::Device const &device,
+                         VkImageCreateFlags flags = 0,
+                         VkImageUsageFlags image_usage = VK_IMAGE_USAGE_SAMPLED_BIT | VK_IMAGE_USAGE_TRANSFER_DST_BIT);
 
     [[nodiscard]] const core::Image &get_vk_image() const;
 
-    [[nodiscard]] const core::ImageView &get_vk_image_view() const;
+    [[nodiscard]] const core::ImageView &get_vk_image_view(VkImageViewType view_type = VK_IMAGE_VIEW_TYPE_2D,
+                                                           uint32_t base_mip_level = 0,
+                                                           uint32_t base_array_layer = 0,
+                                                           uint32_t n_mip_levels = 0,
+                                                           uint32_t n_array_layers = 0);
 
     void coerce_format_to_srgb();
 
 protected:
+    friend class TextureManager;
+
     std::vector<uint8_t> &get_mut_data();
 
     void set_data(const uint8_t *raw_data, size_t size);
@@ -119,7 +128,7 @@ private:
 
     std::unique_ptr<core::Image> vk_image;
 
-    std::unique_ptr<core::ImageView> vk_image_view;
+    std::unordered_map<size_t, std::unique_ptr<core::ImageView>> vk_image_views;
 };
 
 }// namespace vox

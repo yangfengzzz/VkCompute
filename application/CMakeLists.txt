@@ -36,6 +36,8 @@ set(BASE_FILES
         base/update_flag_manager.cpp)
 
 set(TEXTURE_FILES
+        texture/texture_manager.h
+        texture/texture_manager.cpp
         texture/texture.h
         texture/texture.cpp
         texture/stb.h
@@ -60,6 +62,10 @@ set(MESH_FILES
         mesh/primitive_mesh.cpp
         )
 
+set(SHADER_FILES
+        shader/shader_manager.h
+        shader/shader_manager.cpp)
+
 source_group("\\" FILES ${FRAMEWORK_FILES})
 source_group("common\\" FILES ${COMMON_FILES})
 
@@ -68,6 +74,7 @@ set(PROJECT_FILES
         ${BASE_FILES}
         ${TEXTURE_FILES}
         ${MESH_FILES}
+        ${SHADER_FILES}
         )
 
 # mask out the min/max macros from minwindef.h
