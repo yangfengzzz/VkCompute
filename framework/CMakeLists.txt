@@ -128,6 +128,7 @@ set(CORE_FILES
         core/resource_replay.h
         core/semaphore_pool.h
         core/resource_cache.h
+        core/frame_resource.h
         # Source Files
         core/instance.cpp
         core/physical_device.cpp
@@ -161,6 +162,7 @@ set(CORE_FILES
         core/resource_replay.cpp
         core/semaphore_pool.cpp
         core/resource_cache.cpp
+        core/frame_resource.cpp
         )
 
 set(PLATFORM_FILES

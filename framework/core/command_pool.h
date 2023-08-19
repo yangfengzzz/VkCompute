@@ -10,17 +10,14 @@
 #include "common/vk_common.h"
 #include "core/command_buffer.h"
 
-namespace vox {
-namespace rendering {
-class RenderFrame;
-}// namespace rendering
-namespace core {
+namespace vox::core {
 class Device;
+class FrameResource;
 
 class CommandPool {
 public:
     CommandPool(Device &device, uint32_t queue_family_index,
-                rendering::RenderFrame *render_frame = nullptr,
+                FrameResource *frame_resource = nullptr,
                 size_t thread_index = 0,
                 CommandBuffer::ResetMode reset_mode = CommandBuffer::ResetMode::ResetPool);
 
@@ -40,7 +37,7 @@ public:
 
     [[nodiscard]] VkCommandPool get_handle() const;
 
-    rendering::RenderFrame *get_render_frame();
+    FrameResource *get_frame_resource();
 
     [[nodiscard]] size_t get_thread_index() const;
 
@@ -55,7 +52,7 @@ private:
 
     VkCommandPool handle{VK_NULL_HANDLE};
 
-    rendering::RenderFrame *render_frame{nullptr};
+    FrameResource *frame_resource{nullptr};
 
     size_t thread_index{0};
 
@@ -74,5 +71,4 @@ private:
     VkResult reset_command_buffers();
 };
 
-}// namespace core
-}// namespace vox
+}// namespace vox::core

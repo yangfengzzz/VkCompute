@@ -454,7 +454,7 @@ void CommandBuffer::flush_pipeline_state(VkPipelineBindPoint pipeline_bind_point
 }
 
 void CommandBuffer::flush_descriptor_state(VkPipelineBindPoint pipeline_bind_point) {
-    assert(command_pool.get_render_frame() && "The command pool must be associated to a render frame");
+    assert(command_pool.get_frame_resource() && "The command pool must be associated to a frame resource");
 
     const auto &pipeline_layout = pipeline_state.get_pipeline_layout();
 
@@ -589,11 +589,11 @@ void CommandBuffer::flush_descriptor_state(VkPipelineBindPoint pipeline_bind_poi
             }
 
             VkDescriptorSet descriptor_set_handle =
-                command_pool.get_render_frame()->request_descriptor_set(descriptor_set_layout,
-                                                                        buffer_infos,
-                                                                        image_infos,
-                                                                        update_after_bind,
-                                                                        command_pool.get_thread_index());
+                command_pool.get_frame_resource()->request_descriptor_set(descriptor_set_layout,
+                                                                          buffer_infos,
+                                                                          image_infos,
+                                                                          update_after_bind,
+                                                                          command_pool.get_thread_index());
 
             // Bind descriptor set
             vkCmdBindDescriptorSets(get_handle(),

@@ -11,10 +11,10 @@
 
 namespace vox::core {
 CommandPool::CommandPool(Device &d, uint32_t queue_family_index,
-                         rendering::RenderFrame *render_frame, size_t thread_index,
+                         FrameResource *frame_resource, size_t thread_index,
                          CommandBuffer::ResetMode reset_mode)
     : device{d},
-      render_frame{render_frame},
+      frame_resource{frame_resource},
       thread_index{thread_index},
       reset_mode{reset_mode} {
     VkCommandPoolCreateFlags flags;
@@ -58,7 +58,7 @@ CommandPool::CommandPool(CommandPool &&other) noexcept : device{other.device},
                                                          active_primary_command_buffer_count{other.active_primary_command_buffer_count},
                                                          secondary_command_buffers{std::move(other.secondary_command_buffers)},
                                                          active_secondary_command_buffer_count{other.active_secondary_command_buffer_count},
-                                                         render_frame{other.render_frame},
+                                                         frame_resource{other.frame_resource},
                                                          thread_index{other.thread_index},
                                                          reset_mode{other.reset_mode} {
     other.handle = VK_NULL_HANDLE;
@@ -82,8 +82,8 @@ VkCommandPool CommandPool::get_handle() const {
     return handle;
 }
 
-rendering::RenderFrame *CommandPool::get_render_frame() {
-    return render_frame;
+FrameResource *CommandPool::get_frame_resource() {
+    return frame_resource;
 }
 
 size_t CommandPool::get_thread_index() const {
