@@ -66,6 +66,12 @@ set(SHADER_FILES
         shader/shader_manager.h
         shader/shader_manager.cpp)
 
+set(MATERIAL_FILES
+        material/material.h
+        material/material.cpp
+        material/base_material.h
+        material/base_material.cpp)
+
 source_group("\\" FILES ${FRAMEWORK_FILES})
 source_group("common\\" FILES ${COMMON_FILES})
 
@@ -75,6 +81,7 @@ set(PROJECT_FILES
         ${TEXTURE_FILES}
         ${MESH_FILES}
         ${SHADER_FILES}
+        ${MATERIAL_FILES}
         )
 
 # mask out the min/max macros from minwindef.h
