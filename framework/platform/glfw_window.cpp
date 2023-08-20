@@ -220,6 +220,13 @@ void mouse_button_callback(GLFWwindow *window, int button, int action, int /*mod
             static_cast<float>(ypos)});
     }
 }
+
+void scroll_callback(GLFWwindow *window, double xoffset, double yoffset) {
+    if (auto *platform = reinterpret_cast<Platform *>(glfwGetWindowUserPointer(window))) {
+        platform->input_event(ScrollInputEvent(xoffset, yoffset));
+    }
+}
+
 }// namespace
 
 GlfwWindow::GlfwWindow(Platform *platform, const Window::Properties &properties) : Window(properties) {
@@ -259,7 +266,7 @@ GlfwWindow::GlfwWindow(Platform *platform, const Window::Properties &properties)
         }
 
         default:
-            handle = glfwCreateWindow(properties.extent.width, properties.extent.height, properties.title.c_str(), NULL, NULL);
+            handle = glfwCreateWindow(properties.extent.width, properties.extent.height, properties.title.c_str(), nullptr, nullptr);
             break;
     }
 
@@ -277,6 +284,7 @@ GlfwWindow::GlfwWindow(Platform *platform, const Window::Properties &properties)
     glfwSetKeyCallback(handle, key_callback);
     glfwSetCursorPosCallback(handle, cursor_position_callback);
     glfwSetMouseButtonCallback(handle, mouse_button_callback);
+    glfwSetScrollCallback(handle, scroll_callback);
 
     glfwSetInputMode(handle, GLFW_STICKY_KEYS, 1);
     glfwSetInputMode(handle, GLFW_STICKY_MOUSE_BUTTONS, 1);

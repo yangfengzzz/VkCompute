@@ -15,7 +15,8 @@ class Platform;
 enum class EventSource {
     Keyboard,
     Mouse,
-    Touchscreen
+    Touchscreen,
+    Scroll,
 };
 
 class InputEvent {
@@ -192,6 +193,21 @@ private:
     float pos_x;
 
     float pos_y;
+};
+
+// MARK: - Scroll Event
+class ScrollInputEvent : public InputEvent {
+public:
+    ScrollInputEvent(float offset_x, float offset_y);
+
+    [[nodiscard]] float get_offset_x() const;
+
+    [[nodiscard]] float get_offset_y() const;
+
+private:
+    float offset_x_;
+
+    float offset_y_;
 };
 
 enum class TouchAction {

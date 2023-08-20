@@ -110,6 +110,14 @@ set(LIGHT_FILES
         light/spot_light.h
         light/spot_light.cpp)
 
+set(CONTROL_FILES
+        controls/spherical.h
+        controls/spherical.cpp
+        controls/orbit_control.h
+        controls/orbit_control.cpp
+        controls/free_control.h
+        controls/free_control.cpp)
+
 set(SUBPASS_FILES
         subpasses/render_element.h
         subpasses/render_element.cpp)
@@ -127,6 +135,7 @@ set(PROJECT_FILES
         ${ECS_FILES}
         ${COMPONENTS_FILES}
         ${LIGHT_FILES}
+        ${CONTROL_FILES}
         ${SUBPASS_FILES}
         )
 
