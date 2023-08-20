@@ -120,7 +120,9 @@ set(CONTROL_FILES
 
 set(SUBPASS_FILES
         subpasses/render_element.h
-        subpasses/render_element.cpp)
+        subpasses/render_element.cpp
+        subpasses/geometry_subpass.h
+        subpasses/geometry_subpass.cpp)
 
 source_group("\\" FILES ${FRAMEWORK_FILES})
 source_group("common\\" FILES ${COMMON_FILES})

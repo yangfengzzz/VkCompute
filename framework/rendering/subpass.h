@@ -26,7 +26,7 @@ namespace rendering {
  */
 class Subpass {
 public:
-    Subpass(RenderContext &render_context, ShaderSource &&vertex_shader, ShaderSource &&fragment_shader);
+    explicit Subpass(RenderContext &render_context);
 
     Subpass(const Subpass &) = delete;
 
@@ -57,10 +57,6 @@ public:
     virtual void draw(core::CommandBuffer &command_buffer) = 0;
 
     RenderContext &get_render_context();
-
-    [[nodiscard]] const ShaderSource &get_vertex_shader() const;
-
-    [[nodiscard]] const ShaderSource &get_fragment_shader() const;
 
     core::DepthStencilState &get_depth_stencil_state();
 
@@ -104,10 +100,6 @@ protected:
 
 private:
     std::string debug_name{};
-
-    ShaderSource vertex_shader;
-
-    ShaderSource fragment_shader;
 
     core::DepthStencilState depth_stencil_state{};
 

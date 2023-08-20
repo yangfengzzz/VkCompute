@@ -12,10 +12,7 @@
 
 namespace vox::rendering {
 
-Subpass::Subpass(RenderContext &render_context, ShaderSource &&vertex_source,
-                 ShaderSource &&fragment_source) : render_context{render_context},
-                                                   vertex_shader{std::move(vertex_source)},
-                                                   fragment_shader{std::move(fragment_source)} {
+Subpass::Subpass(RenderContext &render_context) : render_context{render_context} {
 }
 
 void Subpass::update_render_target_attachments(RenderTarget &render_target) {
@@ -25,14 +22,6 @@ void Subpass::update_render_target_attachments(RenderTarget &render_target) {
 
 RenderContext &Subpass::get_render_context() {
     return render_context;
-}
-
-const ShaderSource &Subpass::get_vertex_shader() const {
-    return vertex_shader;
-}
-
-const ShaderSource &Subpass::get_fragment_shader() const {
-    return fragment_shader;
 }
 
 core::DepthStencilState &Subpass::get_depth_stencil_state() {
