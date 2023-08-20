@@ -72,6 +72,48 @@ set(MATERIAL_FILES
         material/base_material.h
         material/base_material.cpp)
 
+set(COMPONENTS_FILES
+        components/camera.h
+        components/camera.cpp
+        components/script.h
+        components/script.cpp
+        components/transform.h
+        components/transform.cpp
+        components/renderer.h
+        components/renderer.cpp
+        components/mesh_renderer.h
+        components/mesh_renderer.cpp)
+
+set(ECS_FILES
+        ecs/component.h
+        ecs/component.cpp
+        ecs/components_manager.h
+        ecs/components_manager.cpp
+        ecs/entity.h
+        ecs/entity.cpp
+        ecs/scene.h
+        ecs/scene.cpp
+        ecs/scene_manager.h
+        ecs/scene_manager.cpp)
+
+set(LIGHT_FILES
+        light/ambient_light.h
+        light/ambient_light.cpp
+        light/direct_light.h
+        light/direct_light.cpp
+        light/light.h
+        light/light.cpp
+        light/light_manager.h
+        light/light_manager.cpp
+        light/point_light.h
+        light/point_light.cpp
+        light/spot_light.h
+        light/spot_light.cpp)
+
+set(SUBPASS_FILES
+        subpasses/render_element.h
+        subpasses/render_element.cpp)
+
 source_group("\\" FILES ${FRAMEWORK_FILES})
 source_group("common\\" FILES ${COMMON_FILES})
 
@@ -82,6 +124,10 @@ set(PROJECT_FILES
         ${MESH_FILES}
         ${SHADER_FILES}
         ${MATERIAL_FILES}
+        ${ECS_FILES}
+        ${COMPONENTS_FILES}
+        ${LIGHT_FILES}
+        ${SUBPASS_FILES}
         )
 
 # mask out the min/max macros from minwindef.h
