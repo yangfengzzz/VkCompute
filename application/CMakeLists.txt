@@ -25,6 +25,8 @@ set(COMMON_FILES
         application.cpp
         graphics_application.h
         graphics_application.cpp
+        forward_application.h
+        forward_application.cpp
         )
 
 set(BASE_FILES

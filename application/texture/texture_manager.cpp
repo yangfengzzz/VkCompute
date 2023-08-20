@@ -10,9 +10,9 @@
 #include "shader/shader_manager.h"
 
 namespace vox {
-TextureManager *TextureManager::GetSingletonPtr() { return ms_singleton; }
+TextureManager *TextureManager::get_singleton_ptr() { return ms_singleton; }
 
-TextureManager &TextureManager::GetSingleton() {
+TextureManager &TextureManager::get_singleton() {
     assert(ms_singleton);
     return (*ms_singleton);
 }
@@ -43,46 +43,46 @@ TextureManager::TextureManager(core::Device &device)
     sampler_ = std::make_unique<core::Sampler>(device, sampler_create_info_);
 }
 
-std::shared_ptr<Texture> TextureManager::LoadTexture(const std::string &file) {
+std::shared_ptr<Texture> TextureManager::load_texture(const std::string &file) {
     auto iter = image_pool_.find(file);
     if (iter != image_pool_.end()) {
         return iter->second;
     } else {
         auto image = vox::Texture::load(file, file);
         image->create_vk_image(device_);
-        UploadTexture(image.get());
+        upload_texture(image.get());
         image_pool_.insert(std::make_pair(file, image));
         return image;
     }
 }
 
-std::shared_ptr<Texture> TextureManager::LoadTextureArray(const std::string &file) {
+std::shared_ptr<Texture> TextureManager::load_texture_array(const std::string &file) {
     auto iter = image_pool_.find(file);
     if (iter != image_pool_.end()) {
         return iter->second;
     } else {
         auto image = vox::Texture::load(file, file);
         image->create_vk_image(device_, VK_IMAGE_VIEW_TYPE_2D_ARRAY);
-        UploadTexture(image.get());
+        upload_texture(image.get());
         image_pool_.insert(std::make_pair(file, image));
         return image;
     }
 }
 
-std::shared_ptr<Texture> TextureManager::LoadTextureCubemap(const std::string &file) {
+std::shared_ptr<Texture> TextureManager::load_texture_cubemap(const std::string &file) {
     auto iter = image_pool_.find(file);
     if (iter != image_pool_.end()) {
         return iter->second;
     } else {
         auto image = vox::Texture::load(file, file);
         image->create_vk_image(device_, VK_IMAGE_CREATE_CUBE_COMPATIBLE_BIT);
-        UploadTexture(image.get());
+        upload_texture(image.get());
         image_pool_.insert(std::make_pair(file, image));
         return image;
     }
 }
 
-void TextureManager::UploadTexture(Texture *image) {
+void TextureManager::upload_texture(vox::Texture *image) {
     const auto &queue = device_.get_queue_by_flags(VK_QUEUE_GRAPHICS_BIT, 0);
 
     VkCommandBuffer command_buffer = device_.create_command_buffer(VK_COMMAND_BUFFER_LEVEL_PRIMARY, true);
@@ -139,7 +139,7 @@ void TextureManager::UploadTexture(Texture *image) {
     device_.flush_command_buffer(command_buffer, queue.get_handle());
 }
 
-void TextureManager::CollectGarbage() {
+void TextureManager::collect_garbage() {
     for (auto &image : image_pool_) {
         if (image.second.use_count() == 1) {
             image.second.reset();
@@ -148,7 +148,7 @@ void TextureManager::CollectGarbage() {
 }
 
 // MARK: - PBR
-std::shared_ptr<Texture> TextureManager::GenerateIBL(const std::string &file, rendering::RenderContext &render_context) {
+std::shared_ptr<Texture> TextureManager::generate_ibl(const std::string &file, rendering::RenderContext &render_context) {
     auto iter = image_pool_.find(file + "ibl");
     if (iter != image_pool_.end()) {
         return iter->second;
@@ -156,7 +156,7 @@ std::shared_ptr<Texture> TextureManager::GenerateIBL(const std::string &file, re
         auto &command_buffer = render_context.begin();
         command_buffer.begin(VK_COMMAND_BUFFER_USAGE_ONE_TIME_SUBMIT_BIT);
 
-        auto source = LoadTextureCubemap(file);
+        auto source = load_texture_cubemap(file);
         auto baker_mipmap_count = static_cast<uint32_t>(source->get_mipmaps().size());
         std::vector<Mipmap> mipmap = source->get_mipmaps();
 
@@ -196,8 +196,8 @@ std::shared_ptr<Texture> TextureManager::GenerateIBL(const std::string &file, re
     }
 }
 
-SphericalHarmonics3 TextureManager::GenerateSH(const std::string &file) {
-    auto source = LoadTextureCubemap(file);
+SphericalHarmonics3 TextureManager::generate_sh(const std::string &file) {
+    auto source = load_texture_cubemap(file);
     const auto &layers = source->get_layers();
     auto &offsets = source->get_offsets();
     uint32_t texture_size = source->get_extent().width;

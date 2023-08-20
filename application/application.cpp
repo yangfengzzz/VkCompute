@@ -28,7 +28,8 @@ bool Application::prepare(const ApplicationOptions &options) {
 void Application::finish() {
 }
 
-bool Application::resize(const uint32_t /*width*/, const uint32_t /*height*/) {
+bool Application::resize(const uint32_t /*width*/, const uint32_t /*height*/,
+                         uint32_t fb_width, uint32_t fb_height) {
     return true;
 }
 

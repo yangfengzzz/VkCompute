@@ -47,7 +47,7 @@ public:
 	 * @param width New width of the window
 	 * @param height New height of the window
 	 */
-    virtual bool resize(uint32_t width, uint32_t height);
+    virtual bool resize(uint32_t width, uint32_t height, uint32_t fb_width, uint32_t fb_height);
 
     /**
 	 * @brief Handles input events of the window

@@ -16,38 +16,38 @@
 namespace vox {
 class TextureManager : public Singleton<TextureManager> {
 public:
-    static TextureManager &GetSingleton();
+    static TextureManager &get_singleton();
 
-    static TextureManager *GetSingletonPtr();
+    static TextureManager *get_singleton_ptr();
 
     explicit TextureManager(core::Device &device);
 
     ~TextureManager() = default;
 
-    void CollectGarbage();
+    void collect_garbage();
 
 public:
     /**
      * @brief Loads in a ktx 2D texture
      */
-    std::shared_ptr<Texture> LoadTexture(const std::string &file);
+    std::shared_ptr<Texture> load_texture(const std::string &file);
 
     /**
      * @brief Loads in a ktx 2D texture array
      */
-    std::shared_ptr<Texture> LoadTextureArray(const std::string &file);
+    std::shared_ptr<Texture> load_texture_array(const std::string &file);
 
     /**
      * @brief Loads in a ktx 2D texture cubemap
      */
-    std::shared_ptr<Texture> LoadTextureCubemap(const std::string &file);
+    std::shared_ptr<Texture> load_texture_cubemap(const std::string &file);
 
-    void UploadTexture(Texture *image);
+    void upload_texture(Texture *image);
 
 public:
-    std::shared_ptr<Texture> GenerateIBL(const std::string &file, rendering::RenderContext &render_context);
+    std::shared_ptr<Texture> generate_ibl(const std::string &file, rendering::RenderContext &render_context);
 
-    SphericalHarmonics3 GenerateSH(const std::string &file);
+    SphericalHarmonics3 generate_sh(const std::string &file);
 
 private:
     core::Device &device_;

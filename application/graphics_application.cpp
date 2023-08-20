@@ -264,8 +264,8 @@ void GraphicsApplication::render(core::CommandBuffer &command_buffer) {
     }
 }
 
-bool GraphicsApplication::resize(uint32_t width, uint32_t height) {
-    Application::resize(width, height);
+bool GraphicsApplication::resize(uint32_t width, uint32_t height, uint32_t fb_width, uint32_t fb_height) {
+    Application::resize(width, height, fb_width, fb_height);
 
     if (stats) {
         stats->resize(width);
