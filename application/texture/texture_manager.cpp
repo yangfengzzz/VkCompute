@@ -6,7 +6,6 @@
 
 #include "texture/texture_manager.h"
 
-#include "framework/core/device.h"
 #include "shader/shader_manager.h"
 
 namespace vox {
@@ -206,7 +205,7 @@ SphericalHarmonics3 TextureManager::generate_sh(const std::string &file) {
     float solid_angle_sum = 0;
     const uint32_t kChannelLength = get_bits_per_pixel(source->get_format()) / 8;
     const uint32_t kChannelShift = kChannelLength / 4;
-    const float kTotalColor = std::powf(256.f, static_cast<float>(kChannelShift)) - 1;
+    const float kTotalColor = std::pow(256.f, static_cast<float>(kChannelShift)) - 1;
     SphericalHarmonics3 sh;
     for (uint32_t layer = 0; layer < layers; layer++) {
         uint64_t buffer_offset = offsets[layer][0];
@@ -218,17 +217,17 @@ SphericalHarmonics3 TextureManager::generate_sh(const std::string &file) {
 
                 float r = 0.f;
                 for (uint8_t i = 0; i < kChannelShift; i++) {
-                    r += static_cast<float>(source->data[data_offset + i]) * std::powf(256.f, i);
+                    r += static_cast<float>(source->data[data_offset + i]) * std::pow(256.f, i);
                 }
 
                 float g = 0.f;
                 for (uint8_t i = 0; i < kChannelShift; i++) {
-                    g += static_cast<float>(source->data[data_offset + i + kChannelShift]) * std::powf(256.f, i);
+                    g += static_cast<float>(source->data[data_offset + i + kChannelShift]) * std::pow(256.f, i);
                 }
 
                 float b = 0.f;
                 for (uint8_t i = 0; i < kChannelShift; i++) {
-                    b += static_cast<float>(source->data[data_offset + i + 2 * kChannelShift]) * std::powf(256.f, i);
+                    b += static_cast<float>(source->data[data_offset + i + 2 * kChannelShift]) * std::pow(256.f, i);
                 }
                 Color color(r / kTotalColor, g / kTotalColor, b / kTotalColor, 0);
 

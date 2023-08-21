@@ -7,6 +7,7 @@
 #include "base/update_flag.h"
 
 #include "base/update_flag_manager.h"
+#include <algorithm>
 
 namespace vox {
 UpdateFlag::UpdateFlag(UpdateFlagManager *flags) : flags_(flags) { flags->update_flags_.push_back(this); }

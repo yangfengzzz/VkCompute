@@ -5,6 +5,7 @@
 //  property of any third parties.
 
 #include "math/random.h"
+#include <cassert>
 
 namespace vox {
 Random::Random() : Random(0) {}
