@@ -59,8 +59,7 @@ void AtomicComputeApp::load_scene() {
 bool AtomicComputeApp::prepare(const ApplicationOptions &options) {
     ForwardApplication::prepare(options);
 
-    pipeline_ = std::make_unique<rendering::PostProcessingPipeline>(*render_context, ShaderSource());
-    auto atomic_pass = &pipeline_->add_pass<rendering::PostProcessingComputePass>(
+    atomic_pass = std::make_unique<compute::ComputePass>(
         ShaderManager::get_singleton().load_shader("base/compute/atomic_counter.comp"));
     atomic_pass->set_dispatch_size({1, 1, 1});
     atomic_pass->attach_shader_data(&material_->shader_data_);
@@ -70,7 +69,7 @@ bool AtomicComputeApp::prepare(const ApplicationOptions &options) {
 
 void AtomicComputeApp::update_gpu_task(core::CommandBuffer &command_buffer) {
     ForwardApplication::update_gpu_task(command_buffer);
-    pipeline_->draw(command_buffer);
+    atomic_pass->compute(command_buffer);
 }
 
 }// namespace vox

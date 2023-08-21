@@ -70,7 +70,9 @@ set(SHADER_FILES
 
 set(COMPUTE_FILES
         compute/compute_context.h
-        compute/compute_context.cpp)
+        compute/compute_context.cpp
+        compute/compute_pass.h
+        compute/compute_pass.cpp)
 
 set(RENDERING_FILES
         # Header files

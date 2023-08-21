@@ -7,7 +7,7 @@
 #pragma once
 
 #include "application/forward_application.h"
-#include "framework/rendering/postprocessing_pipeline.h"
+#include "framework/compute//compute_pass.h"
 
 namespace vox {
 class AtomicComputeApp : public ForwardApplication {
@@ -20,7 +20,7 @@ public:
 
 private:
     std::shared_ptr<Material> material_{nullptr};
-    std::unique_ptr<rendering::PostProcessingPipeline> pipeline_{nullptr};
+    std::unique_ptr<compute::ComputePass> atomic_pass{nullptr};
 };
 
 }// namespace vox

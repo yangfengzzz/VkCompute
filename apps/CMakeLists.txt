@@ -20,11 +20,9 @@ include(android_package)
 # create sample app project
 project(apps LANGUAGES C CXX)
 
-#add_subdirectory(plugins)
-#add_subdirectory(apps)
-
 set(SRC
         main.cpp
+        atomic_compute_app.cpp
         )
 
 source_group("\\" FILES ${SRC})

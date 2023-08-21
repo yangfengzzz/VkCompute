@@ -31,6 +31,9 @@
 #error "Platform not supported"
 #endif
 
+#include "primitive_app.h"
+#include "atomic_compute_app.h"
+
 CUSTOM_MAIN(context) {
 #if defined(PLATFORM__ANDROID)
     vox::AndroidPlatform platform{context};
@@ -46,15 +49,17 @@ CUSTOM_MAIN(context) {
 #error "Platform not supported"
 #endif
 
+    auto app = std::make_unique<vox::AtomicComputeApp>();
+    app->prepare({false, &platform.get_window()});
     auto code = platform.initialize(
         [&](float delta_time) {
-            // update
+            app->update(delta_time);
         },
         [&](uint32_t width, uint32_t height) {
-            // resize
+            app->resize(width, height, 1, 1);
         },
         [&](const vox::InputEvent &event) {
-            // event
+            app->input_event(event);
         });
 
     if (code == vox::ExitCode::Success) {
