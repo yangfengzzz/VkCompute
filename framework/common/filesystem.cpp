@@ -5,6 +5,7 @@
 //  property of any third parties.
 
 #include "common/filesystem.h"
+#include "platform/platform.h"
 
 namespace vox::fs {
 namespace path {
@@ -21,9 +22,9 @@ std::string get(const Type type, const std::string &file) {
 
     // Check for special cases first
     if (type == Type::WorkingDir) {
-        return "";
+        return Platform::get_external_storage_directory();
     } else if (type == Type::Temp) {
-        return "";
+        return Platform::get_temp_directory();
     }
 
     // Check for relative paths
@@ -37,10 +38,10 @@ std::string get(const Type type, const std::string &file) {
         throw std::runtime_error("Path was found, but it is empty");
     }
 
-    auto path = it->second;
+    auto path = Platform::get_external_storage_directory() + it->second;
 
     if (!is_directory(path)) {
-        create_path("", it->second);
+        create_path(Platform::get_external_storage_directory(), it->second);
     }
 
     return path + file;

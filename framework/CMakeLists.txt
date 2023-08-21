@@ -50,6 +50,7 @@ set(COMMON_FILES
         common/utils.cpp
         common/vk_common.cpp
         common/filesystem.cpp
+        common/strings.cpp
         )
 
 set(SHADER_FILES
