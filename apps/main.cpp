@@ -49,20 +49,20 @@ CUSTOM_MAIN(context) {
 #error "Platform not supported"
 #endif
 
-    auto app = std::make_unique<vox::AtomicComputeApp>();
-    app->prepare({false, &platform.get_window()});
-    auto code = platform.initialize(
-        [&](float delta_time) {
-            app->update(delta_time);
-        },
-        [&](uint32_t width, uint32_t height) {
-            app->resize(width, height, 1, 1);
-        },
-        [&](const vox::InputEvent &event) {
-            app->input_event(event);
-        });
+    auto code = platform.initialize();
 
     if (code == vox::ExitCode::Success) {
+        auto app = std::make_unique<vox::AtomicComputeApp>();
+        app->prepare({false, &platform.get_window()});
+        platform.set_callback([&](float delta_time) { app->update(delta_time); },
+                              [&](uint32_t width, uint32_t height) {
+                                  app->resize(width, height, 1, 1);
+                              },
+                              [&](const vox::InputEvent &event) {
+                                  app->input_event(event);
+                              });
+
+        // loop
         code = platform.main_loop();
     }
 

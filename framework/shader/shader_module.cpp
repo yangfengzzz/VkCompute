@@ -9,6 +9,7 @@
 #include "common/logging.h"
 #include "common/filesystem.h"
 #include "shader/glsl_compiler.h"
+#include "shader/spirv_reflection.h"
 #include "core/device.h"
 
 namespace vox {
@@ -84,6 +85,13 @@ ShaderModule::ShaderModule(core::Device &device, VkShaderStageFlagBits stage, co
     if (!glsl_compiler.compile_to_spirv(stage, convert_to_bytes(glsl_final_source), entry_point, shader_variant, spirv, info_log)) {
         LOGE("Shader compilation failed for shader \"{}\"", glsl_source.get_filename())
         LOGE("{}", info_log)
+        throw VulkanException{VK_ERROR_INITIALIZATION_FAILED};
+    }
+
+    SPIRVReflection spirv_reflection;
+
+    // Reflect all shader resources
+    if (!spirv_reflection.reflect_shader_resources(stage, spirv, resources, shader_variant)) {
         throw VulkanException{VK_ERROR_INITIALIZATION_FAILED};
     }
 

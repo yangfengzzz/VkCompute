@@ -39,9 +39,11 @@ public:
 	 * @brief Initialize the platform
 	 * @return An exit code representing the outcome of initialization
 	 */
-    virtual ExitCode initialize(std::function<void(float)> update_callback,
-                                std::function<void(uint32_t, uint32_t)> resize_callback = {},
-                                std::function<void(const InputEvent &)> event_callback = {});
+    virtual ExitCode initialize();
+
+    void set_callback(std::function<void(float)> update_callback,
+                      std::function<void(uint32_t, uint32_t)> resize_callback = {},
+                      std::function<void(const InputEvent &)> event_callback = {});
 
     /**
 	 * @brief Handles the main loop of the platform

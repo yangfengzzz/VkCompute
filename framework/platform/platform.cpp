@@ -31,9 +31,7 @@ Platform::Platform(const PlatformContext &context) {
     temp_directory = context.temp_directory();
 }
 
-ExitCode Platform::initialize(std::function<void(float)> update_callback,
-                              std::function<void(uint32_t, uint32_t)> resize_callback,
-                              std::function<void(const InputEvent &)> event_callback) {
+ExitCode Platform::initialize() {
     auto sinks = get_platform_sinks();
 
     auto logger = std::make_shared<spdlog::logger>("logger", sinks.begin(), sinks.end());
@@ -62,6 +60,14 @@ ExitCode Platform::initialize(std::function<void(float)> update_callback,
     }
 
     return ExitCode::Success;
+}
+
+void Platform::set_callback(std::function<void(float)> update_callback,
+                            std::function<void(uint32_t, uint32_t)> resize_callback,
+                            std::function<void(const InputEvent &)> event_callback) {
+    this->update_callback = update_callback;
+    this->resize_callback = resize_callback;
+    this->event_callback = event_callback;
 }
 
 ExitCode Platform::main_loop() {
