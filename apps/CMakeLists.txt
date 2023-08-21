@@ -23,6 +23,7 @@ project(apps LANGUAGES C CXX)
 set(SRC
         main.cpp
         atomic_compute_app.cpp
+        primitive_app.cpp
         )
 
 source_group("\\" FILES ${SRC})

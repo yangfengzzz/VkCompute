@@ -167,6 +167,10 @@ void ResourceCache::clear_framebuffers() {
     state.framebuffers.clear();
 }
 
+core::Sampler &ResourceCache::request_sampler(const VkSamplerCreateInfo &info) {
+    return request_resource(device, recorder, sampler_mutex, state.samplers, info);
+}
+
 void ResourceCache::clear() {
     state.shader_modules.clear();
     state.pipeline_layouts.clear();

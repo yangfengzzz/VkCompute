@@ -17,7 +17,38 @@
 
 #include "common/helpers.h"
 
+inline bool operator==(const VkSamplerCreateInfo &x, const VkSamplerCreateInfo &y) {
+    return x.magFilter == y.magFilter && x.minFilter == y.minFilter && x.mipmapMode == y.mipmapMode &&
+           x.addressModeU == y.addressModeU && x.addressModeV == y.addressModeV && x.addressModeW == y.addressModeW &&
+           x.mipLodBias == y.mipLodBias && x.anisotropyEnable == y.anisotropyEnable &&
+           x.maxAnisotropy == y.maxAnisotropy && x.compareEnable == y.compareEnable && x.compareOp == y.compareOp &&
+           x.minLod == y.minLod && x.maxLod == y.maxLod && x.borderColor == y.borderColor;
+}
+
 namespace std {
+template <>
+struct hash<VkSamplerCreateInfo> {
+    std::size_t operator()(const VkSamplerCreateInfo &sampler) const {
+        std::size_t result = 0;
+
+        vox::hash_combine(result, sampler.magFilter);
+        vox::hash_combine(result, sampler.minFilter);
+        vox::hash_combine(result, sampler.mipmapMode);
+        vox::hash_combine(result, sampler.addressModeU);
+        vox::hash_combine(result, sampler.addressModeV);
+        vox::hash_combine(result, sampler.addressModeW);
+        vox::hash_combine(result, sampler.mipLodBias);
+        vox::hash_combine(result, sampler.anisotropyEnable);
+        vox::hash_combine(result, sampler.maxAnisotropy);
+        vox::hash_combine(result, sampler.compareEnable);
+        vox::hash_combine(result, sampler.compareOp);
+        vox::hash_combine(result, sampler.minLod);
+        vox::hash_combine(result, sampler.maxLod);
+        vox::hash_combine(result, sampler.borderColor);
+        return result;
+    }
+};
+
 template<>
 struct hash<vox::ShaderSource> {
     std::size_t operator()(const vox::ShaderSource &shader_source) const {

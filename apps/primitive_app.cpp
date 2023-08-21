@@ -10,7 +10,7 @@
 #include "application/components/mesh_renderer.h"
 #include "application/controls/orbit_control.h"
 #include "application/ecs/entity.h"
-#include "application/material/base_material.h"
+#include "application/material/unlit_material.h"
 #include "application/mesh/primitive_mesh.h"
 
 namespace vox {
@@ -51,7 +51,7 @@ void PrimitiveApp::load_scene() {
     cube_entity->add_component<MoveScript>();
     auto renderer = cube_entity->add_component<MeshRenderer>();
     renderer->set_mesh(PrimitiveMesh::create_cuboid(1));
-    auto material = std::make_shared<BlinnPhongMaterial>(*device);
+    auto material = std::make_shared<UnlitMaterial>(*device);
     material->set_base_color(Color(0.4, 0.6, 0.6));
     renderer->set_material(material);
 
@@ -59,7 +59,7 @@ void PrimitiveApp::load_scene() {
     plane_entity->transform->set_position(0, 5, 0);
     auto plane_renderer = plane_entity->add_component<MeshRenderer>();
     plane_renderer->set_mesh(PrimitiveMesh::create_sphere(1));
-    auto textured_material = std::make_shared<BlinnPhongMaterial>(*device);
+    auto textured_material = std::make_shared<UnlitMaterial>(*device);
     textured_material->set_base_texture(TextureManager::get_singleton().load_texture("Textures/wood.png"));
     plane_renderer->set_material(textured_material);
 

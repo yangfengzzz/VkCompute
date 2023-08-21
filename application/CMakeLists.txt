@@ -72,7 +72,9 @@ set(MATERIAL_FILES
         material/material.h
         material/material.cpp
         material/base_material.h
-        material/base_material.cpp)
+        material/base_material.cpp
+        material/unlit_material.h
+        material/unlit_material.cpp)
 
 set(COMPONENTS_FILES
         components/camera.h
