@@ -19,6 +19,19 @@ cmake_minimum_required(VERSION 3.16)
 
 project(framework LANGUAGES C CXX)
 
+# Platform settings
+add_subdirectory(platform/core)
+
+if(ANDROID)
+    add_subdirectory(platform/android)
+elseif(WIN32)
+    add_subdirectory(platform/windows)
+elseif(APPLE OR UNIX)
+    add_subdirectory(platform/unix)
+else()
+    message(FATAL_ERROR "Unsupported platform")
+endif()
+
 set(COMMON_FILES
         # Header Files
         common/error.h

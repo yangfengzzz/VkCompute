@@ -20,13 +20,20 @@ namespace vox {
 const uint32_t Platform::MIN_WINDOW_WIDTH = 420;
 const uint32_t Platform::MIN_WINDOW_HEIGHT = 320;
 
-ExitCode Platform::initialize(std::function<void(float)> update,
-                              std::function<void(uint32_t, uint32_t)> resize,
-                              std::function<void(const InputEvent &)> event) {
-    update_callback = std::move(update);
-    resize_callback = std::move(resize);
-    event_callback = std::move(event);
+std::string Platform::external_storage_directory = "";
 
+std::string Platform::temp_directory = "";
+
+Platform::Platform(const PlatformContext &context) {
+    arguments = context.arguments();
+
+    external_storage_directory = context.external_storage_directory();
+    temp_directory = context.temp_directory();
+}
+
+ExitCode Platform::initialize(std::function<void(float)> update_callback,
+                              std::function<void(uint32_t, uint32_t)> resize_callback,
+                              std::function<void(const InputEvent &)> event_callback) {
     auto sinks = get_platform_sinks();
 
     auto logger = std::make_shared<spdlog::logger>("logger", sinks.begin(), sinks.end());
@@ -40,7 +47,7 @@ ExitCode Platform::initialize(std::function<void(float)> update,
     logger->set_pattern(LOGGER_FORMAT);
     spdlog::set_default_logger(logger);
 
-    LOGI("Logger initialized")
+    LOGI("Logger initialized");
 
     // Platform has been closed by a plugins initialization phase
     if (close_requested) {
@@ -50,7 +57,7 @@ ExitCode Platform::initialize(std::function<void(float)> update,
     create_window(window_properties);
 
     if (!window) {
-        LOGE("Window creation failed!")
+        LOGE("Window creation failed!");
         return ExitCode::FatalError;
     }
 
@@ -118,8 +125,20 @@ void Platform::set_window_properties(const Window::OptionalProperties &propertie
     window_properties.extent.height = properties.extent.height.has_value() ? properties.extent.height.value() : window_properties.extent.height;
 }
 
+const std::string &Platform::get_external_storage_directory() {
+    return external_storage_directory;
+}
+
+const std::string &Platform::get_temp_directory() {
+    return temp_directory;
+}
+
 Window &Platform::get_window() {
     return *window;
+}
+
+void Platform::set_external_storage_directory(const std::string &dir) {
+    external_storage_directory = dir;
 }
 
 std::vector<spdlog::sink_ptr> Platform::get_platform_sinks() {

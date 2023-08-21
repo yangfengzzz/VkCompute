@@ -16,10 +16,12 @@ constexpr uint32_t ATTACHMENT_BITMASK = 0x7FFFFFFF;
 
 PostProcessingSubpass::PostProcessingSubpass(PostProcessingRenderPass *parent,
                                              RenderContext &render_context,
-                                             ShaderSource &&triangle_vs,
-                                             ShaderSource &&fs,
+                                             std::shared_ptr<ShaderSource> triangle_vs,
+                                             std::shared_ptr<ShaderSource> fs,
                                              ShaderVariant &&fs_variant)
-    : Subpass(render_context, std::move(triangle_vs), std::move(fs)),
+    : Subpass(render_context),
+      vertex_shader_{std::move(triangle_vs)},
+      fragment_shader_{std::move(fs)},
       parent{parent},
       fs_variant{std::move(fs_variant)} {
     set_disable_depth_stencil_attachment(true);
@@ -91,15 +93,15 @@ PostProcessingSubpass &PostProcessingSubpass::set_draw_func(DrawFunc &&new_func)
 void PostProcessingSubpass::prepare() {
     // Build all shaders upfront
     auto &resource_cache = render_context.get_device().get_resource_cache();
-    resource_cache.request_shader_module(VK_SHADER_STAGE_VERTEX_BIT, get_vertex_shader());
-    resource_cache.request_shader_module(VK_SHADER_STAGE_FRAGMENT_BIT, get_fragment_shader(), fs_variant);
+    resource_cache.request_shader_module(VK_SHADER_STAGE_VERTEX_BIT, *vertex_shader_);
+    resource_cache.request_shader_module(VK_SHADER_STAGE_FRAGMENT_BIT, *fragment_shader_, fs_variant);
 }
 
 void PostProcessingSubpass::draw(core::CommandBuffer &command_buffer) {
     // Get shaders from cache
     auto &resource_cache = command_buffer.get_device().get_resource_cache();
-    auto &vert_shader_module = resource_cache.request_shader_module(VK_SHADER_STAGE_VERTEX_BIT, get_vertex_shader());
-    auto &frag_shader_module = resource_cache.request_shader_module(VK_SHADER_STAGE_FRAGMENT_BIT, get_fragment_shader(), fs_variant);
+    auto &vert_shader_module = resource_cache.request_shader_module(VK_SHADER_STAGE_VERTEX_BIT, *vertex_shader_);
+    auto &frag_shader_module = resource_cache.request_shader_module(VK_SHADER_STAGE_FRAGMENT_BIT, *fragment_shader_, fs_variant);
 
     std::vector<ShaderModule *> shader_modules{&vert_shader_module, &frag_shader_module};
 

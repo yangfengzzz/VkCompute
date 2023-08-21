@@ -14,6 +14,7 @@
 #include "common/vk_common.h"
 #include "platform/window.h"
 #include "platform/input_events.h"
+#include "platform/core/context.hpp"
 #include "common/timer.h"
 
 #if defined(VK_USE_PLATFORM_XLIB_KHR)
@@ -30,13 +31,12 @@ enum class ExitCode {
 
 class Platform {
 public:
-    Platform() = default;
+    Platform(const PlatformContext &context);
 
     virtual ~Platform() = default;
 
     /**
 	 * @brief Initialize the platform
-	 * @param plugins plugins available to the platform
 	 * @return An exit code representing the outcome of initialization
 	 */
     virtual ExitCode initialize(std::function<void(float)> update_callback,
@@ -66,12 +66,25 @@ public:
 	 */
     virtual void close();
 
-public:
-    Window &get_window();
+    /**
+	 * @brief Returns the working directory of the application set by the platform
+	 * @returns The path to the working directory
+	 */
+    static const std::string &get_external_storage_directory();
+
+    /**
+	 * @brief Returns the suitable directory for temporary files from the environment variables set in the system
+	 * @returns The path to the temp folder on the system
+	 */
+    static const std::string &get_temp_directory();
 
     virtual void resize(uint32_t width, uint32_t height);
 
     virtual void input_event(const InputEvent &input_event);
+
+    Window &get_window();
+
+    static void set_external_storage_directory(const std::string &dir);
 
     void set_focus(bool focused);
 
@@ -107,8 +120,15 @@ protected:
     std::function<void(uint32_t, uint32_t)> resize_callback;
     std::function<void(const InputEvent &)> event_callback;
 
-private:
     Timer timer;
+
+    std::vector<std::string> arguments;
+
+    // static so can be references from vox::fs
+    static std::string external_storage_directory;
+
+    // static so can be references from vox::fs
+    static std::string temp_directory;
 };
 
 }// namespace vox

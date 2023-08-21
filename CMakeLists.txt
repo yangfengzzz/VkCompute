@@ -74,6 +74,7 @@ add_subdirectory(test.math)
 
 add_subdirectory(framework)
 add_subdirectory(application)
+add_subdirectory(apps)
 
 if(VKB_BUILD_TESTS)
     # Add vulkan tests

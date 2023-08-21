@@ -45,7 +45,7 @@ void create_directory(const std::string &path) {
 }
 }// namespace fs
 
-UnixPlatform::UnixPlatform(const UnixType &type) : Platform{}, type{type} {
+UnixPlatform::UnixPlatform(const PlatformContext &context, const UnixType &type) : Platform{context}, type{type} {
 }
 
 void UnixPlatform::create_window(const Window::Properties &properties) {

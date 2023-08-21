@@ -76,7 +76,7 @@ namespace vox {
  * - ShaderModule
  * - ResourceCache
  * - BufferPool
- * - Core classes: Classes in vkb::core wrap Vulkan objects for indexing and hashing.
+ * - Core classes: Classes in vox::core wrap Vulkan objects for indexing and hashing.
  */
 
 class GraphicsApplication : public Application {

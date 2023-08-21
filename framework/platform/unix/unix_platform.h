@@ -16,7 +16,7 @@ enum UnixType {
 
 class UnixPlatform : public Platform {
 public:
-    explicit UnixPlatform(const UnixType &type);
+    explicit UnixPlatform(const PlatformContext &context, const UnixType &type);
 
     ~UnixPlatform() override = default;
 

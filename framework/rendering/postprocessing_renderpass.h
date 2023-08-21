@@ -58,8 +58,8 @@ class PostProcessingRenderPass;
 class PostProcessingSubpass : public Subpass {
 public:
     PostProcessingSubpass(PostProcessingRenderPass *parent, RenderContext &render_context,
-                          ShaderSource &&triangle_vs,
-                          ShaderSource &&fs, ShaderVariant &&fs_variant = {});
+                          std::shared_ptr<ShaderSource> triangle_vs,
+                          std::shared_ptr<ShaderSource> fs, ShaderVariant &&fs_variant = {});
 
     PostProcessingSubpass(const PostProcessingSubpass &to_copy) = delete;
     PostProcessingSubpass &operator=(const PostProcessingSubpass &to_copy) = delete;
@@ -179,6 +179,8 @@ public:
 private:
     PostProcessingRenderPass *parent;
 
+    std::shared_ptr<ShaderSource> vertex_shader_{nullptr};
+    std::shared_ptr<ShaderSource> fragment_shader_{nullptr};
     ShaderVariant fs_variant{};
 
     AttachmentMap input_attachments{};

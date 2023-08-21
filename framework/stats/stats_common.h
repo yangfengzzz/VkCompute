@@ -15,7 +15,7 @@
 
 namespace vox {
 /**
- * @brief Handles of stats to be optionally enabled in @ref vkb::Stats
+ * @brief Handles of stats to be optionally enabled in @ref vox::Stats
  */
 enum class StatIndex {
     frame_times,
