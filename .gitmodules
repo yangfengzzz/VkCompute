@@ -37,3 +37,6 @@
 [submodule "third_party/astc"]
 	path = third_party/astc
 	url = https://github.com/ARM-software/astc-encoder
+[submodule "third_party/benchmark"]
+	path = third_party/benchmark
+	url = https://github.com/google/benchmark.git
