@@ -9,6 +9,20 @@
 #include "core/frame_resource.h"
 
 namespace vox::compute {
+enum class LatencyMeasureMode {
+    // time spent from queue submit to returning from queue wait
+    kSystemSubmit,
+    // system_submit subtracted by time for void dispatch
+    kSystemDispatch,
+    // Timestamp difference measured on GPU
+    kGpuTimestamp,
+};
+
+struct LatencyMeasure {
+    LatencyMeasureMode mode;
+    double overhead_seconds;
+};
+
 /**
  * @brief ComputeContext acts as a frame manager for the sample, with a lifetime that is the
  * same as that of the Application itself. It acts as a container for RenderFrame objects,
@@ -18,11 +32,12 @@ namespace vox::compute {
  */
 class ComputeContext final {
 public:
+    LatencyMeasure latency_measure;
+
     /**
 	 * @brief Constructor
-	 * @param device A valid device
 	 */
-    explicit ComputeContext(core::Device &device);
+    explicit ComputeContext();
 
     ComputeContext(const ComputeContext &) = delete;
 
@@ -34,6 +49,52 @@ public:
 
     ComputeContext &operator=(ComputeContext &&) = delete;
 
+    /**
+	 * @brief Add a sample-specific device extension
+	 * @param extension The extension name
+	 * @param optional (Optional) Whether the extension is optional
+	 */
+    void add_device_extension(const char *extension, bool optional = false);
+
+    /**
+	 * @brief Add a sample-specific instance extension
+	 * @param extension The extension name
+	 * @param optional (Optional) Whether the extension is optional
+	 */
+    void add_instance_extension(const char *extension, bool optional = false);
+
+    /**
+	 * @brief Get sample-specific instance extensions.
+	 *
+	 * @return Map of instance extensions and whether or not they are optional. Default is empty map.
+	 */
+    const std::unordered_map<const char *, bool> get_instance_extensions();
+
+    /**
+	 * @brief Get sample-specific device extensions.
+	 *
+	 * @return Map of device extensions and whether or not they are optional. Default is empty map.
+	 */
+    const std::unordered_map<const char *, bool> get_device_extensions();
+
+    /**
+	 * @brief Set the Vulkan API version to request at instance creation time
+	 */
+    void set_api_version(uint32_t requested_api_version);
+
+    /**
+	 * @brief Get additional sample-specific instance layers.
+	 *
+	 * @return Vector of additional instance layers. Default is empty vector.
+	 */
+    virtual const std::vector<const char *> get_validation_layers();
+
+    /**
+	 * @brief Request features from the gpu based on what is supported
+	 */
+    virtual void request_gpu_features(core::PhysicalDevice &gpu);
+
+public:
     /**
 	 * @brief Prepares the RenderFrames for rendering
 	 * @param thread_count The number of threads in the application, necessary to allocate this many resource pools for each RenderFrame
@@ -89,26 +150,35 @@ public:
     core::FrameResource &get_active_frame();
 
     VkSemaphore request_semaphore();
+
     VkSemaphore request_semaphore_with_ownership();
+
     void release_owned_semaphore(VkSemaphore semaphore);
 
     core::Device &get_device();
 
+private:
     /**
-	 * @brief Returns the WSI acquire semaphore. Only to be used in very special circumstances.
-	 * @return The WSI acquire semaphore.
+	 * @brief The Vulkan instance
 	 */
-    VkSemaphore consume_acquired_semaphore();
+    std::unique_ptr<core::Instance> instance{nullptr};
+
+    /**
+	 * @brief The Vulkan device
+	 */
+    std::unique_ptr<core::Device> device{nullptr};
+
+    /** @brief Set of device extensions to be enabled for this example and whether they are optional (must be set in the derived constructor) */
+    std::unordered_map<const char *, bool> device_extensions;
+
+    /** @brief Set of instance extensions to be enabled for this example and whether they are optional (must be set in the derived constructor) */
+    std::unordered_map<const char *, bool> instance_extensions;
+
+    /** @brief The Vulkan API version to request for this sample at instance creation time */
+    uint32_t api_version = VK_API_VERSION_1_0;
 
 private:
-    core::Device &device;
-
-    /// If swapchain exists, then this will be a present supported queue, else a graphics queue
-    const core::Queue &queue;
-
     std::unique_ptr<core::FrameResource> frames;
-
-    VkSemaphore acquired_semaphore{};
 
     bool prepared{false};
 

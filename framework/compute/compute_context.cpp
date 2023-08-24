@@ -8,17 +8,112 @@
 
 namespace vox::compute {
 
-ComputeContext::ComputeContext(core::Device &device)
-    : device{device},
-      queue{device.get_suitable_graphics_queue()} {
+ComputeContext::ComputeContext() {
+    LOGI("Initializing Vulkan sample");
+
+    VkResult result = volkInitialize();
+    if (result) {
+        throw VulkanException(result, "Failed to initialize volk.");
+    }
+
+    std::unique_ptr<core::DebugUtils> debug_utils{};
+
+#ifdef VKB_VULKAN_DEBUG
+    {
+        uint32_t instance_extension_count;
+        VK_CHECK(vkEnumerateInstanceExtensionProperties(nullptr, &instance_extension_count, nullptr));
+
+        std::vector<VkExtensionProperties> available_instance_extensions(instance_extension_count);
+        VK_CHECK(vkEnumerateInstanceExtensionProperties(nullptr, &instance_extension_count, available_instance_extensions.data()));
+
+        for (const auto &it : available_instance_extensions) {
+            if (strcmp(it.extensionName, VK_EXT_DEBUG_UTILS_EXTENSION_NAME) == 0) {
+                LOGI("Vulkan debug utils enabled ({})", VK_EXT_DEBUG_UTILS_EXTENSION_NAME);
+
+                debug_utils = std::make_unique<core::DebugUtilsExtDebugUtils>();
+                add_instance_extension(VK_EXT_DEBUG_UTILS_EXTENSION_NAME);
+                break;
+            }
+        }
+    }
+#endif
+
+    if (!instance) {
+        instance = std::make_unique<core::Instance>("vulkan compute", get_instance_extensions(), get_validation_layers(), true, api_version);
+    }
+
+    auto &gpu = instance->get_first_gpu();
+    // Request sample required GPU features
+    request_gpu_features(gpu);
+
+#ifdef VKB_VULKAN_DEBUG
+    if (!debug_utils) {
+        uint32_t device_extension_count;
+        VK_CHECK(vkEnumerateDeviceExtensionProperties(gpu.get_handle(), nullptr, &device_extension_count, nullptr));
+
+        std::vector<VkExtensionProperties> available_device_extensions(device_extension_count);
+        VK_CHECK(vkEnumerateDeviceExtensionProperties(gpu.get_handle(), nullptr, &device_extension_count, available_device_extensions.data()));
+
+        for (const auto &it : available_device_extensions) {
+            if (strcmp(it.extensionName, VK_EXT_DEBUG_MARKER_EXTENSION_NAME) == 0) {
+                LOGI("Vulkan debug utils enabled ({})", VK_EXT_DEBUG_MARKER_EXTENSION_NAME);
+
+                debug_utils = std::make_unique<core::DebugMarkerExtDebugUtils>();
+                add_device_extension(VK_EXT_DEBUG_MARKER_EXTENSION_NAME);
+                break;
+            }
+        }
+    }
+
+    if (!debug_utils) {
+        LOGW("Vulkan debug utils were requested, but no extension that provides them was found");
+    }
+#endif
+
+    if (!debug_utils) {
+        debug_utils = std::make_unique<core::DummyDebugUtils>();
+    }
+
+    if (!device) {
+        device = std::make_unique<core::Device>(gpu, VK_NULL_HANDLE, std::move(debug_utils), get_device_extensions());
+    }
 }
 
-void ComputeContext::prepare(size_t thread_count) {
-    device.wait_idle();
+void ComputeContext::add_instance_extension(const char *extension, bool optional) {
+    instance_extensions[extension] = optional;
+}
 
-    frames = std::make_unique<core::FrameResource>(device, thread_count);
+void ComputeContext::add_device_extension(const char *extension, bool optional) {
+    device_extensions[extension] = optional;
+}
 
-    this->thread_count = thread_count;
+void ComputeContext::set_api_version(uint32_t requested_api_version) {
+    api_version = requested_api_version;
+}
+
+const std::vector<const char *> ComputeContext::get_validation_layers() {
+    return {};
+}
+
+const std::unordered_map<const char *, bool> ComputeContext::get_instance_extensions() {
+    return instance_extensions;
+}
+
+const std::unordered_map<const char *, bool> ComputeContext::get_device_extensions() {
+    return device_extensions;
+}
+
+void ComputeContext::request_gpu_features(core::PhysicalDevice &gpu) {
+    // To be overridden by sample
+}
+
+//-----------------------------------------------------------------------------------------------------------------------------------------------
+void ComputeContext::prepare(size_t count) {
+    device->wait_idle();
+
+    frames = std::make_unique<core::FrameResource>(*device, count);
+
+    this->thread_count = count;
     this->prepared = true;
 }
 
@@ -29,11 +124,7 @@ core::CommandBuffer &ComputeContext::begin(core::CommandBuffer::ResetMode reset_
         begin_frame();
     }
 
-    if (acquired_semaphore == VK_NULL_HANDLE) {
-        throw std::runtime_error("Couldn't begin frame");
-    }
-
-    const auto &queue = device.get_queue_by_flags(VK_QUEUE_GRAPHICS_BIT, 0);
+    const auto &queue = device->get_queue_by_flags(VK_QUEUE_COMPUTE_BIT, 0);
     return get_active_frame().request_command_buffer(queue, reset_mode);
 }
 
@@ -45,16 +136,12 @@ void ComputeContext::submit(const std::vector<core::CommandBuffer *> &command_bu
     assert(frame_active && "ComputeContext is inactive, cannot submit command buffer. Please call begin()");
 
     VkSemaphore render_semaphore = VK_NULL_HANDLE;
-    submit(queue, command_buffers);
+    submit(device->get_queue_by_flags(VK_QUEUE_COMPUTE_BIT, 0), command_buffers);
     end_frame(render_semaphore);
 }
 
 void ComputeContext::begin_frame() {
     assert(!frame_active && "Frame is still active, please call end_frame");
-
-    // We will use the acquired semaphore in a different frame context,
-    // so we need to hold ownership.
-    acquired_semaphore = frames->request_semaphore_with_ownership();
 
     // Now the frame is active again
     frame_active = true;
@@ -116,20 +203,7 @@ void ComputeContext::wait_frame() {
 
 void ComputeContext::end_frame(VkSemaphore semaphore) {
     assert(frame_active && "Frame is not active, please call begin_frame");
-
-    // Frame is not active anymore
-    if (acquired_semaphore) {
-        release_owned_semaphore(acquired_semaphore);
-        acquired_semaphore = VK_NULL_HANDLE;
-    }
     frame_active = false;
-}
-
-VkSemaphore ComputeContext::consume_acquired_semaphore() {
-    assert(frame_active && "Frame is not active, please call begin_frame");
-    auto sem = acquired_semaphore;
-    acquired_semaphore = VK_NULL_HANDLE;
-    return sem;
 }
 
 core::FrameResource &ComputeContext::get_active_frame() {
@@ -153,7 +227,7 @@ void ComputeContext::release_owned_semaphore(VkSemaphore semaphore) {
 }
 
 core::Device &ComputeContext::get_device() {
-    return device;
+    return *device;
 }
 
 }// namespace vox::compute

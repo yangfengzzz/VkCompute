@@ -5,7 +5,14 @@
 //  property of any third parties.
 
 #include <benchmark/benchmark.h>
+#include "compute/compute_context.h"
+
+using namespace vox::compute;
 
 int main(int argc, char **argv) {
     ::benchmark::Initialize(&argc, argv);
+    auto context = ComputeContext();
+    context.latency_measure.mode = LatencyMeasureMode::kSystemSubmit;
+
+    ::benchmark::RunSpecifiedBenchmarks();
 }
