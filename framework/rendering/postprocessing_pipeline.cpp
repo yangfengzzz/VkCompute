@@ -9,7 +9,7 @@
 namespace vox::rendering {
 
 PostProcessingPipeline::PostProcessingPipeline(RenderContext &render_context,
-                                               ShaderSource triangle_vs)
+                                               std::shared_ptr<ShaderModule> triangle_vs)
     : render_context{&render_context},
       triangle_vs{std::move(triangle_vs)} {}
 

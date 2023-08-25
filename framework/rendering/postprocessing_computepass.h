@@ -18,7 +18,7 @@ namespace vox::rendering {
 class PostProcessingComputePass : public PostProcessingPass<PostProcessingComputePass> {
 public:
     PostProcessingComputePass(PostProcessingPipeline *parent,
-                              std::shared_ptr<ShaderSource> cs_source);
+                              std::shared_ptr<ShaderModule> cs_source);
 
     PostProcessingComputePass(const PostProcessingComputePass &to_copy) = delete;
     PostProcessingComputePass &operator=(const PostProcessingComputePass &to_copy) = delete;
@@ -72,7 +72,7 @@ public:
     }
 
 private:
-    std::shared_ptr<ShaderSource> cs_source;
+    std::shared_ptr<ShaderModule> cs_source;
     std::array<uint32_t, 3> n_workgroups{1, 1, 1};
 
     std::vector<ShaderData *> data_{};
@@ -82,7 +82,7 @@ private:
 	 * @brief Transitions sampled_images (to SHADER_READ_ONLY_OPTIMAL)
 	 *        and storage_images (to GENERAL) as appropriate.
 	 */
-    void transition_images(core::CommandBuffer &command_buffer, RenderTarget &default_render_target, const ShaderVariant &cs_variant);
+    void transition_images(core::CommandBuffer &command_buffer, RenderTarget &default_render_target);
 
     [[nodiscard]] BarrierInfo get_src_barrier_info() const override;
     [[nodiscard]] BarrierInfo get_dst_barrier_info() const override;

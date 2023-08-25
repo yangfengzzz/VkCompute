@@ -158,7 +158,7 @@ VkDescriptorSet FrameResource::request_descriptor_set(const DescriptorSetLayout 
     assert(thread_index < thread_count && "Thread index is out of bounds");
 
     assert(thread_index < descriptor_pools.size());
-    auto &descriptor_pool = request_resource(device, nullptr, *descriptor_pools[thread_index], descriptor_set_layout);
+    auto &descriptor_pool = request_resource(device, *descriptor_pools[thread_index], descriptor_set_layout);
     if (descriptor_management_strategy == DescriptorManagementStrategy::StoreInCache) {
         // The bindings we want to update before binding, if empty we update all bindings
         std::vector<uint32_t> bindings_to_update;
@@ -169,7 +169,7 @@ VkDescriptorSet FrameResource::request_descriptor_set(const DescriptorSetLayout 
 
         // Request a descriptor set from the render frame, and write the buffer infos and image infos of all the specified bindings
         assert(thread_index < descriptor_sets.size());
-        auto &descriptor_set = request_resource(device, nullptr, *descriptor_sets[thread_index], descriptor_set_layout, descriptor_pool, buffer_infos, image_infos);
+        auto &descriptor_set = request_resource(device, *descriptor_sets[thread_index], descriptor_set_layout, descriptor_pool, buffer_infos, image_infos);
         descriptor_set.update(bindings_to_update);
         return descriptor_set.get_handle();
     } else {

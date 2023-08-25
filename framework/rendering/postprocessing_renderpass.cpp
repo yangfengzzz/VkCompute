@@ -8,22 +8,20 @@
 
 #include "postprocessing_pipeline.h"
 
-namespace vox {
-namespace rendering {
+
+namespace vox::rendering {
 
 constexpr uint32_t DEPTH_RESOLVE_BITMASK = 0x80000000;
 constexpr uint32_t ATTACHMENT_BITMASK = 0x7FFFFFFF;
 
 PostProcessingSubpass::PostProcessingSubpass(PostProcessingRenderPass *parent,
                                              RenderContext &render_context,
-                                             std::shared_ptr<ShaderSource> triangle_vs,
-                                             std::shared_ptr<ShaderSource> fs,
-                                             ShaderVariant &&fs_variant)
+                                             std::shared_ptr<ShaderModule> triangle_vs,
+                                             std::shared_ptr<ShaderModule> fs)
     : Subpass(render_context),
       vertex_shader_{std::move(triangle_vs)},
       fragment_shader_{std::move(fs)},
-      parent{parent},
-      fs_variant{std::move(fs_variant)} {
+      parent{parent} {
     set_disable_depth_stencil_attachment(true);
 
     std::vector<uint32_t> input_attachments{};
@@ -36,7 +34,6 @@ PostProcessingSubpass::PostProcessingSubpass(PostProcessingRenderPass *parent,
 PostProcessingSubpass::PostProcessingSubpass(PostProcessingSubpass &&to_move) noexcept
     : Subpass{std::move(to_move)},
       parent{std::move(to_move.parent)},
-      fs_variant{std::move(to_move.fs_variant)},
       input_attachments{std::move(to_move.input_attachments)},
       sampled_images{std::move(to_move.sampled_images)} {}
 
@@ -90,20 +87,12 @@ PostProcessingSubpass &PostProcessingSubpass::set_draw_func(DrawFunc &&new_func)
     return *this;
 }
 
-void PostProcessingSubpass::prepare() {
-    // Build all shaders upfront
-    auto &resource_cache = render_context.get_device().get_resource_cache();
-    resource_cache.request_shader_module(VK_SHADER_STAGE_VERTEX_BIT, *vertex_shader_);
-    resource_cache.request_shader_module(VK_SHADER_STAGE_FRAGMENT_BIT, *fragment_shader_, fs_variant);
-}
+void PostProcessingSubpass::prepare() {}
 
 void PostProcessingSubpass::draw(core::CommandBuffer &command_buffer) {
     // Get shaders from cache
     auto &resource_cache = command_buffer.get_device().get_resource_cache();
-    auto &vert_shader_module = resource_cache.request_shader_module(VK_SHADER_STAGE_VERTEX_BIT, *vertex_shader_);
-    auto &frag_shader_module = resource_cache.request_shader_module(VK_SHADER_STAGE_FRAGMENT_BIT, *fragment_shader_, fs_variant);
-
-    std::vector<ShaderModule *> shader_modules{&vert_shader_module, &frag_shader_module};
+    std::vector<ShaderModule *> shader_modules{vertex_shader_.get(), fragment_shader_.get()};
 
     // Create pipeline layout and bind it
     auto &pipeline_layout = resource_cache.request_pipeline_layout(shader_modules);
@@ -457,4 +446,4 @@ void PostProcessingRenderPass::draw(core::CommandBuffer &command_buffer, RenderT
 }
 
 }
-}// namespace vox::rendering
+// namespace vox::rendering

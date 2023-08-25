@@ -16,15 +16,21 @@ public:
 
     static ShaderManager *get_singleton_ptr();
 
+    explicit ShaderManager(core::Device &device);
+
     /**
      * @brief Loads shader source
      */
-    std::shared_ptr<ShaderSource> load_shader(const std::string &file);
+    std::shared_ptr<ShaderModule> load_shader(const std::string &file, VkShaderStageFlagBits stage,
+                                              const std::string &entry_point = "main",
+                                              const ShaderVariant &shader_variant = {});
 
     void collect_garbage();
 
 private:
-    std::unordered_map<std::string, std::shared_ptr<ShaderSource>> shader_pool_;
+    core::Device &device_;
+
+    std::unordered_map<std::string, std::shared_ptr<ShaderModule>> shader_pool_;
 };
 
 template<>

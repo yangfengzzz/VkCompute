@@ -68,14 +68,14 @@ public:
 	 *
 	 * @return Map of instance extensions and whether or not they are optional. Default is empty map.
 	 */
-    const std::unordered_map<const char *, bool> get_instance_extensions();
+    std::unordered_map<const char *, bool> get_instance_extensions();
 
     /**
 	 * @brief Get sample-specific device extensions.
 	 *
 	 * @return Map of device extensions and whether or not they are optional. Default is empty map.
 	 */
-    const std::unordered_map<const char *, bool> get_device_extensions();
+    std::unordered_map<const char *, bool> get_device_extensions();
 
     /**
 	 * @brief Set the Vulkan API version to request at instance creation time

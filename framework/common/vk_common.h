@@ -78,15 +78,6 @@ bool is_buffer_descriptor_type(VkDescriptorType descriptor_type);
 int32_t get_bits_per_pixel(VkFormat format);
 
 /**
- * @brief Helper function to create a VkShaderModule
- * @param filename The shader location
- * @param device The logical device
- * @param stage The shader stage
- * @return The string to return.
- */
-VkShaderModule load_shader(const std::string &filename, VkDevice device, VkShaderStageFlagBits stage);
-
-/**
  * @brief Image memory barrier structure used to define
  *        memory access for an image view during command recording.
  */

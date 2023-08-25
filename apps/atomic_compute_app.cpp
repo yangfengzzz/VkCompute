@@ -25,8 +25,8 @@ public:
                                                         VMA_MEMORY_USAGE_GPU_ONLY);
         shader_data_.set_buffer_functor(atomic_prop_, [this]() -> core::Buffer * { return atomic_buffer_.get(); });
 
-        vertex_source_ = ShaderManager::get_singleton().load_shader("base/unlit.vert");
-        fragment_source_ = ShaderManager::get_singleton().load_shader("base/compute/atomic_counter.frag");
+        vertex_source_ = ShaderManager::get_singleton().load_shader("base/unlit.vert", VK_SHADER_STAGE_VERTEX_BIT);
+        fragment_source_ = ShaderManager::get_singleton().load_shader("base/compute/atomic_counter.frag", VK_SHADER_STAGE_FRAGMENT_BIT);
     }
 };
 
@@ -60,7 +60,7 @@ bool AtomicComputeApp::prepare(const ApplicationOptions &options) {
     ForwardApplication::prepare(options);
 
     atomic_pass = std::make_unique<compute::ComputePass>(
-        ShaderManager::get_singleton().load_shader("base/compute/atomic_counter.comp"));
+        ShaderManager::get_singleton().load_shader("base/compute/atomic_counter.comp", VK_SHADER_STAGE_COMPUTE_BIT));
     atomic_pass->set_dispatch_size({1, 1, 1});
     atomic_pass->attach_shader_data(&material_->shader_data_);
 

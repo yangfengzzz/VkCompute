@@ -16,7 +16,7 @@ namespace vox::compute {
 */
 class ComputePass {
 public:
-    ComputePass(std::shared_ptr<ShaderSource> cs_source);
+    ComputePass(std::shared_ptr<ShaderModule> cs_source);
 
     ComputePass(const ComputePass &to_copy) = delete;
     ComputePass &operator=(const ComputePass &to_copy) = delete;
@@ -70,7 +70,7 @@ public:
     }
 
 private:
-    std::shared_ptr<ShaderSource> cs_source;
+    std::shared_ptr<ShaderModule> cs_source;
     std::array<uint32_t, 3> n_workgroups{1, 1, 1};
 
     std::vector<ShaderData *> data_{};

@@ -10,10 +10,6 @@
 #include "common/vk_common.h"
 #include "shader/shader_variant.h"
 
-#if defined(VK_USE_PLATFORM_XLIB_KHR)
-#undef None
-#endif
-
 namespace vox {
 namespace core {
 class Device;
@@ -85,28 +81,6 @@ struct ShaderResource {
     std::string name;
 };
 
-class ShaderSource {
-public:
-    ShaderSource() = default;
-
-    ShaderSource(const std::string &filename);
-
-    size_t get_id() const;
-
-    const std::string &get_filename() const;
-
-    void set_source(const std::string &source);
-
-    const std::string &get_source() const;
-
-private:
-    size_t id;
-
-    std::string filename;
-
-    std::string source;
-};
-
 /**
  * @brief Contains shader code, with an entry point, for a specific shader stage.
  * It is needed by a PipelineLayout to create a Pipeline.
@@ -120,31 +94,36 @@ class ShaderModule {
 public:
     ShaderModule(core::Device &device,
                  VkShaderStageFlagBits stage,
-                 const ShaderSource &glsl_source,
+                 const std::string &glsl_source,
                  const std::string &entry_point,
                  const ShaderVariant &shader_variant);
 
+    ShaderModule(core::Device &device,
+                 VkShaderStageFlagBits stage,
+                 const std::string &spv_source,
+                 const std::string &entry_point);
+
     ShaderModule(const ShaderModule &) = delete;
 
-    ShaderModule(ShaderModule &&other);
+    ShaderModule(ShaderModule &&other) noexcept;
 
     ShaderModule &operator=(const ShaderModule &) = delete;
 
     ShaderModule &operator=(ShaderModule &&) = delete;
 
-    size_t get_id() const;
+    [[nodiscard]] size_t get_id() const;
 
-    VkShaderStageFlagBits get_stage() const;
+    [[nodiscard]] VkShaderStageFlagBits get_stage() const;
 
-    const std::string &get_entry_point() const;
+    [[nodiscard]] const std::string &get_entry_point() const;
 
-    const std::vector<ShaderResource> &get_resources() const;
+    [[nodiscard]] const std::vector<ShaderResource> &get_resources() const;
 
-    const std::string &get_info_log() const;
+    [[nodiscard]] const std::string &get_info_log() const;
 
-    const std::vector<uint32_t> &get_binary() const;
+    [[nodiscard]] const std::vector<uint32_t> &get_binary() const;
 
-    inline const std::string &get_debug_name() const {
+    [[nodiscard]] inline const std::string &get_debug_name() const {
         return debug_name;
     }
 

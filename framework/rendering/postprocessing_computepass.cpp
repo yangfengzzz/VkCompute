@@ -13,7 +13,7 @@
 namespace vox::rendering {
 
 PostProcessingComputePass::PostProcessingComputePass(PostProcessingPipeline *parent,
-                                                     std::shared_ptr<ShaderSource> cs_source)
+                                                     std::shared_ptr<ShaderModule> cs_source)
     : PostProcessingPass{parent},
       cs_source{std::move(cs_source)} {
 }
@@ -38,25 +38,20 @@ void PostProcessingComputePass::prepare(core::CommandBuffer &command_buffer, Ren
 }
 
 void PostProcessingComputePass::draw(core::CommandBuffer &command_buffer, RenderTarget &default_render_target) {
-    ShaderVariant cs_variant;
-    for (const auto &data : data_) {
-        data->merge_variants(cs_variant, cs_variant);
-    }
+    transition_images(command_buffer, default_render_target);
 
-    transition_images(command_buffer, default_render_target, cs_variant);
-
-    // Get compute shader from cache
+    // Get cache
     auto &resource_cache = command_buffer.get_device().get_resource_cache();
-    auto &shader_module = resource_cache.request_shader_module(VK_SHADER_STAGE_COMPUTE_BIT, *cs_source, cs_variant);
 
     // Create pipeline layout and bind it
-    auto &pipeline_layout = resource_cache.request_pipeline_layout({&shader_module});
+    auto &pipeline_layout = resource_cache.request_pipeline_layout({cs_source.get()});
     command_buffer.bind_pipeline_layout(pipeline_layout);
 
     auto &bindings = pipeline_layout.get_descriptor_set_layout(0);
     // Bind samplers to set = 0, binding = <according to name>
     for (const auto &data : data_) {
         data->bind_data(command_buffer, bindings);
+        data->bind_specialization_constant(command_buffer, *cs_source);
     }
 
     if (!push_constants_data.empty()) {
@@ -68,8 +63,7 @@ void PostProcessingComputePass::draw(core::CommandBuffer &command_buffer, Render
 }
 
 void PostProcessingComputePass::transition_images(core::CommandBuffer &command_buffer,
-                                                  RenderTarget &default_render_target,
-                                                  const ShaderVariant &cs_variant) {
+                                                  RenderTarget &default_render_target) {
     BarrierInfo fallback_barrier_src{};
     fallback_barrier_src.pipeline_stage = VK_PIPELINE_STAGE_COMPUTE_SHADER_BIT;
     fallback_barrier_src.image_read_access = 0;// For UNDEFINED -> STORAGE in first CP
@@ -78,8 +72,7 @@ void PostProcessingComputePass::transition_images(core::CommandBuffer &command_b
 
     // Get compute shader from cache
     auto &resource_cache = command_buffer.get_device().get_resource_cache();
-    auto &shader_module = resource_cache.request_shader_module(VK_SHADER_STAGE_COMPUTE_BIT, *cs_source, cs_variant);
-    auto &pipeline_layout = resource_cache.request_pipeline_layout({&shader_module});
+    auto &pipeline_layout = resource_cache.request_pipeline_layout({cs_source.get()});
 
     for (const auto &data : data_) {
         for (const auto &sampled : data->sampled_textures()) {

@@ -1,5 +1,7 @@
 #version 450
 
+#include "base/constants.h"
+
 #define PI 3.14159265359
 #define RECIPROCAL_PI 0.31830988618
 #define EPSILON 1e-6
@@ -27,9 +29,7 @@ layout(set = 0, binding = 2) uniform alphaCutoff {
     float value;
 } alpha_cutoff;
 
-#ifdef HAS_BASE_TEXTURE
-    layout(set = 0, binding = 3) uniform sampler2D baseTexture;
-#endif
+layout(set = 0, binding = 3) uniform sampler2D baseTexture;
 
 layout(location = 0) in vec2 v_uv;
 layout(location = 0) out vec4 o_color;
@@ -37,16 +37,16 @@ layout(location = 0) out vec4 o_color;
 void main() {
     vec4 baseColor = base_color.value;
 
-    #ifdef HAS_BASE_TEXTURE
+    if (HAS_BASE_TEXTURE) {
         vec4 textureColor = texture(baseTexture, v_uv);
         baseColor *= textureColor;
-    #endif
-
-    #ifdef NEED_ALPHA_CUTOFF
-    if (base_color.value.a < alpha_cutoff.value) {
-        discard;
     }
-    #endif
+
+    if (NEED_ALPHA_CUTOFF) {
+        if (base_color.value.a < alpha_cutoff.value) {
+            discard;
+        }
+    }
 
     o_color = baseColor;
 }

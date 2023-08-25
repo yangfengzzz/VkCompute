@@ -27,7 +27,7 @@ inline std::vector<std::string> precompile_shader(const std::string &source) {
         if (line.find("#include \"") == 0) {
             // Include paths are relative to the base shader directory
             std::string include_path = line.substr(10);
-            size_t last_quote = include_path.find("\"");
+            size_t last_quote = include_path.find('\"');
             if (!include_path.empty() && last_quote != std::string::npos) {
                 include_path = include_path.substr(0, last_quote);
             }
@@ -56,20 +56,20 @@ inline std::vector<uint8_t> convert_to_bytes(std::vector<std::string> &lines) {
     return bytes;
 }
 
-ShaderModule::ShaderModule(core::Device &device, VkShaderStageFlagBits stage, const ShaderSource &glsl_source,
+ShaderModule::ShaderModule(core::Device &device, VkShaderStageFlagBits stage, const std::string &glsl_source,
                            const std::string &entry_point, const ShaderVariant &shader_variant)
     : device{device},
       stage{stage},
       entry_point{entry_point} {
     debug_name = fmt::format("{} [variant {:X}] [entrypoint {}]",
-                             glsl_source.get_filename(), shader_variant.get_id(), entry_point);
+                             glsl_source, shader_variant.get_id(), entry_point);
 
     // Compiling from GLSL source requires the entry point
     if (entry_point.empty()) {
         throw VulkanException{VK_ERROR_INITIALIZATION_FAILED};
     }
 
-    auto &source = glsl_source.get_source();
+    auto source = fs::read_shader(glsl_source);
 
     // Check if application is passing in GLSL source code to compile to SPIR-V
     if (source.empty()) {
@@ -83,7 +83,7 @@ ShaderModule::ShaderModule(core::Device &device, VkShaderStageFlagBits stage, co
     GLSLCompiler glsl_compiler;
 
     if (!glsl_compiler.compile_to_spirv(stage, convert_to_bytes(glsl_final_source), entry_point, shader_variant, spirv, info_log)) {
-        LOGE("Shader compilation failed for shader \"{}\"", glsl_source.get_filename())
+        LOGE("Shader compilation failed for shader \"{}\"", glsl_source)
         LOGE("{}", info_log)
         throw VulkanException{VK_ERROR_INITIALIZATION_FAILED};
     }
@@ -101,7 +101,35 @@ ShaderModule::ShaderModule(core::Device &device, VkShaderStageFlagBits stage, co
                             reinterpret_cast<const char *>(spirv.data() + spirv.size())});
 }
 
-ShaderModule::ShaderModule(ShaderModule &&other)
+ShaderModule::ShaderModule(core::Device &device,
+                           VkShaderStageFlagBits stage,
+                           const std::string &spv_source,
+                           const std::string &entry_point)
+    : device{device},
+      stage{stage},
+      entry_point{entry_point} {
+    debug_name = fmt::format("{} [entrypoint {}]", spv_source, entry_point);
+
+    // Compiling from GLSL source requires the entry point
+    if (entry_point.empty()) {
+        throw VulkanException{VK_ERROR_INITIALIZATION_FAILED};
+    }
+
+    spirv = fs::read_spv(spv_source);
+    SPIRVReflection spirv_reflection;
+
+    // Reflect all shader resources
+    if (!spirv_reflection.reflect_shader_resources(stage, spirv, resources, {})) {
+        throw VulkanException{VK_ERROR_INITIALIZATION_FAILED};
+    }
+
+    // Generate a unique id, determined by source and variant
+    std::hash<std::string> hasher{};
+    id = hasher(std::string{reinterpret_cast<const char *>(spirv.data()),
+                            reinterpret_cast<const char *>(spirv.data() + spirv.size())});
+}
+
+ShaderModule::ShaderModule(ShaderModule &&other) noexcept
     : device{other.device},
       id{other.id},
       stage{other.stage},
@@ -138,7 +166,8 @@ const std::vector<uint32_t> &ShaderModule::get_binary() const {
 }
 
 void ShaderModule::set_resource_mode(const std::string &resource_name, const ShaderResourceMode &resource_mode) {
-    auto it = std::find_if(resources.begin(), resources.end(), [&resource_name](const ShaderResource &resource) { return resource.name == resource_name; });
+    auto it = std::find_if(resources.begin(), resources.end(),
+                           [&resource_name](const ShaderResource &resource) { return resource.name == resource_name; });
 
     if (it != resources.end()) {
         if (resource_mode == ShaderResourceMode::Dynamic) {
@@ -153,30 +182,6 @@ void ShaderModule::set_resource_mode(const std::string &resource_name, const Sha
     } else {
         LOGW("Resource `{}` not found for shader.", resource_name)
     }
-}
-
-ShaderSource::ShaderSource(const std::string &filename) : filename{filename},
-                                                          source{fs::read_shader(filename)} {
-    std::hash<std::string> hasher{};
-    id = hasher(std::string{this->source.cbegin(), this->source.cend()});
-}
-
-size_t ShaderSource::get_id() const {
-    return id;
-}
-
-const std::string &ShaderSource::get_filename() const {
-    return filename;
-}
-
-void ShaderSource::set_source(const std::string &source_) {
-    source = source_;
-    std::hash<std::string> hasher{};
-    id = hasher(std::string{this->source.cbegin(), this->source.cend()});
-}
-
-const std::string &ShaderSource::get_source() const {
-    return source;
 }
 
 }// namespace vox

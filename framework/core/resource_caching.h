@@ -11,7 +11,6 @@
 #include "core/descriptor_set_layout.h"
 #include "core/pipeline.h"
 #include "core/pipeline_state.h"
-#include "core/resource_record.h"
 #include "rendering/framebuffer.h"
 #include "rendering/render_target.h"
 
@@ -45,39 +44,6 @@ struct hash<VkSamplerCreateInfo> {
         vox::hash_combine(result, sampler.minLod);
         vox::hash_combine(result, sampler.maxLod);
         vox::hash_combine(result, sampler.borderColor);
-        return result;
-    }
-};
-
-template<>
-struct hash<vox::ShaderSource> {
-    std::size_t operator()(const vox::ShaderSource &shader_source) const {
-        std::size_t result = 0;
-
-        vox::hash_combine(result, shader_source.get_id());
-
-        return result;
-    }
-};
-
-template<>
-struct hash<vox::ShaderVariant> {
-    std::size_t operator()(const vox::ShaderVariant &shader_variant) const {
-        std::size_t result = 0;
-
-        vox::hash_combine(result, shader_variant.get_id());
-
-        return result;
-    }
-};
-
-template<>
-struct hash<vox::ShaderModule> {
-    std::size_t operator()(const vox::ShaderModule &shader_module) const {
-        std::size_t result = 0;
-
-        vox::hash_combine(result, shader_module.get_id());
-
         return result;
     }
 };
@@ -586,65 +552,10 @@ inline void hash_param(size_t &seed, const T &first_arg, const Args &...args) {
     hash_param(seed, args...);
 }
 
-template<class T, class... A>
-struct RecordHelper {
-    size_t record(ResourceRecord & /*recorder*/, A &.../*args*/) {
-        return 0;
-    }
-
-    void index(ResourceRecord & /*recorder*/, size_t /*index*/, T & /*resource*/) {
-    }
-};
-
-template<class... A>
-struct RecordHelper<ShaderModule, A...> {
-    size_t record(ResourceRecord &recorder, A &...args) {
-        return recorder.register_shader_module(args...);
-    }
-
-    void index(ResourceRecord &recorder, size_t index, ShaderModule &shader_module) {
-        recorder.set_shader_module(index, shader_module);
-    }
-};
-
-template<class... A>
-struct RecordHelper<PipelineLayout, A...> {
-    size_t record(ResourceRecord &recorder, A &...args) {
-        return recorder.register_pipeline_layout(args...);
-    }
-
-    void index(ResourceRecord &recorder, size_t index, PipelineLayout &pipeline_layout) {
-        recorder.set_pipeline_layout(index, pipeline_layout);
-    }
-};
-
-template<class... A>
-struct RecordHelper<RenderPass, A...> {
-    size_t record(ResourceRecord &recorder, A &...args) {
-        return recorder.register_render_pass(args...);
-    }
-
-    void index(ResourceRecord &recorder, size_t index, RenderPass &render_pass) {
-        recorder.set_render_pass(index, render_pass);
-    }
-};
-
-template<class... A>
-struct RecordHelper<GraphicsPipeline, A...> {
-    size_t record(ResourceRecord &recorder, A &...args) {
-        return recorder.register_graphics_pipeline(args...);
-    }
-
-    void index(ResourceRecord &recorder, size_t index, GraphicsPipeline &graphics_pipeline) {
-        recorder.set_graphics_pipeline(index, graphics_pipeline);
-    }
-};
 }// namespace
 
 template<class T, class... A>
-T &request_resource(Device &device, ResourceRecord *recorder, std::unordered_map<std::size_t, T> &resources, A &...args) {
-    RecordHelper<T, A...> record_helper;
-
+T &request_resource(Device &device, std::unordered_map<std::size_t, T> &resources, A &...args) {
     std::size_t hash{0U};
     hash_param(hash, args...);
 
@@ -674,10 +585,6 @@ T &request_resource(Device &device, ResourceRecord *recorder, std::unordered_map
 
         res_it = res_ins_it.first;
 
-        if (recorder) {
-            size_t index = record_helper.record(*recorder, args...);
-            record_helper.index(*recorder, index, res_it->second);
-        }
 #ifndef DEBUG
     } catch (const std::exception &e) {
         LOGE("Creation error for #{} cache object ({})", res_id, res_type);

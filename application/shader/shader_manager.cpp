@@ -14,12 +14,19 @@ ShaderManager &ShaderManager::get_singleton() {
     return (*ms_singleton);
 }
 
-std::shared_ptr<ShaderSource> ShaderManager::load_shader(const std::string &file) {
+ShaderManager::ShaderManager(core::Device &device):
+device_{device} {
+
+}
+
+std::shared_ptr<ShaderModule> ShaderManager::load_shader(const std::string &file, VkShaderStageFlagBits stage,
+                                                         const std::string &entry_point,
+                                                         const ShaderVariant &shader_variant) {
     auto iter = shader_pool_.find(file);
     if (iter != shader_pool_.end() && iter->second != nullptr) {
         return iter->second;
     } else {
-        auto shader = std::make_shared<ShaderSource>(file);
+        auto shader = std::make_shared<ShaderModule>(device_, stage, file, entry_point, shader_variant);
         shader_pool_.insert(std::make_pair(file, shader));
         return shader;
     }

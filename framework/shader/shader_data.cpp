@@ -9,7 +9,8 @@
 namespace vox {
 ShaderData::ShaderData(core::Device &device) : device_(device) {}
 
-void ShaderData::bind_data(core::CommandBuffer &command_buffer, core::DescriptorSetLayout &descriptor_set_layout) {
+void ShaderData::bind_data(core::CommandBuffer &command_buffer,
+                           core::DescriptorSetLayout &descriptor_set_layout) {
     for (auto &allocation : shader_buffer_pools_) {
         if (auto layout_binding = descriptor_set_layout.get_layout_binding(allocation.first)) {
             command_buffer.bind_buffer(allocation.second.get_buffer(), allocation.second.get_offset(),
@@ -44,6 +45,17 @@ void ShaderData::bind_data(core::CommandBuffer &command_buffer, core::Descriptor
     }
 }
 
+void ShaderData::bind_specialization_constant(core::CommandBuffer &command_buffer, ShaderModule& shader) {
+    for(auto& resource: shader.get_resources()) {
+        if (resource.type == ShaderResourceType::SpecializationConstant) {
+            auto iter = specialization_constant_state.find(resource.name);
+            if (iter != specialization_constant_state.end()) {
+                command_buffer.set_specialization_constant(resource.constant_id, iter->first);
+            }
+        }
+    }
+}
+
 void ShaderData::set_data(const std::string &property_name, core::BufferAllocation &&value) {
     shader_buffer_pools_.insert(std::make_pair(property_name, std::move(value)));
 }
@@ -72,12 +84,12 @@ void ShaderData::set_storage_texture(const std::string &texture_name, const core
     }
 }
 
-void ShaderData::add_define(const std::string &def) { variant_.add_define(def); }
+void ShaderData::add_define(const std::string &def) {
+    specialization_constant_state[def] = to_bytes(1);
+}
 
-void ShaderData::remove_define(const std::string &undef) { variant_.remove_define(undef); }
-
-void ShaderData::merge_variants(const vox::ShaderVariant &variant, vox::ShaderVariant &result) const {
-    ShaderVariant::union_collection(variant, variant_, result);
+void ShaderData::remove_define(const std::string &undef) {
+    specialization_constant_state[undef] = to_bytes(0);
 }
 
 }// namespace vox

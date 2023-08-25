@@ -35,15 +35,9 @@ public:
      */
     void draw(core::CommandBuffer &command_buffer) override;
 
-    /**
-     * @brief Thread index to use for allocating resources
-     */
-    void set_thread_index(uint32_t index);
-
 protected:
     void draw_element(core::CommandBuffer &command_buffer,
-                      const std::vector<RenderElement> &items,
-                      const ShaderVariant &variant);
+                      const std::vector<RenderElement> &items);
 
     uint32_t thread_index_{0};
 

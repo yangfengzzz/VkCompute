@@ -75,7 +75,7 @@ protected:
     /**
 	 * @brief Returns the parent's fullscreen triangle vertex shader source.
 	 */
-    [[nodiscard]] ShaderSource &get_triangle_vs() const;
+    [[nodiscard]] std::shared_ptr<ShaderModule> get_triangle_vs() const;
 
     struct BarrierInfo {
         VkPipelineStageFlags pipeline_stage;// Pipeline stage of this pass' inputs/outputs

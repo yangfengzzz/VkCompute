@@ -15,8 +15,6 @@
 #include "core/descriptor_set.h"
 #include "core/descriptor_set_layout.h"
 #include "core/pipeline.h"
-#include "core/resource_record.h"
-#include "core/resource_replay.h"
 #include "core/sampler.h"
 #include "rendering/framebuffer.h"
 
@@ -29,8 +27,6 @@ class ImageView;
  *
  */
 struct ResourceCacheState {
-    std::unordered_map<std::size_t, ShaderModule> shader_modules;
-
     std::unordered_map<std::size_t, PipelineLayout> pipeline_layouts;
 
     std::unordered_map<std::size_t, DescriptorSetLayout> descriptor_set_layouts;
@@ -74,14 +70,7 @@ public:
 
     ResourceCache &operator=(ResourceCache &&) = delete;
 
-    void warmup(const std::vector<uint8_t> &data);
-
-    std::vector<uint8_t> serialize();
-
     void set_pipeline_cache(VkPipelineCache pipeline_cache);
-
-    ShaderModule &request_shader_module(VkShaderStageFlagBits stage,
-                                        const ShaderSource &glsl_source, const ShaderVariant &shader_variant = {});
 
     PipelineLayout &request_pipeline_layout(const std::vector<ShaderModule *> &shader_modules);
 
@@ -122,10 +111,6 @@ public:
 private:
     Device &device;
 
-    ResourceRecord recorder;
-
-    ResourceReplay replayer;
-
     VkPipelineCache pipeline_cache{VK_NULL_HANDLE};
 
     ResourceCacheState state;
@@ -133,8 +118,6 @@ private:
     std::mutex descriptor_set_mutex;
 
     std::mutex pipeline_layout_mutex;
-
-    std::mutex shader_module_mutex;
 
     std::mutex descriptor_set_layout_mutex;
 

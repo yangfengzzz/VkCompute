@@ -93,7 +93,7 @@ std::string read_shader(const std::string &filename);
  * @param filename The path to the file (relative to the assets directory)
  * @return A vector filled with data read from the file
  */
-std::vector<uint8_t> read_shader_binary(const std::string &filename);
+std::vector<uint32_t> read_spv(const std::string &filename);
 
 /**
  * @brief Helper to read a temporary file into a byte-array

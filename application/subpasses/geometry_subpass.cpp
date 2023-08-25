@@ -23,12 +23,6 @@ GeometrySubpass::GeometrySubpass(rendering::RenderContext &render_context, Scene
 void GeometrySubpass::prepare() {}
 
 void GeometrySubpass::draw(core::CommandBuffer &command_buffer) {
-    auto compile_variant = ShaderVariant();
-    scene_->shader_data.merge_variants(compile_variant, compile_variant);
-    if (camera_) {
-        camera_->shader_data_.merge_variants(compile_variant, compile_variant);
-    }
-
     std::vector<RenderElement> opaque_queue;
     std::vector<RenderElement> alpha_test_queue;
     std::vector<RenderElement> transparent_queue;
@@ -37,23 +31,18 @@ void GeometrySubpass::draw(core::CommandBuffer &command_buffer) {
     std::sort(alpha_test_queue.begin(), alpha_test_queue.end(), compare_from_near_to_far);
     std::sort(transparent_queue.begin(), transparent_queue.end(), compare_from_far_to_near);
 
-    draw_element(command_buffer, opaque_queue, compile_variant);
-    draw_element(command_buffer, alpha_test_queue, compile_variant);
-    draw_element(command_buffer, transparent_queue, compile_variant);
+    draw_element(command_buffer, opaque_queue);
+    draw_element(command_buffer, alpha_test_queue);
+    draw_element(command_buffer, transparent_queue);
 }
 
 void GeometrySubpass::draw_element(core::CommandBuffer &command_buffer,
-                                   const std::vector<RenderElement> &items,
-                                   const ShaderVariant &variant) {
+                                   const std::vector<RenderElement> &items) {
     auto &device = command_buffer.get_device();
     for (auto &element : items) {
-        auto macros = variant;
         auto &renderer = element.renderer;
         renderer->update_shader_data();
-        renderer->shader_data_.merge_variants(macros, macros);
-
         auto &material = element.material;
-        material->shader_data_.merge_variants(macros, macros);
 
         auto &sub_mesh = element.sub_mesh;
         auto &mesh = element.mesh;
@@ -72,20 +61,27 @@ void GeometrySubpass::draw_element(core::CommandBuffer &command_buffer,
         command_buffer.set_input_assembly_state(material->input_assembly_state_);
 
         // shader
-        auto &vert_shader_module = device.get_resource_cache().request_shader_module(VK_SHADER_STAGE_VERTEX_BIT,
-                                                                                     *material->vertex_source_, macros);
-        auto &frag_shader_module = device.get_resource_cache().request_shader_module(VK_SHADER_STAGE_FRAGMENT_BIT,
-                                                                                     *material->fragment_source_, macros);
-        std::vector<ShaderModule *> shader_modules{&vert_shader_module, &frag_shader_module};
+        std::vector<ShaderModule *> shader_modules{material->vertex_source_.get(), material->fragment_source_.get()};
         auto &pipeline_layout = prepare_pipeline_layout(command_buffer, shader_modules);
         command_buffer.bind_pipeline_layout(pipeline_layout);
 
         // uniform & texture
         core::DescriptorSetLayout &descriptor_set_layout = pipeline_layout.get_descriptor_set_layout(0);
         scene_->shader_data.bind_data(command_buffer, descriptor_set_layout);
+        scene_->shader_data.bind_specialization_constant(command_buffer, *material->vertex_source_);
+        scene_->shader_data.bind_specialization_constant(command_buffer, *material->fragment_source_);
+
         camera_->shader_data_.bind_data(command_buffer, descriptor_set_layout);
+        camera_->shader_data_.bind_specialization_constant(command_buffer, *material->vertex_source_);
+        camera_->shader_data_.bind_specialization_constant(command_buffer, *material->fragment_source_);
+
         renderer->shader_data_.bind_data(command_buffer, descriptor_set_layout);
+        renderer->shader_data_.bind_specialization_constant(command_buffer, *material->vertex_source_);
+        renderer->shader_data_.bind_specialization_constant(command_buffer, *material->fragment_source_);
+
         material->shader_data_.bind_data(command_buffer, descriptor_set_layout);
+        material->shader_data_.bind_specialization_constant(command_buffer, *material->vertex_source_);
+        material->shader_data_.bind_specialization_constant(command_buffer, *material->fragment_source_);
 
         // vertex buffer
         command_buffer.set_vertex_input_state(mesh->get_vertex_input_state());

@@ -58,8 +58,8 @@ class PostProcessingRenderPass;
 class PostProcessingSubpass : public Subpass {
 public:
     PostProcessingSubpass(PostProcessingRenderPass *parent, RenderContext &render_context,
-                          std::shared_ptr<ShaderSource> triangle_vs,
-                          std::shared_ptr<ShaderSource> fs, ShaderVariant &&fs_variant = {});
+                          std::shared_ptr<ShaderModule> triangle_vs,
+                          std::shared_ptr<ShaderModule> fs);
 
     PostProcessingSubpass(const PostProcessingSubpass &to_copy) = delete;
     PostProcessingSubpass &operator=(const PostProcessingSubpass &to_copy) = delete;
@@ -93,22 +93,6 @@ public:
 	 */
     [[nodiscard]] inline const StorageImageMap &get_storage_images() const {
         return storage_images;
-    }
-
-    /**
-	 * @brief Returns the shader variant used for this postprocess' fragment shader.
-	 */
-    inline ShaderVariant &get_fs_variant() {
-        return fs_variant;
-    }
-
-    /**
-	 * @brief Sets the shader variant that will be used for this postprocess' fragment shader.
-	 */
-    inline PostProcessingSubpass &set_fs_variant(ShaderVariant &&new_variant) {
-        fs_variant = std::move(new_variant);
-
-        return *this;
     }
 
     /**
@@ -179,9 +163,8 @@ public:
 private:
     PostProcessingRenderPass *parent;
 
-    std::shared_ptr<ShaderSource> vertex_shader_{nullptr};
-    std::shared_ptr<ShaderSource> fragment_shader_{nullptr};
-    ShaderVariant fs_variant{};
+    std::shared_ptr<ShaderModule> vertex_shader_{nullptr};
+    std::shared_ptr<ShaderModule> fragment_shader_{nullptr};
 
     AttachmentMap input_attachments{};
     SampledMap sampled_images{};
@@ -227,7 +210,7 @@ public:
 	 */
     template<typename... ConstructorArgs>
     PostProcessingSubpass &add_subpass(ConstructorArgs &&...args) {
-        ShaderSource vs_copy = get_triangle_vs();
+        std::shared_ptr<ShaderModule> vs_copy = get_triangle_vs();
         auto new_subpass = std::make_unique<PostProcessingSubpass>(this, get_render_context(), std::move(vs_copy), std::forward<ConstructorArgs>(args)...);
         auto &new_subpass_ref = *new_subpass;
 

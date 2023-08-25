@@ -135,8 +135,8 @@ set(CORE_FILES
         core/resource_binding_state.h
         core/pipeline_state.h
         core/fence_pool.h
-        core/resource_record.h
-        core/resource_replay.h
+#        core/resource_record.h
+#        core/resource_replay.h
         core/semaphore_pool.h
         core/resource_cache.h
         core/frame_resource.h
@@ -170,8 +170,8 @@ set(CORE_FILES
         core/resource_binding_state.cpp
         core/pipeline_state.cpp
         core/fence_pool.cpp
-        core/resource_record.cpp
-        core/resource_replay.cpp
+#        core/resource_record.cpp
+#        core/resource_replay.cpp
         core/semaphore_pool.cpp
         core/resource_cache.cpp
         core/frame_resource.cpp

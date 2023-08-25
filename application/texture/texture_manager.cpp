@@ -165,9 +165,9 @@ std::shared_ptr<Texture> TextureManager::generate_ibl(const std::string &file, r
         target->create_vk_image(device_, 0, VK_IMAGE_USAGE_STORAGE_BIT | VK_IMAGE_USAGE_SAMPLED_BIT);
 
         if (!pipeline_) {
-            pipeline_ = std::make_unique<rendering::PostProcessingPipeline>(render_context, ShaderSource());
+            pipeline_ = std::make_unique<rendering::PostProcessingPipeline>(render_context, nullptr);
             ibl_pass_ = &pipeline_->add_pass<rendering::PostProcessingComputePass>(
-                ShaderManager::get_singleton().load_shader("base/ibl.comp"));
+                ShaderManager::get_singleton().load_shader("base/ibl.comp", VK_SHADER_STAGE_COMPUTE_BIT));
             ibl_pass_->attach_shader_data(&shader_data_);
         }
         shader_data_.set_sampled_texture("environmentMap", source->get_vk_image_view(VK_IMAGE_VIEW_TYPE_CUBE),

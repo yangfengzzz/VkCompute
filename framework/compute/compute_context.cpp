@@ -95,11 +95,11 @@ const std::vector<const char *> ComputeContext::get_validation_layers() {
     return {};
 }
 
-const std::unordered_map<const char *, bool> ComputeContext::get_instance_extensions() {
+std::unordered_map<const char *, bool> ComputeContext::get_instance_extensions() {
     return instance_extensions;
 }
 
-const std::unordered_map<const char *, bool> ComputeContext::get_device_extensions() {
+std::unordered_map<const char *, bool> ComputeContext::get_device_extensions() {
     return device_extensions;
 }
 

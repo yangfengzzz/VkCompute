@@ -31,7 +31,7 @@ bool ForwardApplication::prepare(const ApplicationOptions &options) {
 
     // resource loader
     texture_manager_ = std::make_unique<TextureManager>(*device);
-    shader_manager_ = std::make_unique<ShaderManager>();
+    shader_manager_ = std::make_unique<ShaderManager>(*device);
     mesh_manager_ = std::make_unique<MeshManager>(*device);
 
     // logic system

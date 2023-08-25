@@ -39,8 +39,8 @@ void UnlitMaterial::set_base_texture(const std::shared_ptr<Texture> &new_value, 
 
 UnlitMaterial::UnlitMaterial(core::Device &device, const std::string &name)
     : BaseMaterial(device, name), base_color_prop_("baseColor"), base_texture_prop_("baseTexture") {
-    vertex_source_ = ShaderManager::get_singleton().load_shader("base/unlit.vert");
-    fragment_source_ = ShaderManager::get_singleton().load_shader("base/unlit.frag");
+    vertex_source_ = ShaderManager::get_singleton().load_shader("base/unlit.vert", VK_SHADER_STAGE_VERTEX_BIT);
+    fragment_source_ = ShaderManager::get_singleton().load_shader("base/unlit.frag", VK_SHADER_STAGE_FRAGMENT_BIT);
 
     shader_data_.add_define(OMIT_NORMAL);
 

@@ -22,6 +22,8 @@ public:
 
     void bind_data(core::CommandBuffer &command_buffer, core::DescriptorSetLayout &descriptor_set_layout);
 
+    void bind_specialization_constant(core::CommandBuffer &command_buffer, ShaderModule& shader);
+
     void set_buffer_functor(const std::string &property_name, const std::function<core::Buffer *()> &functor);
 
     void set_data(const std::string &property_name, core::BufferAllocation &&value);
@@ -91,8 +93,6 @@ public:
      */
     void remove_define(const std::string &undef);
 
-    void merge_variants(const ShaderVariant &variant, ShaderVariant &result) const;
-
 private:
     core::Device &device_;
     std::unordered_map<std::string, core::BufferAllocation> shader_buffer_pools_{};
@@ -101,7 +101,8 @@ private:
     std::unordered_map<std::string, std::unique_ptr<core::SampledImage>> sampled_textures_{};
     std::unordered_map<std::string, std::unique_ptr<core::SampledImage>> storage_textures_{};
 
-    ShaderVariant variant_;
+    // Map tracking state of the Specialization Constants
+    std::map<std::string, std::vector<uint8_t>> specialization_constant_state;
 };
 
 }// namespace vox

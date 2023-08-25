@@ -24,8 +24,8 @@ public:
     RenderQueueType::Enum render_queue_ = RenderQueueType::Enum::OPAQUE;
 
     /** Shader used by the material. */
-    std::shared_ptr<ShaderSource> vertex_source_{nullptr};
-    std::shared_ptr<ShaderSource> fragment_source_{nullptr};
+    std::shared_ptr<ShaderModule> vertex_source_{nullptr};
+    std::shared_ptr<ShaderModule> fragment_source_{nullptr};
 
     /** Shader data. */
     ShaderData shader_data_;

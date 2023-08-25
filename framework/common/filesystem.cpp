@@ -86,8 +86,9 @@ std::string read_text_file(const std::string &filename) {
                        (std::istreambuf_iterator<char>())};
 }
 
-std::vector<uint8_t> read_binary_file(const std::string &filename, const uint32_t count) {
-    std::vector<uint8_t> data;
+template<typename T>
+std::vector<T> read_binary_file(const std::string &filename, const uint32_t count) {
+    std::vector<T> data;
 
     std::ifstream file;
 
@@ -104,7 +105,7 @@ std::vector<uint8_t> read_binary_file(const std::string &filename, const uint32_
         file.seekg(0, std::ios::beg);
     }
 
-    data.resize(static_cast<size_t>(read_count));
+    data.resize(static_cast<size_t>(read_count) / sizeof(T) * sizeof(uint8_t));
     file.read(reinterpret_cast<char *>(data.data()), read_count);
     file.close();
 
@@ -130,19 +131,19 @@ static void write_binary_file(const std::vector<uint8_t> &data, const std::strin
 }
 
 std::vector<uint8_t> read_asset(const std::string &filename, const uint32_t count) {
-    return read_binary_file(path::get(path::Type::Assets) + filename, count);
+    return read_binary_file<uint8_t>(path::get(path::Type::Assets) + filename, count);
 }
 
 std::string read_shader(const std::string &filename) {
     return read_text_file(path::get(path::Type::Shaders) + filename);
 }
 
-std::vector<uint8_t> read_shader_binary(const std::string &filename) {
-    return read_binary_file(path::get(path::Type::Shaders) + filename, 0);
+std::vector<uint32_t> read_spv(const std::string &filename) {
+    return read_binary_file<uint32_t>(path::get(path::Type::Shaders) + filename, 0);
 }
 
 std::vector<uint8_t> read_temp(const std::string &filename, const uint32_t count) {
-    return read_binary_file(path::get(path::Type::Temp) + filename, count);
+    return read_binary_file<uint8_t>(path::get(path::Type::Temp) + filename, count);
 }
 
 void write_temp(const std::vector<uint8_t> &data, const std::string &filename, const uint32_t count) {
