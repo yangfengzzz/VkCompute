@@ -80,5 +80,5 @@ private:
     std::vector<ShaderModule *> shader_modules;
 };
 
-}
-}// namespace vox::core
+}// namespace core
+}// namespace vox

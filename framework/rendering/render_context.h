@@ -176,7 +176,7 @@ public:
 	 *        A frame is active after @ref begin_frame has been called.
 	 * @return The current active frame index
 	 */
-    uint32_t get_active_frame_index() const;
+    [[nodiscard]] uint32_t get_active_frame_index() const;
 
     /**
 	 * @brief An error should be raised if a frame is active.

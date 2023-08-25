@@ -11,15 +11,15 @@ project(framework LANGUAGES C CXX)
 # Platform settings
 add_subdirectory(platform/core)
 
-if(ANDROID)
+if (ANDROID)
     add_subdirectory(platform/android)
-elseif(WIN32)
+elseif (WIN32)
     add_subdirectory(platform/windows)
-elseif(APPLE OR UNIX)
+elseif (APPLE OR UNIX)
     add_subdirectory(platform/unix)
-else()
+else ()
     message(FATAL_ERROR "Unsupported platform")
-endif()
+endif ()
 
 set(COMMON_FILES
         # Header Files
@@ -40,7 +40,7 @@ set(COMMON_FILES
         common/vk_common.cpp
         common/filesystem.cpp
         common/strings.cpp
-        )
+)
 
 set(SHADER_FILES
         # Header Files
@@ -55,7 +55,7 @@ set(SHADER_FILES
         shader/shader_module.cpp
         shader/shader_data.cpp
         shader/shader_variant.cpp
-        )
+)
 
 set(COMPUTE_FILES
         compute/compute_context.h
@@ -90,7 +90,7 @@ set(RENDERING_FILES
         rendering/subpass.cpp
         rendering/framebuffer.cpp
         rendering/swapchain.cpp
-        )
+)
 
 set(STATS_FILES
         # Header Files
@@ -137,8 +137,8 @@ set(CORE_FILES
         core/resource_binding_state.h
         core/pipeline_state.h
         core/fence_pool.h
-#        core/resource_record.h
-#        core/resource_replay.h
+        #        core/resource_record.h
+        #        core/resource_replay.h
         core/semaphore_pool.h
         core/resource_cache.h
         core/frame_resource.h
@@ -172,13 +172,13 @@ set(CORE_FILES
         core/resource_binding_state.cpp
         core/pipeline_state.cpp
         core/fence_pool.cpp
-#        core/resource_record.cpp
-#        core/resource_replay.cpp
+        #        core/resource_record.cpp
+        #        core/resource_replay.cpp
         core/semaphore_pool.cpp
         core/resource_cache.cpp
         core/frame_resource.cpp
         core/sampled_image.cpp
-        )
+)
 
 set(PLATFORM_FILES
         # Header Files
@@ -192,14 +192,14 @@ set(PLATFORM_FILES
         platform/platform.cpp
         platform/window.cpp
         platform/input_events.cpp
-        )
+)
 
 set(GLFW_FILES
         # Header Files
         platform/glfw_window.h
         # Source Files
         platform/glfw_window.cpp
-        )
+)
 
 set(PARSER_FILES
         # Header Files
@@ -208,7 +208,7 @@ set(PARSER_FILES
         # Source Files
         platform/parsers/CLI11.cpp
         platform/parsers/help_formatter.cpp
-        )
+)
 
 set(ANDROID_FILES
         # Header Files
@@ -259,7 +259,7 @@ set(PROJECT_FILES
         ${COMPUTE_FILES}
         ${STATS_FILES}
         ${SHADER_FILES}
-        )
+)
 
 # Add files based on platform
 if (ANDROID)
@@ -354,7 +354,7 @@ target_link_libraries(${PROJECT_NAME} PUBLIC
         spirv-cross-glsl
         glslang-default-resource-limits
         spdlog
-        )
+)
 
 if (${NEED_LINK_ATOMIC})
     target_link_libraries(${PROJECT_NAME} PUBLIC atomic)

@@ -23,7 +23,7 @@ public:
 
     PipelineLayout(const PipelineLayout &) = delete;
 
-    PipelineLayout(PipelineLayout &&other);
+    PipelineLayout(PipelineLayout &&other) noexcept;
 
     ~PipelineLayout();
 
@@ -35,14 +35,14 @@ public:
 
     const std::vector<ShaderModule *> &get_shader_modules() const;
 
-    const std::vector<ShaderResource> get_resources(const ShaderResourceType &type = ShaderResourceType::All,
-                                                    VkShaderStageFlagBits stage = VK_SHADER_STAGE_ALL) const;
+    std::vector<ShaderResource> get_resources(const ShaderResourceType &type = ShaderResourceType::All,
+                                              VkShaderStageFlagBits stage = VK_SHADER_STAGE_ALL) const;
 
     const std::unordered_map<uint32_t, std::vector<ShaderResource>> &get_shader_sets() const;
 
-    bool has_descriptor_set_layout(const uint32_t set_index) const;
+    bool has_descriptor_set_layout(uint32_t set_index) const;
 
-    DescriptorSetLayout &get_descriptor_set_layout(const uint32_t set_index) const;
+    DescriptorSetLayout &get_descriptor_set_layout(uint32_t set_index) const;
 
     VkShaderStageFlags get_push_constant_range_stage(uint32_t size, uint32_t offset = 0) const;
 
@@ -64,5 +64,5 @@ private:
     std::vector<DescriptorSetLayout *> descriptor_set_layouts;
 };
 
-}
-}// namespace vox::core
+}// namespace core
+}// namespace vox

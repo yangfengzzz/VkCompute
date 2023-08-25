@@ -8,7 +8,6 @@
 
 #include "postprocessing_pipeline.h"
 
-
 namespace vox::rendering {
 
 constexpr uint32_t DEPTH_RESOLVE_BITMASK = 0x80000000;
@@ -33,7 +32,7 @@ PostProcessingSubpass::PostProcessingSubpass(PostProcessingRenderPass *parent,
 
 PostProcessingSubpass::PostProcessingSubpass(PostProcessingSubpass &&to_move) noexcept
     : Subpass{std::move(to_move)},
-      parent{std::move(to_move.parent)},
+      parent{to_move.parent},
       input_attachments{std::move(to_move.input_attachments)},
       sampled_images{std::move(to_move.sampled_images)} {}
 
@@ -445,5 +444,5 @@ void PostProcessingRenderPass::draw(core::CommandBuffer &command_buffer, RenderT
     }
 }
 
-}
-// namespace vox::rendering
+}// namespace vox::rendering
+ // namespace vox::rendering

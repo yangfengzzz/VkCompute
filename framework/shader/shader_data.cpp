@@ -45,8 +45,8 @@ void ShaderData::bind_data(core::CommandBuffer &command_buffer,
     }
 }
 
-void ShaderData::bind_specialization_constant(core::CommandBuffer &command_buffer, ShaderModule& shader) {
-    for(auto& resource: shader.get_resources()) {
+void ShaderData::bind_specialization_constant(core::CommandBuffer &command_buffer, ShaderModule &shader) {
+    for (auto &resource : shader.get_resources()) {
         if (resource.type == ShaderResourceType::SpecializationConstant) {
             auto iter = specialization_constant_state.find(resource.name);
             if (iter != specialization_constant_state.end()) {

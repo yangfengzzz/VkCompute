@@ -33,7 +33,7 @@ public:
 
     ComputeContext &operator=(ComputeContext &&) = delete;
 
-    void create_device(core::PhysicalDevice& gpu);
+    void create_device(core::PhysicalDevice &gpu);
 
     /**
 	 * @brief Add a sample-specific device extension

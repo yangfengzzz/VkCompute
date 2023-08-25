@@ -60,7 +60,7 @@ public:
     void clear();
 
 private:
-    size_t id;
+    size_t id{};
 
     std::set<std::string> preambles;
 

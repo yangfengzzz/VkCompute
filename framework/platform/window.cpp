@@ -8,8 +8,6 @@
 
 #include <utility>
 
-//#include "platform/platform.h"
-
 namespace vox {
 Window::Window(Properties properties) : properties{std::move(properties)} {
 }

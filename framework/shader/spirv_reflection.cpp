@@ -88,7 +88,7 @@ inline void read_resource_array_size(const spirv_cross::Compiler &compiler,
                                      const ShaderVariant &variant) {
     const auto &spirv_type = compiler.get_type_from_variable(resource.id);
 
-    shader_resource.array_size = spirv_type.array.size() ? spirv_type.array[0] : 1;
+    shader_resource.array_size = !spirv_type.array.empty() ? spirv_type.array[0] : 1;
 }
 
 inline void read_resource_size(const spirv_cross::Compiler &compiler,
@@ -358,12 +358,12 @@ void SPIRVReflection::parse_push_constants(const spirv_cross::Compiler &compiler
     auto shader_resources = compiler.get_shader_resources();
 
     for (auto &resource : shader_resources.push_constant_buffers) {
-        const auto &spivr_type = compiler.get_type_from_variable(resource.id);
+        const auto &spirv_type = compiler.get_type_from_variable(resource.id);
 
         std::uint32_t offset = std::numeric_limits<std::uint32_t>::max();
 
-        for (auto i = 0U; i < spivr_type.member_types.size(); ++i) {
-            auto mem_offset = compiler.get_member_decoration(spivr_type.self, i, spv::DecorationOffset);
+        for (auto i = 0U; i < spirv_type.member_types.size(); ++i) {
+            auto mem_offset = compiler.get_member_decoration(spirv_type.self, i, spv::DecorationOffset);
 
             offset = std::min(offset, mem_offset);
         }

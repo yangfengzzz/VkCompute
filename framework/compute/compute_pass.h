@@ -16,7 +16,7 @@ namespace vox::compute {
 */
 class ComputePass {
 public:
-    ComputePass(std::shared_ptr<ShaderModule> cs_source);
+    explicit ComputePass(std::shared_ptr<ShaderModule> cs_source);
 
     ComputePass(const ComputePass &to_copy) = delete;
     ComputePass &operator=(const ComputePass &to_copy) = delete;

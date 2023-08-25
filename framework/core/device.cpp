@@ -11,8 +11,7 @@ VKBP_DISABLE_WARNINGS()
 #include <vk_mem_alloc.h>
 VKBP_ENABLE_WARNINGS()
 
-namespace vox {
-namespace core {
+namespace vox::core {
 Device::Device(PhysicalDevice &gpu,
                VkSurfaceKHR surface,
                std::unique_ptr<DebugUtils> &&debug_utils,
@@ -607,5 +606,5 @@ ResourceCache &Device::get_resource_cache() {
     return resource_cache;
 }
 
-}
 }// namespace vox::core
+// namespace vox::core

@@ -11,8 +11,7 @@
 #include "core/image_view.h"
 #include "core/sampler.h"
 
-namespace vox {
-namespace core {
+namespace vox::core {
 /**
  * @brief A resource info is a struct containing the actual resource data.
  *
@@ -42,7 +41,7 @@ class ResourceSet {
 public:
     void reset();
 
-    bool is_dirty() const;
+    [[nodiscard]] bool is_dirty() const;
 
     void clear_dirty();
 
@@ -56,7 +55,7 @@ public:
 
     void bind_input(const ImageView &image_view, uint32_t binding, uint32_t array_element);
 
-    const BindingMap<ResourceInfo> &get_resource_bindings() const;
+    [[nodiscard]] const BindingMap<ResourceInfo> &get_resource_bindings() const;
 
 private:
     bool dirty{false};
@@ -100,5 +99,5 @@ private:
     std::unordered_map<uint32_t, ResourceSet> resource_sets;
 };
 
-}
 }// namespace vox::core
+// namespace vox::core

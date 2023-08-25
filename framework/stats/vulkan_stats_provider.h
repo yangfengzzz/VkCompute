@@ -9,6 +9,8 @@
 #include "core/query_pool.h"
 #include "stats_provider.h"
 
+#include <utility>
+
 namespace vox {
 namespace rendering {
 class RenderContext;
@@ -37,8 +39,8 @@ private:
     };
 
     struct VendorStat {
-        VendorStat(const std::string &name, const std::string &divisor_name = "")
-            : name(name),
+        VendorStat(std::string name, const std::string &divisor_name = "")
+            : name(std::move(name)),
               divisor_name(divisor_name) {
             if (!divisor_name.empty())
                 scaling = StatScaling::ByCounter;

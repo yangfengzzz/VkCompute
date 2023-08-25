@@ -8,7 +8,6 @@
 
 #include "instance.h"
 
-#include <algorithm>
 #include <functional>
 
 namespace vox::core {

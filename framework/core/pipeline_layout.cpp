@@ -61,9 +61,9 @@ PipelineLayout::PipelineLayout(Device &device, const std::vector<ShaderModule *>
 
     // Collect all the descriptor set layout handles, maintaining set order
     std::vector<VkDescriptorSetLayout> descriptor_set_layout_handles;
-    for (uint32_t i = 0; i < descriptor_set_layouts.size(); ++i) {
-        if (descriptor_set_layouts[i]) {
-            descriptor_set_layout_handles.push_back(descriptor_set_layouts[i]->get_handle());
+    for (auto &descriptor_set_layout : descriptor_set_layouts) {
+        if (descriptor_set_layout) {
+            descriptor_set_layout_handles.push_back(descriptor_set_layout->get_handle());
         } else {
             descriptor_set_layout_handles.push_back(VK_NULL_HANDLE);
         }
@@ -90,12 +90,12 @@ PipelineLayout::PipelineLayout(Device &device, const std::vector<ShaderModule *>
     }
 }
 
-PipelineLayout::PipelineLayout(PipelineLayout &&other) : device{other.device},
-                                                         handle{other.handle},
-                                                         shader_modules{std::move(other.shader_modules)},
-                                                         shader_resources{std::move(other.shader_resources)},
-                                                         shader_sets{std::move(other.shader_sets)},
-                                                         descriptor_set_layouts{std::move(other.descriptor_set_layouts)} {
+PipelineLayout::PipelineLayout(PipelineLayout &&other) noexcept : device{other.device},
+                                                                  handle{other.handle},
+                                                                  shader_modules{std::move(other.shader_modules)},
+                                                                  shader_resources{std::move(other.shader_resources)},
+                                                                  shader_sets{std::move(other.shader_sets)},
+                                                                  descriptor_set_layouts{std::move(other.descriptor_set_layouts)} {
     other.handle = VK_NULL_HANDLE;
 }
 
@@ -114,7 +114,7 @@ const std::vector<ShaderModule *> &PipelineLayout::get_shader_modules() const {
     return shader_modules;
 }
 
-const std::vector<ShaderResource> PipelineLayout::get_resources(const ShaderResourceType &type, VkShaderStageFlagBits stage) const {
+std::vector<ShaderResource> PipelineLayout::get_resources(const ShaderResourceType &type, VkShaderStageFlagBits stage) const {
     std::vector<ShaderResource> found_resources;
 
     for (auto &it : shader_resources) {

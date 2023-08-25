@@ -245,7 +245,7 @@ GlfwWindow::GlfwWindow(Platform *platform, const Window::Properties &properties)
         case Window::Mode::Fullscreen: {
             auto *monitor = glfwGetPrimaryMonitor();
             const auto *mode = glfwGetVideoMode(monitor);
-            handle = glfwCreateWindow(mode->width, mode->height, properties.title.c_str(), monitor, NULL);
+            handle = glfwCreateWindow(mode->width, mode->height, properties.title.c_str(), monitor, nullptr);
             break;
         }
 
@@ -256,7 +256,7 @@ GlfwWindow::GlfwWindow(Platform *platform, const Window::Properties &properties)
             glfwWindowHint(GLFW_GREEN_BITS, mode->greenBits);
             glfwWindowHint(GLFW_BLUE_BITS, mode->blueBits);
             glfwWindowHint(GLFW_REFRESH_RATE, mode->refreshRate);
-            handle = glfwCreateWindow(mode->width, mode->height, properties.title.c_str(), monitor, NULL);
+            handle = glfwCreateWindow(mode->width, mode->height, properties.title.c_str(), monitor, nullptr);
             break;
         }
 
@@ -305,7 +305,7 @@ VkSurfaceKHR GlfwWindow::create_surface(VkInstance instance, VkPhysicalDevice) {
 
     VkSurfaceKHR surface;
 
-    VkResult errCode = glfwCreateWindowSurface(instance, handle, NULL, &surface);
+    VkResult errCode = glfwCreateWindowSurface(instance, handle, nullptr, &surface);
 
     if (errCode != VK_SUCCESS) {
         return nullptr;

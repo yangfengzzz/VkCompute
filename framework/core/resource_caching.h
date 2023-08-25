@@ -25,7 +25,7 @@ inline bool operator==(const VkSamplerCreateInfo &x, const VkSamplerCreateInfo &
 }
 
 namespace std {
-template <>
+template<>
 struct hash<VkSamplerCreateInfo> {
     std::size_t operator()(const VkSamplerCreateInfo &sampler) const {
         std::size_t result = 0;
@@ -148,7 +148,7 @@ struct hash<vox::core::SpecializationConstantState> {
     std::size_t operator()(const vox::core::SpecializationConstantState &specialization_constant_state) const {
         std::size_t result = 0;
 
-        for (auto constants : specialization_constant_state.get_specialization_constant_state()) {
+        for (const auto &constants : specialization_constant_state.get_specialization_constant_state()) {
             vox::hash_combine(result, constants.first);
             for (const auto data : constants.second) {
                 vox::hash_combine(result, data);
@@ -453,8 +453,7 @@ struct hash<vox::core::PipelineState> {
 };
 }// namespace std
 
-namespace vox {
-namespace core {
+namespace vox::core {
 namespace {
 template<typename T>
 inline void hash_param(size_t &seed, const T &value) {
@@ -595,5 +594,5 @@ T &request_resource(Device &device, std::unordered_map<std::size_t, T> &resource
     return res_it->second;
 }
 
-}
 }// namespace vox::core
+// namespace vox::core

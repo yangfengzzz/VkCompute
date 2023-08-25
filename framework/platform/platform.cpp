@@ -20,9 +20,9 @@ namespace vox {
 const uint32_t Platform::MIN_WINDOW_WIDTH = 420;
 const uint32_t Platform::MIN_WINDOW_HEIGHT = 320;
 
-std::string Platform::external_storage_directory = "";
+std::string Platform::external_storage_directory;
 
-std::string Platform::temp_directory = "";
+std::string Platform::temp_directory;
 
 Platform::Platform(const PlatformContext &context) {
     arguments = context.arguments();
@@ -65,9 +65,9 @@ ExitCode Platform::initialize() {
 void Platform::set_callback(std::function<void(float)> update_callback,
                             std::function<void(uint32_t, uint32_t)> resize_callback,
                             std::function<void(const InputEvent &)> event_callback) {
-    this->update_callback = update_callback;
-    this->resize_callback = resize_callback;
-    this->event_callback = event_callback;
+    this->update_callback = std::move(update_callback);
+    this->resize_callback = std::move(resize_callback);
+    this->event_callback = std::move(event_callback);
 }
 
 ExitCode Platform::main_loop() {

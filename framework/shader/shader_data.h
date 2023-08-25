@@ -22,7 +22,7 @@ public:
 
     void bind_data(core::CommandBuffer &command_buffer, core::DescriptorSetLayout &descriptor_set_layout);
 
-    void bind_specialization_constant(core::CommandBuffer &command_buffer, ShaderModule& shader);
+    void bind_specialization_constant(core::CommandBuffer &command_buffer, ShaderModule &shader);
 
     void set_buffer_functor(const std::string &property_name, const std::function<core::Buffer *()> &functor);
 
