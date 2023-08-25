@@ -75,6 +75,10 @@ public:
 	 */
     PhysicalDevice &get_first_gpu();
 
+    PhysicalDevice &get_gpu_at(size_t index);
+
+    size_t get_gpu_count();
+
     /**
 	 * @brief Checks if the given extension is enabled in the VkInstance
 	 * @param extension An extension to check

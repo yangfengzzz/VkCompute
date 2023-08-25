@@ -406,6 +406,14 @@ PhysicalDevice &Instance::get_suitable_gpu(VkSurfaceKHR surface) {
     return *gpus[0];
 }
 
+PhysicalDevice &Instance::get_gpu_at(size_t index) {
+    return *gpus[index];
+}
+
+size_t Instance::get_gpu_count() {
+    return gpus.size();
+}
+
 bool Instance::is_enabled(const char *extension) const {
     return std::find_if(enabled_extensions.begin(), enabled_extensions.end(), [extension](const char *enabled_extension) { return strcmp(extension, enabled_extension) == 0; }) != enabled_extensions.end();
 }

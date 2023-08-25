@@ -127,7 +127,7 @@ public:
 	 */
     void update_descriptor_sets(size_t thread_index = 0);
 
-private:
+protected:
     Device &device;
 
     /**
