@@ -160,6 +160,7 @@ static void throughput(::benchmark::State &state,
             auto start_time = std::chrono::high_resolution_clock::now();
             resource->submit(cmd);
             device.get_fence_pool().wait();
+            device.get_fence_pool().reset();
             auto end_time = std::chrono::high_resolution_clock::now();
             auto elapsed_seconds = std::chrono::duration_cast<std::chrono::duration<double>>(end_time - start_time);
 
@@ -209,7 +210,8 @@ void MADThroughPut::register_vulkan_benchmarks(compute::ComputeResource &resourc
         ::benchmark::RegisterBenchmark(test_name, throughput, &resource, pass.get(), shader_data.get(),
                                        num_element, loop_count, compute::DataType::fp32)
             ->UseManualTime()
-            ->Unit(::benchmark::kMicrosecond);
+            ->Unit(::benchmark::kMicrosecond)
+            ->MinTime(std::numeric_limits<float>::epsilon()); // use cache make calculation fast after warmup
     }
 }
 
