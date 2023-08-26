@@ -40,6 +40,8 @@ public:
 
     [[nodiscard]] const VkPhysicalDeviceProperties &get_properties() const;
 
+    [[nodiscard]] const VkPhysicalDeviceSubgroupProperties &get_subgroup_properties() const;
+
     [[nodiscard]] const VkPhysicalDeviceMemoryProperties &get_memory_properties() const;
 
     [[nodiscard]] const std::vector<VkQueueFamilyProperties> &get_queue_family_properties() const;
@@ -141,6 +143,9 @@ private:
 
     // The GPU properties
     VkPhysicalDeviceProperties properties{};
+
+    // The Subgroup properties
+    VkPhysicalDeviceSubgroupProperties subgroup_properties{};
 
     // The GPU memory properties
     VkPhysicalDeviceMemoryProperties memory_properties{};

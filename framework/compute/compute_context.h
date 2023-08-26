@@ -83,7 +83,7 @@ public:
 public:
     uint32_t get_device_count();
 
-    ComputeResource get_resource(uint32_t index, size_t thread_count);
+    ComputeResource get_resource(uint32_t index, size_t thread_count = 1);
 
 private:
     std::unique_ptr<core::DebugUtils> debug_utils{nullptr};

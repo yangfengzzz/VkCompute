@@ -9,6 +9,8 @@ project(vk-benchmark LANGUAGES C CXX)
 
 set(SRC
         main.cpp
+        data_type_util.cpp
+        mad_throughput.cpp
 )
 
 add_executable(${PROJECT_NAME} WIN32 ${SRC})

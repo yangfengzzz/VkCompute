@@ -6,13 +6,19 @@
 
 #include <benchmark/benchmark.h>
 #include "compute/compute_context.h"
+#include "mad_throughput.h"
 
 using namespace vox::compute;
 
 int main(int argc, char **argv) {
     ::benchmark::Initialize(&argc, argv);
     auto context = ComputeContext();
-    context.latency_measure.mode = LatencyMeasureMode::kSystemSubmit;
+    auto app = std::make_unique<vox::MADThroughPut>();
+
+    for (size_t i = 0; i < context.get_device_count(); i++) {
+        auto resource = context.get_resource(i);
+        app->register_vulkan_benchmarks(resource);
+    }
 
     ::benchmark::RunSpecifiedBenchmarks();
 }

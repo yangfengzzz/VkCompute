@@ -10,7 +10,17 @@ namespace vox::core {
 PhysicalDevice::PhysicalDevice(Instance &instance, VkPhysicalDevice physical_device) : instance{instance},
                                                                                        handle{physical_device} {
     vkGetPhysicalDeviceFeatures(physical_device, &features);
-    vkGetPhysicalDeviceProperties(physical_device, &properties);
+
+    VkPhysicalDeviceSubgroupProperties subgroup = {};
+    subgroup.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_SUBGROUP_PROPERTIES;
+    subgroup.pNext = nullptr;
+    VkPhysicalDeviceProperties2 properties2 = {};
+    properties2.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_PROPERTIES_2;
+    properties2.pNext = &subgroup;
+    vkGetPhysicalDeviceProperties2(physical_device, &properties2);
+    properties = properties2.properties;
+    subgroup_properties = subgroup;
+
     vkGetPhysicalDeviceMemoryProperties(physical_device, &memory_properties);
 
     LOGI("Found GPU: {}", properties.deviceName)
@@ -53,6 +63,10 @@ const VkPhysicalDeviceFeatures &PhysicalDevice::get_features() const {
 
 const VkPhysicalDeviceProperties &PhysicalDevice::get_properties() const {
     return properties;
+}
+
+const VkPhysicalDeviceSubgroupProperties &PhysicalDevice::get_subgroup_properties() const {
+    return subgroup_properties;
 }
 
 const VkPhysicalDeviceMemoryProperties &PhysicalDevice::get_memory_properties() const {
