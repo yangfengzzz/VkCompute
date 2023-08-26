@@ -212,6 +212,8 @@ public:
 
     void image_memory_barrier(const ImageView &image_view, const ImageMemoryBarrier &memory_barrier) const;
 
+    void image_memory_barrier(const Image &image, VkImageLayout from_layout, VkImageLayout to_layout) const;
+
     void buffer_memory_barrier(const Buffer &buffer, VkDeviceSize offset,
                                VkDeviceSize size, const BufferMemoryBarrier &memory_barrier);
 

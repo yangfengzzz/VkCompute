@@ -404,6 +404,52 @@ void CommandBuffer::image_memory_barrier(const ImageView &image_view, const Imag
         &image_memory_barrier);
 }
 
+void CommandBuffer::image_memory_barrier(const Image &image, VkImageLayout from_layout, VkImageLayout to_layout) const {
+    VkImageMemoryBarrier barrier = {};
+    barrier.sType = VK_STRUCTURE_TYPE_IMAGE_MEMORY_BARRIER;
+    barrier.oldLayout = from_layout;
+    barrier.newLayout = to_layout;
+    barrier.srcQueueFamilyIndex = VK_QUEUE_FAMILY_IGNORED;
+    barrier.dstQueueFamilyIndex = VK_QUEUE_FAMILY_IGNORED;
+    barrier.image = image.get_handle();
+    barrier.subresourceRange.aspectMask = VK_IMAGE_ASPECT_COLOR_BIT;
+    barrier.subresourceRange.baseMipLevel = 0;
+    barrier.subresourceRange.levelCount = 1;
+    barrier.subresourceRange.baseArrayLayer = 0;
+    barrier.subresourceRange.layerCount = 1;
+
+    VkPipelineStageFlags src_stage{};
+    VkPipelineStageFlags dst_stage{};
+    if (from_layout == VK_IMAGE_LAYOUT_UNDEFINED &&
+        to_layout == VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL) {
+        // Uploading data to the image after creation
+        barrier.srcAccessMask = 0;
+        barrier.dstAccessMask = VK_ACCESS_TRANSFER_WRITE_BIT;
+
+        src_stage = VK_PIPELINE_STAGE_TOP_OF_PIPE_BIT;
+        dst_stage = VK_PIPELINE_STAGE_TRANSFER_BIT;
+    } else if (from_layout == VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL &&
+               to_layout == VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL) {
+        // Prepare shader image after uploading data
+        barrier.srcAccessMask = VK_ACCESS_TRANSFER_WRITE_BIT;
+        barrier.dstAccessMask = VK_ACCESS_SHADER_READ_BIT;
+
+        src_stage = VK_PIPELINE_STAGE_TRANSFER_BIT;
+        dst_stage = VK_PIPELINE_STAGE_COMPUTE_SHADER_BIT;
+    } else if (from_layout == VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL &&
+               to_layout == VK_IMAGE_LAYOUT_TRANSFER_SRC_OPTIMAL) {
+        // Download data after shader usage
+        barrier.srcAccessMask = VK_ACCESS_SHADER_WRITE_BIT;
+        barrier.dstAccessMask = VK_ACCESS_TRANSFER_READ_BIT;
+
+        src_stage = VK_PIPELINE_STAGE_COMPUTE_SHADER_BIT;
+        dst_stage = VK_PIPELINE_STAGE_TRANSFER_BIT;
+    }
+
+    vkCmdPipelineBarrier(get_handle(), src_stage, dst_stage, 0, 0,
+                         nullptr, 0, nullptr, 1, &barrier);
+}
+
 void CommandBuffer::buffer_memory_barrier(const Buffer &buffer, VkDeviceSize offset, VkDeviceSize size,
                                           const BufferMemoryBarrier &memory_barrier) {
     VkBufferMemoryBarrier buffer_memory_barrier{VK_STRUCTURE_TYPE_BUFFER_MEMORY_BARRIER};

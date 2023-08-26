@@ -1,23 +1,17 @@
-// Copyright 2020-2023 Google LLC
+//  Copyright (c) 2023 Feng Yang
 //
-// Licensed under the Apache License, Version 2.0 (the "License");
-// you may not use this file except in compliance with the License.
-// You may obtain a copy of the License at
-//
-//      https://www.apache.org/licenses/LICENSE-2.0
-//
-// Unless required by applicable law or agreed to in writing, software
-// distributed under the License is distributed on an "AS IS" BASIS,
-// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-// See the License for the specific language governing permissions and
-// limitations under the License.
+//  I am making my contributions/submissions to this project solely in my
+//  personal capacity and am not conveying any rights to any intellectual
+//  property of any third parties.
+
+#pragma once
 
 #include <cstddef>
 #include <cstdint>
 #include <ostream>
 #include <utility>
 
-namespace vox {
+namespace vox::compute {
 class fp16;
 
 enum class DataType {
@@ -82,13 +76,13 @@ constexpr auto invoke_with_traits(DataType data_type, Fn &&fn, Args &&...args) {
     }
 }
 
-constexpr std::size_t GetSize(DataType data_type) {
+constexpr std::size_t get_size(DataType data_type) {
     return invoke_with_traits(data_type, [](auto traits) {
         return sizeof(typename decltype(traits)::storage_type);
     });
 }
 
-constexpr const char *GetName(DataType data_type) {
+constexpr const char *get_name(DataType data_type) {
     return invoke_with_traits(data_type,
                               [](auto traits) { return decltype(traits)::name; });
 }
@@ -131,4 +125,4 @@ private:
     uint16_t value_{};
 };
 
-}// namespace vox
+}// namespace vox::compute

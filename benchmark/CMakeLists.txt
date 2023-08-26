@@ -9,11 +9,10 @@ project(vk-benchmark LANGUAGES C CXX)
 
 set(SRC
         main.cpp
-        data_type_util.cpp
         mad_throughput.cpp
 )
 
 add_executable(${PROJECT_NAME} WIN32 ${SRC})
 
-target_link_libraries(${PROJECT_NAME} PRIVATE vkb__core framework benchmark)
+target_link_libraries(${PROJECT_NAME} PRIVATE vkb__core framework benchmark gtest)
 

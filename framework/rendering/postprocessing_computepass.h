@@ -78,12 +78,6 @@ private:
     std::vector<ShaderData *> data_{};
     std::vector<uint8_t> push_constants_data{};
 
-    /**
-	 * @brief Transitions sampled_images (to SHADER_READ_ONLY_OPTIMAL)
-	 *        and storage_images (to GENERAL) as appropriate.
-	 */
-    void transition_images(core::CommandBuffer &command_buffer, RenderTarget &default_render_target);
-
     [[nodiscard]] BarrierInfo get_src_barrier_info() const override;
     [[nodiscard]] BarrierInfo get_dst_barrier_info() const override;
 };

@@ -34,6 +34,7 @@ set(COMMON_FILES
         common/vk_initializers.h
         common/filesystem.h
         # Source Files
+        common/logging.cpp
         common/error.cpp
         common/timer.cpp
         common/utils.cpp
@@ -63,7 +64,15 @@ set(COMPUTE_FILES
         compute/compute_resource.h
         compute/compute_resource.cpp
         compute/compute_pass.h
-        compute/compute_pass.cpp)
+        compute/compute_pass.cpp
+        compute/status_util.h
+        compute/status_util.cpp
+        compute/data_type_util.h
+        compute/data_type_util.cpp
+        compute/buffer_utils.h
+        compute/buffer_utils.cpp
+        compute/image_utils.h
+        compute/image_utils.cpp)
 
 set(RENDERING_FILES
         # Header files

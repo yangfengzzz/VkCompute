@@ -13,7 +13,7 @@ using namespace vox::compute;
 int main(int argc, char **argv) {
     ::benchmark::Initialize(&argc, argv);
     auto context = ComputeContext();
-    auto app = std::make_unique<vox::MADThroughPut>();
+    auto app = std::make_unique<vox::benchmark::MADThroughPut>();
 
     for (size_t i = 0; i < context.get_device_count(); i++) {
         auto resource = context.get_resource(i);

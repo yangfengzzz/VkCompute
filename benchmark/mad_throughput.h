@@ -7,10 +7,10 @@
 #pragma once
 
 #include "benchmark_api.h"
-#include "data_type_util.h"
+#include "compute/data_type_util.h"
 #include "compute/compute_pass.h"
 
-namespace vox {
+namespace vox::benchmark {
 class MADThroughPut : public BenchmarkAPI {
 public:
     void register_vulkan_benchmarks(compute::ComputeResource &resource) override;
