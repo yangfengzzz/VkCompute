@@ -14,7 +14,7 @@ int main(int argc, char **argv) {
     ::benchmark::Initialize(&argc, argv);
     auto context = ComputeContext();
 
-    size_t device_index = 1;
+    size_t device_index = 0;
     auto app = std::make_unique<vox::benchmark::MADThroughPut>();
     auto resource = context.get_resource(device_index);
     app->register_vulkan_benchmarks(resource);

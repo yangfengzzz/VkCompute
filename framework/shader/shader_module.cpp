@@ -51,7 +51,7 @@ ShaderModule::ShaderModule(core::Device &device, VkShaderStageFlagBits stage, co
     shaderc::CompileOptions options;
 
     // todo variant
-    // options.AddMacroDefinition("TYPE", "vec4");
+    options.AddMacroDefinition("TYPE", "vec4");
 
     include_file_finder_.search_path().emplace_back(fs::path::get(fs::path::Type::Shaders));
     auto includer = std::make_unique<FileIncluder>(&include_file_finder_);
@@ -61,7 +61,6 @@ ShaderModule::ShaderModule(core::Device &device, VkShaderStageFlagBits stage, co
 #else
     options.SetOptimizationLevel(shaderc_optimization_level_performance);
 #endif
-
 
     shaderc_shader_kind kind{};
     switch (stage) {
