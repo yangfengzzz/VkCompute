@@ -5,6 +5,7 @@
 //  property of any third parties.
 
 #include "mad_throughput.h"
+#include "core/timestamp_query_pool.h"
 #include "compute/buffer_utils.h"
 #include "compute/status_util.h"
 #include <spdlog/fmt/fmt.h>
@@ -87,13 +88,15 @@ static void throughput(::benchmark::State &state,
     shader_data->set_buffer_functor("inputB", [&]() -> core::Buffer * { return &src1_buffer; });
     shader_data->set_buffer_functor("Output", [&]() -> core::Buffer * { return &dst_buffer; });
 
-    core::CommandBuffer &cmd = resource->begin();
-    cmd.begin(VK_COMMAND_BUFFER_USAGE_ONE_TIME_SUBMIT_BIT);
-    cmd.set_specialization_constant(0, loop_count);
     pass->set_dispatch_size({(uint32_t)num_element / (4 * 16), 1, 1});
-    pass->compute(cmd);
-    cmd.end();
-    resource->submit(cmd);
+    {
+        core::CommandBuffer &cmd = resource->begin();
+        cmd.begin(VK_COMMAND_BUFFER_USAGE_ONE_TIME_SUBMIT_BIT);
+        cmd.set_specialization_constant(0, loop_count);
+        pass->compute(cmd);
+        cmd.end();
+        resource->submit(cmd);
+    }
     device.get_fence_pool().wait();
 
     //===-------------------------------------------------------------------===/
@@ -125,6 +128,67 @@ static void throughput(::benchmark::State &state,
                 }
             });
     }
+
+    //===-------------------------------------------------------------------===/
+    // Benchmarking
+    //===-------------------------------------------------------------------===/
+
+    std::unique_ptr<core::TimestampQueryPool> query_pool{nullptr};
+    bool use_timestamp =
+        resource->latency_measure.mode == compute::LatencyMeasureMode::kGpuTimestamp;
+    if (use_timestamp) {
+        query_pool = std::make_unique<core::TimestampQueryPool>(device, 2);
+    }
+    {
+        core::CommandBuffer &cmd = resource->begin();
+        for (auto _ : state) {
+            cmd.begin(VK_COMMAND_BUFFER_USAGE_ONE_TIME_SUBMIT_BIT);
+            if (use_timestamp) cmd.reset_query_pool(query_pool->get_query_pool(), 0, query_pool->get_query_count());
+
+            if (use_timestamp) {
+                cmd.write_timestamp(VK_PIPELINE_STAGE_TOP_OF_PIPE_BIT, query_pool->get_query_pool(), 0);
+            }
+            cmd.set_specialization_constant(0, loop_count);
+            pass->compute(cmd);
+            if (use_timestamp) {
+                cmd.write_timestamp(VK_PIPELINE_STAGE_TOP_OF_PIPE_BIT, query_pool->get_query_pool(), 0);
+            }
+
+            cmd.end();
+
+            auto start_time = std::chrono::high_resolution_clock::now();
+            resource->submit(cmd);
+            device.get_fence_pool().wait();
+            auto end_time = std::chrono::high_resolution_clock::now();
+            auto elapsed_seconds =
+                std::chrono::duration_cast<std::chrono::duration<double>>(end_time -
+                                                                          start_time);
+
+            switch (resource->latency_measure.mode) {
+                case compute::LatencyMeasureMode::kSystemDispatch: {
+                    state.SetIterationTime(elapsed_seconds.count() -
+                                           resource->latency_measure.overhead_seconds);
+                } break;
+                case compute::LatencyMeasureMode::kSystemSubmit: {
+                    state.SetIterationTime(elapsed_seconds.count());
+                } break;
+                case compute::LatencyMeasureMode::kGpuTimestamp: {
+                    double timestamp_seconds = query_pool->calculate_elapsed_seconds_between(0, 1);
+                    state.SetIterationTime(timestamp_seconds);
+                } break;
+            }
+            cmd.reset(core::CommandBuffer::ResetMode::ResetIndividually);
+        }
+        double numOperation = double(num_element) * 2. /*fma*/ *
+                              10. /*10 elements per loop iteration*/ *
+                              double(loop_count);
+        state.counters["FLOps"] =
+            ::benchmark::Counter(numOperation,
+                                 ::benchmark::Counter::kIsIterationInvariant |
+                                     ::benchmark::Counter::kIsRate,
+                                 ::benchmark::Counter::kIs1000);
+    }
+    device.get_command_pool().reset_pool();
 }
 
 void MADThroughPut::register_vulkan_benchmarks(compute::ComputeResource &resource) {
