@@ -82,13 +82,11 @@ std::shared_ptr<Texture> TextureManager::load_texture_cubemap(const std::string 
 }
 
 void TextureManager::upload_texture(vox::Texture *image) {
-    const auto &queue = device_.get_queue_by_flags(VK_QUEUE_GRAPHICS_BIT, 0);
-
-    VkCommandBuffer command_buffer = device_.create_command_buffer(VK_COMMAND_BUFFER_LEVEL_PRIMARY, true);
+    const auto &queue = device_.get_queue_by_flags(VK_QUEUE_TRANSFER_BIT, 0);
+    core::CommandBuffer& command_buffer = device_.request_command_buffer();
 
     vox::core::Buffer stage_buffer{device_, image->get_data().size(), VK_BUFFER_USAGE_TRANSFER_SRC_BIT,
                                    VMA_MEMORY_USAGE_CPU_ONLY};
-
     stage_buffer.update(image->get_data());
 
     // Setup buffer copy regions for each mip level
@@ -123,19 +121,15 @@ void TextureManager::upload_texture(vox::Texture *image) {
 
     // Image barrier for optimal image (target)
     // Optimal image will be used as destination for the copy
-    vox::set_image_layout(command_buffer, image->get_vk_image().get_handle(), VK_IMAGE_LAYOUT_UNDEFINED,
-                          VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, subresource_range);
+    command_buffer.image_memory_barrier(image->get_vk_image(), VK_IMAGE_LAYOUT_UNDEFINED, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL);
 
     // Copy mip levels from staging buffer
-    vkCmdCopyBufferToImage(command_buffer, stage_buffer.get_handle(), image->get_vk_image().get_handle(),
-                           VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, static_cast<uint32_t>(buffer_copy_regions.size()),
-                           buffer_copy_regions.data());
+    command_buffer.copy_buffer_to_image(stage_buffer,  image->get_vk_image(), buffer_copy_regions);
 
     // Change texture image layout to shader read after all mip levels have been copied
-    vox::set_image_layout(command_buffer, image->get_vk_image().get_handle(), VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL,
-                          VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL, subresource_range);
-
-    device_.flush_command_buffer(command_buffer, queue.get_handle());
+    command_buffer.image_memory_barrier(image->get_vk_image(), VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL);
+    command_buffer.end();
+    queue.submit(command_buffer, device_.request_fence());
 }
 
 void TextureManager::collect_garbage() {

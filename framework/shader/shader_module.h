@@ -9,6 +9,7 @@
 #include "common/helpers.h"
 #include "common/vk_common.h"
 #include "shader/shader_variant.h"
+#include <libshaderc_util/file_finder.h>
 
 namespace vox {
 namespace core {
@@ -159,6 +160,9 @@ private:
     std::vector<ShaderResource> resources;
 
     std::string info_log;
+
+    // A FileFinder used to substitute #include directives in the source code.
+    shaderc_util::FileFinder include_file_finder_;
 };
 
 }// namespace vox

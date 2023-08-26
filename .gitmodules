@@ -40,3 +40,6 @@
 [submodule "third_party/benchmark"]
 	path = third_party/benchmark
 	url = https://github.com/google/benchmark.git
+[submodule "third_party/shaderc"]
+	path = third_party/shaderc
+	url = https://github.com/google/shaderc.git

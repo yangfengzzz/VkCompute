@@ -45,17 +45,17 @@ set(COMMON_FILES
 
 set(SHADER_FILES
         # Header Files
-        shader/glsl_compiler.h
         shader/spirv_reflection.h
         shader/shader_module.h
         shader/shader_data.h
         shader/shader_variant.h
+        shader/file_includer.h
         # Source Files
-        shader/glsl_compiler.cpp
         shader/spirv_reflection.cpp
         shader/shader_module.cpp
         shader/shader_data.cpp
         shader/shader_variant.cpp
+        shader/file_includer.cpp
 )
 
 set(COMPUTE_FILES
@@ -352,12 +352,12 @@ target_include_directories(${PROJECT_NAME} PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})
 target_link_libraries(${PROJECT_NAME} PUBLIC
         vkb__core
         volk
-        glslang
-        SPIRV
+        shaderc
+        shaderc_util
+        glslc
         vma
         hwcpipe
         spirv-cross-glsl
-        glslang-default-resource-limits
         spdlog
 )
 

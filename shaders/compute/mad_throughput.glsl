@@ -3,8 +3,6 @@
 #extension GL_EXT_scalar_block_layout : enable
 #extension GL_AMD_gpu_shader_half_float: enable
 
-#define TYPE vec4
-
 layout(binding=0) buffer InputA { TYPE x[]; } inputA;
 layout(binding=1) buffer InputB { TYPE x[]; } inputB;
 layout(binding=2) buffer Output { TYPE x[]; } outputO;

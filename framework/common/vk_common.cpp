@@ -6,10 +6,8 @@
 
 #include "vk_common.h"
 
-#include <spdlog/fmt/fmt.h>
-
-#include "shader/glsl_compiler.h"
-#include "common/filesystem.h"
+#include "common/strings.h"
+#include "common/logging.h"
 
 std::ostream &operator<<(std::ostream &os, const VkResult result) {
 #define WRITE_VK_ENUM(r) \
@@ -117,7 +115,7 @@ VkFormat get_suitable_depth_format(VkPhysicalDevice physical_device, bool depth_
     }
 
     if (depth_format != VK_FORMAT_UNDEFINED) {
-        LOGI("Depth format selected: {}", to_string(depth_format))
+        LOGI("Depth format selected: {}", vox::to_string(depth_format))
         return depth_format;
     }
 

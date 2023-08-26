@@ -27,6 +27,10 @@ set(BENCHMARK_ENABLE_TESTING OFF CACHE BOOL "" FORCE)
 set(BENCHMARK_ENABLE_INSTALL OFF CACHE BOOL "" FORCE)
 add_subdirectory(benchmark EXCLUDE_FROM_ALL)
 
+# shaderc
+set(SHADERC_SKIP_TESTS OFF CACHE BOOL "" FORCE)
+add_subdirectory(shaderc)
+
 # tinygltf
 #add_library(tinygltf INTERFACE)
 #set(TINYGLTF_DIR ${CMAKE_CURRENT_SOURCE_DIR}/tinygltf)
@@ -212,41 +216,6 @@ set_property(TARGET volk PROPERTY FOLDER "ThirdParty")
 #target_include_directories(imgui PUBLIC ${IMGUI_DIR})
 #
 #set_target_properties(imgui PROPERTIES FOLDER "ThirdParty" POSITION_INDEPENDENT_CODE ON)
-
-# glslang
-option(ENABLE_SPVREMAPPER OFF)
-option(ENABLE_GLSLANG_BINARIES OFF)
-set(ENABLE_HLSL ON)
-option(ENABLE_OPT OFF)
-option(BUILD_TESTING OFF)
-option(BUILD_EXTERNAL OFF)
-
-add_subdirectory(glslang)
-
-if (NOT TARGET glslang-default-resource-limits)
-    add_library(glslang-default-resource-limits
-                glslang/StandAlone/ResourceLimits.cpp)
-
-    set_target_properties(glslang-default-resource-limits PROPERTIES FOLDER "ThirdParty" POSITION_INDEPENDENT_CODE ON)
-
-    target_include_directories(glslang-default-resource-limits
-            PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/glslang)
-endif()
-
-if(NOT MSVC)
-    target_compile_options(glslang PRIVATE
-        "-Wno-logical-op-parentheses"
-        "-Wno-unused-parameter")
-
-    target_compile_options(SPIRV PRIVATE
-        "-Wno-logical-op-parentheses"
-        "-Wno-unused-parameter")
-endif()
-
-set_target_properties(glslang PROPERTIES FOLDER "ThirdParty" POSITION_INDEPENDENT_CODE ON)
-set_target_properties(OGLCompiler PROPERTIES FOLDER "ThirdParty" POSITION_INDEPENDENT_CODE ON)
-set_target_properties(OSDependent PROPERTIES FOLDER "ThirdParty" POSITION_INDEPENDENT_CODE ON)
-set_target_properties(SPIRV PROPERTIES FOLDER "ThirdParty" POSITION_INDEPENDENT_CODE ON)
 
 # spirv-cross
 add_subdirectory(spirv-cross)

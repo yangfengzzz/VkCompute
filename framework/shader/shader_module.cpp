@@ -8,41 +8,12 @@
 
 #include "common/logging.h"
 #include "common/filesystem.h"
-#include "shader/glsl_compiler.h"
+#include <shaderc/shaderc.hpp>
+#include "shader/file_includer.h"
 #include "shader/spirv_reflection.h"
 #include "core/device.h"
 
 namespace vox {
-/**
- * @brief Pre-compiles project shader files to include header code
- * @param source The shader file
- * @returns A byte array of the final shader
- */
-inline std::vector<std::string> precompile_shader(const std::string &source) {
-    std::vector<std::string> final_file;
-
-    auto lines = split(source, '\n');
-
-    for (auto &line : lines) {
-        if (line.find("#include \"") == 0) {
-            // Include paths are relative to the base shader directory
-            std::string include_path = line.substr(10);
-            size_t last_quote = include_path.find('\"');
-            if (!include_path.empty() && last_quote != std::string::npos) {
-                include_path = include_path.substr(0, last_quote);
-            }
-
-            auto include_file = precompile_shader(fs::read_shader(include_path));
-            for (auto &include_file_line : include_file) {
-                final_file.push_back(include_file_line);
-            }
-        } else {
-            final_file.push_back(line);
-        }
-    }
-
-    return final_file;
-}
 
 inline std::vector<uint8_t> convert_to_bytes(std::vector<std::string> &lines) {
     std::vector<uint8_t> bytes;
@@ -76,22 +47,86 @@ ShaderModule::ShaderModule(core::Device &device, VkShaderStageFlagBits stage, co
         throw VulkanException{VK_ERROR_INITIALIZATION_FAILED};
     }
 
-    // Precompile source into the final spirv bytecode
-    auto glsl_final_source = precompile_shader(source);
+    shaderc::Compiler compiler;
+    shaderc::CompileOptions options;
 
-    // Compile the GLSL source
-    GLSLCompiler glsl_compiler;
+    // todo variant
+    // options.AddMacroDefinition("TYPE", "vec4");
 
-    if (!glsl_compiler.compile_to_spirv(stage, convert_to_bytes(glsl_final_source), entry_point, shader_variant, spirv, info_log)) {
-        LOGE("Shader compilation failed for shader \"{}\"", glsl_source)
-        LOGE("{}", info_log)
-        throw VulkanException{VK_ERROR_INITIALIZATION_FAILED};
+    include_file_finder_.search_path().emplace_back(fs::path::get(fs::path::Type::Shaders));
+    auto includer = std::make_unique<FileIncluder>(&include_file_finder_);
+    options.SetIncluder(std::move(includer));
+#ifdef VKB_VULKAN_DEBUG
+    options.SetOptimizationLevel(shaderc_optimization_level_zero);
+#else
+    options.SetOptimizationLevel(shaderc_optimization_level_performance);
+#endif
+
+
+    shaderc_shader_kind kind{};
+    switch (stage) {
+        case VK_SHADER_STAGE_COMPUTE_BIT:
+            kind = shaderc_glsl_compute_shader;
+            break;
+        case VK_SHADER_STAGE_VERTEX_BIT:
+            kind = shaderc_glsl_vertex_shader;
+            break;
+        case VK_SHADER_STAGE_TESSELLATION_CONTROL_BIT:
+            kind = shaderc_glsl_tess_control_shader;
+            break;
+        case VK_SHADER_STAGE_TESSELLATION_EVALUATION_BIT:
+            kind = shaderc_glsl_tess_evaluation_shader;
+            break;
+        case VK_SHADER_STAGE_GEOMETRY_BIT:
+            kind = shaderc_glsl_geometry_shader;
+            break;
+        case VK_SHADER_STAGE_FRAGMENT_BIT:
+            kind = shaderc_glsl_fragment_shader;
+            break;
+        case VK_SHADER_STAGE_RAYGEN_BIT_KHR:
+            kind = shaderc_glsl_raygen_shader;
+            break;
+        case VK_SHADER_STAGE_ANY_HIT_BIT_KHR:
+            kind = shaderc_glsl_anyhit_shader;
+            break;
+        case VK_SHADER_STAGE_CLOSEST_HIT_BIT_KHR:
+            kind = shaderc_glsl_closesthit_shader;
+            break;
+        case VK_SHADER_STAGE_MISS_BIT_KHR:
+            kind = shaderc_glsl_miss_shader;
+            break;
+        case VK_SHADER_STAGE_INTERSECTION_BIT_KHR:
+            kind = shaderc_glsl_intersection_shader;
+            break;
+        case VK_SHADER_STAGE_CALLABLE_BIT_KHR:
+            kind = shaderc_glsl_callable_shader;
+            break;
+        case VK_SHADER_STAGE_TASK_BIT_EXT:
+            kind = shaderc_glsl_task_shader;
+            break;
+        case VK_SHADER_STAGE_MESH_BIT_EXT:
+            kind = shaderc_glsl_mesh_shader;
+            break;
+        case VK_SHADER_STAGE_SUBPASS_SHADING_BIT_HUAWEI:
+        case VK_SHADER_STAGE_CLUSTER_CULLING_BIT_HUAWEI:
+        case VK_SHADER_STAGE_ALL_GRAPHICS:
+        case VK_SHADER_STAGE_ALL:
+            kind = shaderc_glsl_infer_from_source;
+            break;
     }
 
-    SPIRVReflection spirv_reflection;
+    // compile
+    options.SetGenerateDebugInfo();// keep reflection data
+    shaderc::SpvCompilationResult module =
+        compiler.CompileGlslToSpv(source.c_str(), source.size(), kind,
+                                  glsl_source.c_str(), options);
+    if (module.GetCompilationStatus() != shaderc_compilation_status_success) {
+        LOGD(module.GetErrorMessage());
+    }
 
+    spirv = {module.cbegin(), module.cend()};
     // Reflect all shader resources
-    if (!spirv_reflection.reflect_shader_resources(stage, spirv, resources, shader_variant)) {
+    if (!SPIRVReflection::reflect_shader_resources(stage, spirv, resources, shader_variant)) {
         throw VulkanException{VK_ERROR_INITIALIZATION_FAILED};
     }
 
