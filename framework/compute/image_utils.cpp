@@ -21,7 +21,7 @@ void set_device_image_via_staging_buffer(
     staging_buffer_setter(src_staging_ptr, buffer_size_in_bytes);
     stage_buffer.unmap();
 
-    auto &queue = device.get_queue_by_flags(VK_QUEUE_COMPUTE_BIT, 0);
+    auto &queue = device.get_queue_by_flags(VK_QUEUE_TRANSFER_BIT, 0);
     auto &cmd = device.request_command_buffer();
     cmd.begin(VK_COMMAND_BUFFER_USAGE_ONE_TIME_SUBMIT_BIT);
     cmd.image_memory_barrier(device_image, VK_IMAGE_LAYOUT_UNDEFINED,
@@ -46,10 +46,10 @@ void get_device_image_via_staging_buffer(
     size_t buffer_size_in_bytes,
     const std::function<void(void *, size_t)> &staging_buffer_getter) {
     auto stage_buffer = core::Buffer(device, buffer_size_in_bytes,
-                                     VK_BUFFER_USAGE_TRANSFER_SRC_BIT,
-                                     VMA_MEMORY_USAGE_CPU_TO_GPU);
+                                     VK_BUFFER_USAGE_TRANSFER_DST_BIT,
+                                     VMA_MEMORY_USAGE_GPU_TO_CPU);
 
-    auto &queue = device.get_queue_by_flags(VK_QUEUE_COMPUTE_BIT, 0);
+    auto &queue = device.get_queue_by_flags(VK_QUEUE_TRANSFER_BIT, 0);
     auto &cmd = device.request_command_buffer();
     cmd.begin(VK_COMMAND_BUFFER_USAGE_ONE_TIME_SUBMIT_BIT);
     cmd.image_memory_barrier(device_image, from_layout,

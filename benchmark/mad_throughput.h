@@ -17,7 +17,7 @@ public:
 
 private:
     std::unique_ptr<compute::ComputePass> pass{nullptr};
-    std::unique_ptr<ShaderData> shader_data;
+    std::unique_ptr<ShaderData> shader_data{nullptr};
 };
 
 }// namespace vox

@@ -13,12 +13,11 @@ using namespace vox::compute;
 int main(int argc, char **argv) {
     ::benchmark::Initialize(&argc, argv);
     auto context = ComputeContext();
-    auto app = std::make_unique<vox::benchmark::MADThroughPut>();
 
-    for (size_t i = 0; i < context.get_device_count(); i++) {
-        auto resource = context.get_resource(i);
-        app->register_vulkan_benchmarks(resource);
-    }
+    size_t device_index = 1;
+    auto app = std::make_unique<vox::benchmark::MADThroughPut>();
+    auto resource = context.get_resource(device_index);
+    app->register_vulkan_benchmarks(resource);
 
     ::benchmark::RunSpecifiedBenchmarks();
 }

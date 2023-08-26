@@ -32,7 +32,7 @@ static void throughput(::benchmark::State &state,
                                     VK_BUFFER_USAGE_TRANSFER_DST_BIT | VK_BUFFER_USAGE_STORAGE_BUFFER_BIT,
                                     VMA_MEMORY_USAGE_GPU_ONLY);
     auto dst_buffer = core::Buffer(device, dst_size,
-                                   VK_BUFFER_USAGE_TRANSFER_DST_BIT | VK_BUFFER_USAGE_STORAGE_BUFFER_BIT,
+                                   VK_BUFFER_USAGE_TRANSFER_SRC_BIT | VK_BUFFER_USAGE_STORAGE_BUFFER_BIT,
                                    VMA_MEMORY_USAGE_GPU_ONLY);
 
     //===-------------------------------------------------------------------===/
@@ -84,8 +84,8 @@ static void throughput(::benchmark::State &state,
     //===-------------------------------------------------------------------===/
     // Dispatch
     //===-------------------------------------------------------------------===/
-    shader_data->set_buffer_functor("inputA", [&]() -> core::Buffer * { return &src0_buffer; });
-    shader_data->set_buffer_functor("inputB", [&]() -> core::Buffer * { return &src1_buffer; });
+    shader_data->set_buffer_functor("InputA", [&]() -> core::Buffer * { return &src0_buffer; });
+    shader_data->set_buffer_functor("InputB", [&]() -> core::Buffer * { return &src1_buffer; });
     shader_data->set_buffer_functor("Output", [&]() -> core::Buffer * { return &dst_buffer; });
 
     pass->set_dispatch_size({(uint32_t)num_element / (4 * 16), 1, 1});
@@ -98,6 +98,7 @@ static void throughput(::benchmark::State &state,
         resource->submit(cmd);
     }
     device.get_fence_pool().wait();
+    device.get_fence_pool().reset();
 
     //===-------------------------------------------------------------------===/
     // Verify destination buffer data
@@ -140,8 +141,8 @@ static void throughput(::benchmark::State &state,
         query_pool = std::make_unique<core::TimestampQueryPool>(device, 2);
     }
     {
-        core::CommandBuffer &cmd = resource->begin();
         for (auto _ : state) {
+            core::CommandBuffer &cmd = resource->begin();
             cmd.begin(VK_COMMAND_BUFFER_USAGE_ONE_TIME_SUBMIT_BIT);
             if (use_timestamp) cmd.reset_query_pool(query_pool->get_query_pool(), 0, query_pool->get_query_count());
 
@@ -151,7 +152,7 @@ static void throughput(::benchmark::State &state,
             cmd.set_specialization_constant(0, loop_count);
             pass->compute(cmd);
             if (use_timestamp) {
-                cmd.write_timestamp(VK_PIPELINE_STAGE_TOP_OF_PIPE_BIT, query_pool->get_query_pool(), 0);
+                cmd.write_timestamp(VK_PIPELINE_STAGE_BOTTOM_OF_PIPE_BIT, query_pool->get_query_pool(), 1);
             }
 
             cmd.end();
@@ -160,9 +161,7 @@ static void throughput(::benchmark::State &state,
             resource->submit(cmd);
             device.get_fence_pool().wait();
             auto end_time = std::chrono::high_resolution_clock::now();
-            auto elapsed_seconds =
-                std::chrono::duration_cast<std::chrono::duration<double>>(end_time -
-                                                                          start_time);
+            auto elapsed_seconds = std::chrono::duration_cast<std::chrono::duration<double>>(end_time - start_time);
 
             switch (resource->latency_measure.mode) {
                 case compute::LatencyMeasureMode::kSystemDispatch: {
@@ -177,7 +176,6 @@ static void throughput(::benchmark::State &state,
                     state.SetIterationTime(timestamp_seconds);
                 } break;
             }
-            cmd.reset(core::CommandBuffer::ResetMode::ResetIndividually);
         }
         double numOperation = double(num_element) * 2. /*fma*/ *
                               10. /*10 elements per loop iteration*/ *
