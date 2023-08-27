@@ -37,7 +37,7 @@ cmake_minimum_required(VERSION 3.16)
 # globally add VKB_DEBUG for the debug build
 add_compile_definitions($<$<CONFIG:DEBUG>:VKB_DEBUG>)
 
-project(vkCompute)
+project(vkCompute LANGUAGES CXX)
 
 # Add path for local cmake scripts
 list(APPEND CMAKE_MODULE_PATH
@@ -63,6 +63,24 @@ add_subdirectory(framework)
 add_subdirectory(application)
 add_subdirectory(apps)
 add_subdirectory(benchmark)
+
+# CUDA
+option(USE_CUDA "Use CUDA features" ON)
+if (USE_CUDA)
+    find_package(CUDA)
+
+    if (CUDA_FOUND)
+        set(CMAKE_CUDA_ARCHITECTURES 86)
+        set(CMAKE_CUDA_COMPILER /usr/local/cuda/bin/nvcc)
+        enable_language(CUDA)
+    else()
+        set(USE_CUDA OFF)
+    endif()
+endif()
+
+if (USE_CUDA)
+    add_subdirectory(cuda)
+endif ()
 
 if (VKB_BUILD_TESTS)
     # Add vulkan tests
