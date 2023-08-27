@@ -243,6 +243,10 @@ set(LINUX_D2D_FILES
         platform/unix/unix_d2d_platform.cpp
         platform/unix/direct_window.cpp)
 
+set(CUDA_INTEROP_FILES
+        cuda-interop/VulkanBaseApp.cpp
+        cuda-interop/main.cpp)
+
 source_group("\\" FILES ${FRAMEWORK_FILES})
 source_group("common\\" FILES ${COMMON_FILES})
 source_group("platform\\" FILES ${PLATFORM_FILES})
@@ -264,6 +268,7 @@ set(PROJECT_FILES
         ${COMPUTE_FILES}
         ${STATS_FILES}
         ${SHADER_FILES}
+        ${CUDA_INTEROP_FILES}
 )
 
 # Add files based on platform
@@ -294,15 +299,6 @@ endif ()
 #NB: switch this to shared library and things stop working. (there is likely two copies of volk somewhere.
 add_library(${PROJECT_NAME} OBJECT ${PROJECT_FILES})
 set_target_properties(${PROJECT_NAME} PROPERTIES POSITION_INDEPENDENT_CODE ON)
-
-# compiler flags based on compiler type
-if (NOT MSVC)
-    target_compile_options(${PROJECT_NAME} PUBLIC -fexceptions)
-endif ()
-
-if (MSVC)
-    target_compile_options(${PROJECT_NAME} PUBLIC /MP)
-endif ()
 
 if (${VKB_VALIDATION_LAYERS})
     target_compile_definitions(${PROJECT_NAME} PUBLIC VKB_VALIDATION_LAYERS)

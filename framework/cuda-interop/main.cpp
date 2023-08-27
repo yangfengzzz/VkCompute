@@ -31,11 +31,12 @@
 #include <iomanip>
 #include <chrono>
 #include <algorithm>
-#include "linmath.h"
+#include <volk.h>
+#include "../../cuda/linmath.h"
 
-#include "SineWaveSimulation.h"
+#include "../../cuda/SineWaveSimulation.h"
 
-#include <helper_cuda.h>
+#include "../../cuda/utils/helper_cuda.h"
 
 typedef float vec2[2];
 std::string execution_path;

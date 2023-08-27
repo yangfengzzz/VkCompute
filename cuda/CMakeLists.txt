@@ -9,8 +9,9 @@ cmake_minimum_required(VERSION 3.16)
 project(cuda-framework LANGUAGES C CXX CUDA)
 
 set(PROJECT_FILES
-        SineWaveSimulation.cu
-        SineWaveSimulation.h
+        cuda_device.cpp
+        cuda_stream.cpp
+        sine_wave_simulation.cu
 )
 
 # mask out the min/max macros from minwindef.h
@@ -26,6 +27,7 @@ target_include_directories(${PROJECT_NAME} PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})
 
 # Link third party libraries
 target_link_libraries(${PROJECT_NAME} PUBLIC
+        framework
         spdlog
 )
 

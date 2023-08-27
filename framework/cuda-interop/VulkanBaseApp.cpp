@@ -34,10 +34,11 @@
 #include <stdexcept>
 #include <iostream>
 #include <fstream>
-#include <algorithm>
 #include <functional>
 #include <set>
-#include <string.h>
+#include <cstring>
+#include <volk.h>
+#include <limits>
 
 #include "VulkanBaseApp.h"
 
