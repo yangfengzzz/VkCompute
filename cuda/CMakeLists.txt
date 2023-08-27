@@ -12,6 +12,7 @@ set(PROJECT_FILES
         cuda_device.cpp
         cuda_stream.cpp
         cuda_external_buffer.cpp
+        cuda_external_semaphore.cpp
         sine_wave_simulation.cu
 )
 

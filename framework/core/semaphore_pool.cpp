@@ -88,4 +88,20 @@ uint32_t SemaphorePool::get_active_semaphore_count() const {
     return active_semaphore_count;
 }
 
+int SemaphorePool::get_semaphore_handle(VkDevice device, VkSemaphore semaphore, VkExternalSemaphoreHandleTypeFlagBits handleType) {
+    int fd;
+
+    VkSemaphoreGetFdInfoKHR semaphoreGetFdInfoKHR = {};
+    semaphoreGetFdInfoKHR.sType = VK_STRUCTURE_TYPE_SEMAPHORE_GET_FD_INFO_KHR;
+    semaphoreGetFdInfoKHR.pNext = NULL;
+    semaphoreGetFdInfoKHR.semaphore = semaphore;
+    semaphoreGetFdInfoKHR.handleType = handleType;
+
+    if (vkGetSemaphoreFdKHR(device, &semaphoreGetFdInfoKHR, &fd) != VK_SUCCESS) {
+        LOGE("Failed to retrieve handle for semaphore!");
+    }
+
+    return fd;
+}
+
 }// namespace vox::core

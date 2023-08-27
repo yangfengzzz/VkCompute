@@ -10,6 +10,7 @@
 namespace vox::compute {
 CudaExternalBuffer::CudaExternalBuffer(core::Buffer &buffer, VkExternalMemoryHandleTypeFlagBits handleType) {
     cudaExternalMemoryHandleDesc externalMemoryHandleDesc = {};
+    externalMemoryHandleDesc.type = cudaExternalMemoryHandleTypeOpaqueFd;
     externalMemoryHandleDesc.size = buffer.get_size();
     externalMemoryHandleDesc.handle.fd = buffer.get_memory_handle(handleType);
     checkCudaErrors(cudaImportExternalMemory(&cuda_mem, &externalMemoryHandleDesc));
