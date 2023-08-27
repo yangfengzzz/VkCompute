@@ -69,6 +69,8 @@ public:
 
     [[nodiscard]] VkDeviceMemory get_memory() const;
 
+    [[nodiscard]] int get_memory_handle(VkExternalMemoryHandleTypeFlagBits handleType) const;
+
     /**
 	 * @brief Flushes memory if it is HOST_VISIBLE and not HOST_COHERENT
 	 */
@@ -100,7 +102,7 @@ public:
 	 * @param size The amount of bytes to copy
 	 * @param offset The offset to start the copying into the mapped data
 	 */
-    void update(const uint8_t *data, size_t size, size_t offset = 0);
+    void update(const uint8_t *data, size_t bytes_size, size_t offset = 0);
 
     /**
 	 * @brief Converts any non byte data into bytes and then updates the buffer
@@ -108,7 +110,7 @@ public:
 	 * @param size The amount of bytes to copy
 	 * @param offset The offset to start the copying into the mapped data
 	 */
-    void update(void *data, size_t size, size_t offset = 0);
+    void update(void *data, size_t bytes_size, size_t offset = 0);
 
     /**
 	 * @brief Copies a vector of bytes into the buffer
@@ -132,6 +134,11 @@ public:
      * with the VK_BUFFER_USAGE_SHADER_DEVICE_ADDRESS_BIT usage fla)
 	 */
     uint64_t get_device_address();
+
+public:
+    static VkExternalMemoryHandleTypeFlagBits get_default_mem_handle_type() {
+        return VK_EXTERNAL_MEMORY_HANDLE_TYPE_OPAQUE_FD_BIT;
+    }
 
 private:
     VmaAllocation allocation{VK_NULL_HANDLE};

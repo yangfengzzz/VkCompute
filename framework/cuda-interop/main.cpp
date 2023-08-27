@@ -34,7 +34,7 @@
 #include <volk.h>
 #include "../../cuda/linmath.h"
 
-#include "../../cuda/SineWaveSimulation.h"
+#include "../../cuda/sine_wave_simulation.h"
 
 #include "../../cuda/utils/helper_cuda.h"
 

@@ -11,6 +11,7 @@ project(cuda-framework LANGUAGES C CXX CUDA)
 set(PROJECT_FILES
         cuda_device.cpp
         cuda_stream.cpp
+        cuda_external_buffer.cpp
         sine_wave_simulation.cu
 )
 

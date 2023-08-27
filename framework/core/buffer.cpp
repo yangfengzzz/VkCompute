@@ -118,20 +118,35 @@ uint64_t Buffer::get_device_address() {
     return vkGetBufferDeviceAddressKHR(device->get_handle(), &buffer_device_address_info);
 }
 
-void Buffer::update(void *data, size_t size, size_t offset) {
-    update(reinterpret_cast<const uint8_t *>(data), size, offset);
+void Buffer::update(void *data, size_t bytes_size, size_t offset) {
+    update(reinterpret_cast<const uint8_t *>(data), bytes_size, offset);
 }
 
-void Buffer::update(const uint8_t *data, const size_t size, const size_t offset) {
+void Buffer::update(const uint8_t *data, const size_t bytes_size, const size_t offset) {
     if (persistent) {
-        std::copy(data, data + size, mapped_data + offset);
+        std::copy(data, data + bytes_size, mapped_data + offset);
         flush();
     } else {
         map();
-        std::copy(data, data + size, mapped_data + offset);
+        std::copy(data, data + bytes_size, mapped_data + offset);
         flush();
         unmap();
     }
+}
+
+int Buffer::get_memory_handle(VkExternalMemoryHandleTypeFlagBits handleType) const {
+    int fd = -1;
+
+    VkMemoryGetFdInfoKHR vkMemoryGetFdInfoKHR = {};
+    vkMemoryGetFdInfoKHR.sType = VK_STRUCTURE_TYPE_MEMORY_GET_FD_INFO_KHR;
+    vkMemoryGetFdInfoKHR.pNext = NULL;
+    vkMemoryGetFdInfoKHR.memory = memory;
+    vkMemoryGetFdInfoKHR.handleType = handleType;
+
+    if (vkGetMemoryFdKHR(device->get_handle(), &vkMemoryGetFdInfoKHR, &fd) != VK_SUCCESS) {
+        LOGE("Failed to retrieve handle for buffer!");
+    }
+    return fd;
 }
 
 }// namespace vox::core
