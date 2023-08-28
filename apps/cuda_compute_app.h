@@ -21,8 +21,6 @@ public:
 
     void load_scene() override;
 
-    void update_gpu_task(core::CommandBuffer &command_buffer) override;
-
 public:
     void init_buffer(core::Buffer& index_buffer);
 
@@ -32,10 +30,7 @@ public:
 
 private:
     std::unique_ptr<compute::CudaDevice> cuda_device{nullptr};
-    std::unique_ptr<compute::CudaStream> cuda_stream{nullptr};
     std::unique_ptr<compute::SineWaveSimulation> cuda_sim{nullptr};
-
-    std::unique_ptr<compute::CudaExternalBuffer> cuda_height_buffer{nullptr};
 
     std::unique_ptr<core::BufferPool> external_pool{nullptr};
     std::unique_ptr<core::Buffer> height_buffer{nullptr};
@@ -43,6 +38,9 @@ private:
 
     std::shared_ptr<BufferMesh> mesh{nullptr};
     std::shared_ptr<Material> material_{nullptr};
+
+    std::unique_ptr<core::Semaphore> wait_semaphore{nullptr};
+    std::unique_ptr<core::Semaphore> signal_semaphore{nullptr};
 };
 
 }// namespace vox

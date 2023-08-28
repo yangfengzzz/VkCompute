@@ -23,12 +23,40 @@ public:
         fragment_source_ = ShaderManager::get_singleton().load_shader("base/sinwave.frag", VK_SHADER_STAGE_FRAGMENT_BIT);
     }
 };
+
+class CudaExecuteScript : public Script {
+public:
+    explicit CudaExecuteScript(Entity *pEntity) : Script(pEntity) {
+    }
+
+    void init(compute::SineWaveSimulation *sim, core::Buffer &buffer, core::Semaphore& wait_semaphore, core::Semaphore& signal_semaphore) {
+        cuda_sim = sim;
+        cuda_height_buffer = std::make_unique<compute::CudaExternalBuffer>(buffer);
+        cuda_stream = std::make_unique<compute::CudaStream>(sim->get_device());
+        cuda_wait_semaphore = std::make_unique<compute::CudaExternalSemaphore>(wait_semaphore);
+        cuda_signal_semaphore = std::make_unique<compute::CudaExternalSemaphore>(signal_semaphore);
+    }
+
+    void on_update(float delta_time) override {
+        cuda_wait_semaphore->wait(*cuda_stream);
+        cuda_sim->step_simulation(delta_time, static_cast<float *>(cuda_height_buffer->get_cuda_buffer()), *cuda_stream);
+        cuda_signal_semaphore->signal(*cuda_stream);
+    }
+
+private:
+    std::unique_ptr<compute::CudaExternalBuffer> cuda_height_buffer{nullptr};
+    std::unique_ptr<compute::CudaStream> cuda_stream{nullptr};
+    compute::SineWaveSimulation *cuda_sim{nullptr};
+    
+    std::unique_ptr<compute::CudaExternalSemaphore> cuda_wait_semaphore{nullptr};
+    std::unique_ptr<compute::CudaExternalSemaphore> cuda_signal_semaphore{nullptr};
+};
+
 }// namespace
 
 bool CudaComputeApp::prepare(const ApplicationOptions &options) {
     ForwardApplication::prepare(options);
     cuda_device = std::make_unique<compute::CudaDevice>(device->get_gpu().get_device_id_properties().deviceUUID, VK_UUID_SIZE);
-    cuda_stream = std::make_unique<compute::CudaStream>(*cuda_device);
     cuda_sim = std::make_unique<compute::SineWaveSimulation>((1ULL << 8ULL), (1ULL << 8ULL), *cuda_device);
 
     VkExportMemoryAllocateInfoKHR vulkanExportMemoryAllocateInfoKHR = {};
@@ -44,7 +72,6 @@ bool CudaComputeApp::prepare(const ApplicationOptions &options) {
     height_buffer = std::make_unique<core::Buffer>(*device, n_verts * sizeof(float),
                                                    VK_BUFFER_USAGE_TRANSFER_DST_BIT | VK_BUFFER_USAGE_VERTEX_BUFFER_BIT,
                                                    VMA_MEMORY_USAGE_GPU_ONLY, external_pool.get());
-    cuda_height_buffer = std::make_unique<compute::CudaExternalBuffer>(*height_buffer);
 
     auto index_buffer = core::Buffer(*device, n_inds * sizeof(uint32_t),
                                      VK_BUFFER_USAGE_TRANSFER_DST_BIT | VK_BUFFER_USAGE_INDEX_BUFFER_BIT,
@@ -63,6 +90,12 @@ bool CudaComputeApp::prepare(const ApplicationOptions &options) {
     mesh->set_index_buffer_binding(std::make_unique<IndexBufferBinding>(std::move(index_buffer), VK_INDEX_TYPE_UINT32));
     mesh->set_vertex_buffer_binding(0, height_buffer.get());
     mesh->set_vertex_buffer_binding(1, xy_buffer.get());
+
+    wait_semaphore = std::make_unique<core::Semaphore>(*device);
+    signal_semaphore = std::make_unique<core::Semaphore>(*device);
+    render_context->external_signal_semaphores.emplace_back(signal_semaphore.get());
+    render_context->external_wait_semaphores.emplace_back(wait_semaphore.get());
+
     return true;
 }
 
@@ -82,11 +115,10 @@ void CudaComputeApp::load_scene() {
     material_ = std::make_shared<CustomMaterial>(*device);
     renderer->set_material(material_);
 
-    scene->play();
-}
+    auto cuda_execute = cube_entity->add_component<CudaExecuteScript>();
+    cuda_execute->init(cuda_sim.get(), *height_buffer, *wait_semaphore, *signal_semaphore);
 
-void CudaComputeApp::update_gpu_task(core::CommandBuffer &command_buffer) {
-    cuda_sim->step_simulation(1 / 60, static_cast<float *>(cuda_height_buffer->get_cuda_buffer()), *cuda_stream);
+    scene->play();
 }
 
 void CudaComputeApp::get_vertex_descriptions(

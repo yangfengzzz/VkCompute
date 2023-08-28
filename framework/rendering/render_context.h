@@ -48,6 +48,9 @@ namespace rendering {
  */
 class RenderContext {
 public:
+    std::vector<core::Semaphore *> external_wait_semaphores{};
+    std::vector<core::Semaphore *> external_signal_semaphores{};
+
     // The format to use for the RenderTargets if a swapchain isn't created
     static VkFormat DEFAULT_VK_FORMAT;
 
@@ -152,7 +155,7 @@ public:
     void begin_frame();
 
     core::Semaphore &submit(const core::Queue &queue, const std::vector<core::CommandBuffer *> &command_buffers,
-                            core::Semaphore* wait_semaphore, VkPipelineStageFlags wait_pipeline_stage);
+                            core::Semaphore *wait_semaphore, VkPipelineStageFlags wait_pipeline_stage);
 
     /**
 	 * @brief Submits a command buffer related to a frame to a queue
@@ -164,7 +167,7 @@ public:
 	 */
     virtual void wait_frame();
 
-    void end_frame(core::Semaphore* semaphore);
+    void end_frame(core::Semaphore *semaphore);
 
     /**
 	 * @brief An error should be raised if the frame is not active.

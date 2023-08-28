@@ -7,18 +7,22 @@
 #pragma once
 
 #include "core/semaphore.h"
-#include <cuda_runtime_api.h>
+#include "cuda_stream.h"
 
 namespace vox::compute {
 class CudaExternalSemaphore {
 public:
-    CudaExternalSemaphore(core::Semaphore semaphore,
-                          VkExternalSemaphoreHandleTypeFlagBits handleType = core::Semaphore::get_default_semaphore_handle_type());
+    explicit CudaExternalSemaphore(core::Semaphore &semaphore,
+                                   VkExternalSemaphoreHandleTypeFlagBits handleType = core::Semaphore::get_default_semaphore_handle_type());
 
     ~CudaExternalSemaphore();
 
+    void wait(CudaStream &stream);
+
+    void signal(CudaStream &stream);
+
 private:
-    cudaExternalSemaphore_t cuda_semaphore;
+    cudaExternalSemaphore_t cuda_semaphore{};
 };
 
 }// namespace vox::compute

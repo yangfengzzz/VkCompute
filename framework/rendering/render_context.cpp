@@ -297,14 +297,27 @@ core::Semaphore &RenderContext::submit(const core::Queue &queue, const std::vect
     submit_info.commandBufferCount = to_u32(cmd_buf_handles.size());
     submit_info.pCommandBuffers = cmd_buf_handles.data();
 
+    std::vector<VkSemaphore> wait_semaphores;
+    wait_semaphores.reserve(external_wait_semaphores.size());
+    for (const auto &external : external_wait_semaphores) {
+        wait_semaphores.emplace_back(external->get_handle());
+    }
+
     if (wait_semaphore != nullptr) {
-        submit_info.waitSemaphoreCount = 1;
-        submit_info.pWaitSemaphores = &wait_semaphore->get_handle();
+        wait_semaphores.emplace_back(wait_semaphore->get_handle());
+        submit_info.waitSemaphoreCount = wait_semaphores.size();
+        submit_info.pWaitSemaphores = wait_semaphores.data();
         submit_info.pWaitDstStageMask = &wait_pipeline_stage;
     }
 
-    submit_info.signalSemaphoreCount = 1;
-    submit_info.pSignalSemaphores = &signal_semaphore.get_handle();
+    std::vector<VkSemaphore> signal_semaphores;
+    signal_semaphores.reserve(external_signal_semaphores.size() + 1);
+    for (const auto &external : external_signal_semaphores) {
+        signal_semaphores.emplace_back(external->get_handle());
+    }
+    signal_semaphores.emplace_back(signal_semaphore.get_handle());
+    submit_info.signalSemaphoreCount = signal_semaphores.size();
+    submit_info.pSignalSemaphores = signal_semaphores.data();
 
     VkFence fence = frame.request_fence();
 
