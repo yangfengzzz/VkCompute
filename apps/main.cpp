@@ -42,7 +42,7 @@ CUSTOM_MAIN(context) {
     auto code = platform.initialize();
 
     if (code == vox::ExitCode::Success) {
-        auto app = std::make_unique<vox::AtomicComputeApp>();
+        auto app = std::make_unique<vox::CudaComputeApp>();
         app->prepare({false, &platform.get_window()});
         platform.set_callback([&](float delta_time) { app->update(delta_time); },
                               [&](uint32_t width, uint32_t height) {

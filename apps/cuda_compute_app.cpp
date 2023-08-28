@@ -19,8 +19,8 @@ namespace {
 class CustomMaterial : public BaseMaterial {
 public:
     explicit CustomMaterial(core::Device &device) : BaseMaterial(device, "waveRender") {
-        vertex_source_ = ShaderManager::get_singleton().load_shader("base/sinwave.vert", VK_SHADER_STAGE_VERTEX_BIT);
-        fragment_source_ = ShaderManager::get_singleton().load_shader("base/sinwave.frag", VK_SHADER_STAGE_FRAGMENT_BIT);
+        vertex_source_ = ShaderManager::get_singleton().load_shader("base/sinewave.vert", VK_SHADER_STAGE_VERTEX_BIT);
+        fragment_source_ = ShaderManager::get_singleton().load_shader("base/sinewave.frag", VK_SHADER_STAGE_FRAGMENT_BIT);
     }
 };
 
@@ -29,7 +29,7 @@ public:
     explicit CudaExecuteScript(Entity *pEntity) : Script(pEntity) {
     }
 
-    void init(compute::SineWaveSimulation *sim, core::Buffer &buffer, core::Semaphore& wait_semaphore, core::Semaphore& signal_semaphore) {
+    void init(compute::SineWaveSimulation *sim, core::Buffer &buffer, core::Semaphore &wait_semaphore, core::Semaphore &signal_semaphore) {
         cuda_sim = sim;
         cuda_height_buffer = std::make_unique<compute::CudaExternalBuffer>(buffer);
         cuda_stream = std::make_unique<compute::CudaStream>(sim->get_device());
@@ -47,7 +47,7 @@ private:
     std::unique_ptr<compute::CudaExternalBuffer> cuda_height_buffer{nullptr};
     std::unique_ptr<compute::CudaStream> cuda_stream{nullptr};
     compute::SineWaveSimulation *cuda_sim{nullptr};
-    
+
     std::unique_ptr<compute::CudaExternalSemaphore> cuda_wait_semaphore{nullptr};
     std::unique_ptr<compute::CudaExternalSemaphore> cuda_signal_semaphore{nullptr};
 };
