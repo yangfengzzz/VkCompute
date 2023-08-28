@@ -20,10 +20,15 @@ public:
         return pool;
     }
 
+    bool is_exported() {
+        return is_exported_;
+    }
+
     ~BufferPool();
 
 private:
     Device &device;
     VmaPool pool;
+    bool is_exported_{false};
 };
 }// namespace vox::core

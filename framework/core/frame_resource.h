@@ -70,9 +70,11 @@ public:
 
     [[nodiscard]] const SemaphorePool &get_semaphore_pool() const;
 
-    VkSemaphore request_semaphore();
-    VkSemaphore request_semaphore_with_ownership();
-    void release_owned_semaphore(VkSemaphore semaphore);
+    Semaphore& request_semaphore();
+
+    Semaphore request_semaphore_with_ownership();
+
+    void release_owned_semaphore(Semaphore semaphore);
 
     /**
 	 * @brief Requests a command buffer to the command pool of the active frame

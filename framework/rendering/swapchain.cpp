@@ -8,6 +8,7 @@
 
 #include "common/logging.h"
 #include "core/device.h"
+#include "core/semaphore.h"
 
 namespace vox::rendering {
 
@@ -402,8 +403,9 @@ VkSwapchainKHR Swapchain::get_handle() const {
     return handle;
 }
 
-VkResult Swapchain::acquire_next_image(uint32_t &image_index, VkSemaphore image_acquired_semaphore, VkFence fence) const {
-    return vkAcquireNextImageKHR(device.get_handle(), handle, std::numeric_limits<uint64_t>::max(), image_acquired_semaphore, fence, &image_index);
+VkResult Swapchain::acquire_next_image(uint32_t &image_index, const core::Semaphore& image_acquired_semaphore, VkFence fence) const {
+    return vkAcquireNextImageKHR(device.get_handle(), handle, std::numeric_limits<uint64_t>::max(),
+                                 image_acquired_semaphore.get_handle(), fence, &image_index);
 }
 
 const VkExtent2D &Swapchain::get_extent() const {

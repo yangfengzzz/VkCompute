@@ -216,7 +216,7 @@ core::CommandBuffer &RenderContext::begin(core::CommandBuffer::ResetMode reset_m
         begin_frame();
     }
 
-    if (acquired_semaphore == VK_NULL_HANDLE) {
+    if (!acquired_semaphore.has_value()) {
         throw std::runtime_error("Couldn't begin frame");
     }
 
@@ -231,11 +231,11 @@ void RenderContext::submit(core::CommandBuffer &command_buffer) {
 void RenderContext::submit(const std::vector<core::CommandBuffer *> &command_buffers) {
     assert(frame_active && "RenderContext is inactive, cannot submit command buffer. Please call begin()");
 
-    VkSemaphore render_semaphore = VK_NULL_HANDLE;
+    core::Semaphore *render_semaphore = nullptr;
 
     if (swapchain) {
         assert(acquired_semaphore && "We do not have acquired_semaphore, it was probably consumed?\n");
-        render_semaphore = submit(queue, command_buffers, acquired_semaphore, VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT);
+        render_semaphore = &submit(queue, command_buffers, &acquired_semaphore.value(), VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT);
     } else {
         submit(queue, command_buffers);
     }
@@ -256,16 +256,16 @@ void RenderContext::begin_frame() {
 
     // We will use the acquired semaphore in a different frame context,
     // so we need to hold ownership.
-    acquired_semaphore = prev_frame.request_semaphore_with_ownership();
+    acquired_semaphore.emplace(prev_frame.request_semaphore_with_ownership());
 
     if (swapchain) {
-        auto result = swapchain->acquire_next_image(active_frame_index, acquired_semaphore, VK_NULL_HANDLE);
+        auto result = swapchain->acquire_next_image(active_frame_index, acquired_semaphore.value(), VK_NULL_HANDLE);
 
         if (result == VK_SUBOPTIMAL_KHR || result == VK_ERROR_OUT_OF_DATE_KHR) {
             bool swapchain_updated = handle_surface_changes(result == VK_ERROR_OUT_OF_DATE_KHR);
 
             if (swapchain_updated) {
-                result = swapchain->acquire_next_image(active_frame_index, acquired_semaphore, VK_NULL_HANDLE);
+                result = swapchain->acquire_next_image(active_frame_index, acquired_semaphore.value(), VK_NULL_HANDLE);
             }
         }
 
@@ -282,28 +282,29 @@ void RenderContext::begin_frame() {
     wait_frame();
 }
 
-VkSemaphore RenderContext::submit(const core::Queue &queue, const std::vector<core::CommandBuffer *> &command_buffers,
-                                  VkSemaphore wait_semaphore, VkPipelineStageFlags wait_pipeline_stage) {
+core::Semaphore &RenderContext::submit(const core::Queue &queue, const std::vector<core::CommandBuffer *> &command_buffers,
+                                       core::Semaphore *wait_semaphore, VkPipelineStageFlags wait_pipeline_stage) {
     std::vector<VkCommandBuffer> cmd_buf_handles(command_buffers.size(), VK_NULL_HANDLE);
-    std::transform(command_buffers.begin(), command_buffers.end(), cmd_buf_handles.begin(), [](const core::CommandBuffer *cmd_buf) { return cmd_buf->get_handle(); });
+    std::transform(command_buffers.begin(), command_buffers.end(), cmd_buf_handles.begin(),
+                   [](const core::CommandBuffer *cmd_buf) { return cmd_buf->get_handle(); });
 
     RenderFrame &frame = get_active_frame();
 
-    VkSemaphore signal_semaphore = frame.request_semaphore();
+    core::Semaphore &signal_semaphore = frame.request_semaphore();
 
     VkSubmitInfo submit_info{VK_STRUCTURE_TYPE_SUBMIT_INFO};
 
     submit_info.commandBufferCount = to_u32(cmd_buf_handles.size());
     submit_info.pCommandBuffers = cmd_buf_handles.data();
 
-    if (wait_semaphore != VK_NULL_HANDLE) {
+    if (wait_semaphore != nullptr) {
         submit_info.waitSemaphoreCount = 1;
-        submit_info.pWaitSemaphores = &wait_semaphore;
+        submit_info.pWaitSemaphores = &wait_semaphore->get_handle();
         submit_info.pWaitDstStageMask = &wait_pipeline_stage;
     }
 
     submit_info.signalSemaphoreCount = 1;
-    submit_info.pSignalSemaphores = &signal_semaphore;
+    submit_info.pSignalSemaphores = &signal_semaphore.get_handle();
 
     VkFence fence = frame.request_fence();
 
@@ -314,7 +315,8 @@ VkSemaphore RenderContext::submit(const core::Queue &queue, const std::vector<co
 
 void RenderContext::submit(const core::Queue &queue, const std::vector<core::CommandBuffer *> &command_buffers) {
     std::vector<VkCommandBuffer> cmd_buf_handles(command_buffers.size(), VK_NULL_HANDLE);
-    std::transform(command_buffers.begin(), command_buffers.end(), cmd_buf_handles.begin(), [](const core::CommandBuffer *cmd_buf) { return cmd_buf->get_handle(); });
+    std::transform(command_buffers.begin(), command_buffers.end(), cmd_buf_handles.begin(),
+                   [](const core::CommandBuffer *cmd_buf) { return cmd_buf->get_handle(); });
 
     RenderFrame &frame = get_active_frame();
 
@@ -333,7 +335,7 @@ void RenderContext::wait_frame() {
     frame.reset();
 }
 
-void RenderContext::end_frame(VkSemaphore semaphore) {
+void RenderContext::end_frame(core::Semaphore *semaphore) {
     assert(frame_active && "Frame is not active, please call begin_frame");
 
     if (swapchain) {
@@ -342,7 +344,9 @@ void RenderContext::end_frame(VkSemaphore semaphore) {
         VkPresentInfoKHR present_info{VK_STRUCTURE_TYPE_PRESENT_INFO_KHR};
 
         present_info.waitSemaphoreCount = 1;
-        present_info.pWaitSemaphores = &semaphore;
+        if (semaphore) {
+            present_info.pWaitSemaphores = &semaphore->get_handle();
+        }
         present_info.swapchainCount = 1;
         present_info.pSwapchains = &vk_swapchain;
         present_info.pImageIndices = &active_frame_index;
@@ -363,17 +367,15 @@ void RenderContext::end_frame(VkSemaphore semaphore) {
 
     // Frame is not active anymore
     if (acquired_semaphore) {
-        release_owned_semaphore(acquired_semaphore);
-        acquired_semaphore = VK_NULL_HANDLE;
+        release_owned_semaphore(std::move(*acquired_semaphore));
+        acquired_semaphore = std::nullopt;
     }
     frame_active = false;
 }
 
-VkSemaphore RenderContext::consume_acquired_semaphore() {
+core::Semaphore RenderContext::consume_acquired_semaphore() {
     assert(frame_active && "Frame is not active, please call begin_frame");
-    auto sem = acquired_semaphore;
-    acquired_semaphore = VK_NULL_HANDLE;
-    return sem;
+    return std::move(*acquired_semaphore);
 }
 
 RenderFrame &RenderContext::get_active_frame() {
@@ -393,19 +395,19 @@ RenderFrame &RenderContext::get_last_rendered_frame() {
     return *frames[active_frame_index];
 }
 
-VkSemaphore RenderContext::request_semaphore() {
+core::Semaphore &RenderContext::request_semaphore() {
     RenderFrame &frame = get_active_frame();
     return frame.request_semaphore();
 }
 
-VkSemaphore RenderContext::request_semaphore_with_ownership() {
+core::Semaphore RenderContext::request_semaphore_with_ownership() {
     RenderFrame &frame = get_active_frame();
     return frame.request_semaphore_with_ownership();
 }
 
-void RenderContext::release_owned_semaphore(VkSemaphore semaphore) {
+void RenderContext::release_owned_semaphore(core::Semaphore semaphore) {
     RenderFrame &frame = get_active_frame();
-    frame.release_owned_semaphore(semaphore);
+    frame.release_owned_semaphore(std::move(semaphore));
 }
 
 core::Device &RenderContext::get_device() {

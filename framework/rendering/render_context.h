@@ -15,6 +15,7 @@
 #include "core/pipeline.h"
 #include "core/pipeline_layout.h"
 #include "core/queue.h"
+#include "core/semaphore.h"
 #include "core/render_pass.h"
 #include "core/pipeline_state.h"
 #include "core/resource_cache.h"
@@ -23,6 +24,7 @@
 #include "rendering/swapchain.h"
 #include "rendering/framebuffer.h"
 #include "shader/shader_module.h"
+#include <optional>
 
 namespace vox {
 class Window;
@@ -149,8 +151,8 @@ public:
 	 */
     void begin_frame();
 
-    VkSemaphore submit(const core::Queue &queue, const std::vector<core::CommandBuffer *> &command_buffers,
-                       VkSemaphore wait_semaphore, VkPipelineStageFlags wait_pipeline_stage);
+    core::Semaphore &submit(const core::Queue &queue, const std::vector<core::CommandBuffer *> &command_buffers,
+                            core::Semaphore* wait_semaphore, VkPipelineStageFlags wait_pipeline_stage);
 
     /**
 	 * @brief Submits a command buffer related to a frame to a queue
@@ -162,7 +164,7 @@ public:
 	 */
     virtual void wait_frame();
 
-    void end_frame(VkSemaphore semaphore);
+    void end_frame(core::Semaphore* semaphore);
 
     /**
 	 * @brief An error should be raised if the frame is not active.
@@ -185,9 +187,11 @@ public:
 	 */
     RenderFrame &get_last_rendered_frame();
 
-    VkSemaphore request_semaphore();
-    VkSemaphore request_semaphore_with_ownership();
-    void release_owned_semaphore(VkSemaphore semaphore);
+    core::Semaphore &request_semaphore();
+
+    core::Semaphore request_semaphore_with_ownership();
+
+    void release_owned_semaphore(core::Semaphore semaphore);
 
     core::Device &get_device();
 
@@ -211,7 +215,7 @@ public:
 	 * @brief Returns the WSI acquire semaphore. Only to be used in very special circumstances.
 	 * @return The WSI acquire semaphore.
 	 */
-    VkSemaphore consume_acquired_semaphore();
+    core::Semaphore consume_acquired_semaphore();
 
 protected:
     VkExtent2D surface_extent;
@@ -230,7 +234,7 @@ private:
 
     std::vector<std::unique_ptr<RenderFrame>> frames;
 
-    VkSemaphore acquired_semaphore{};
+    std::optional<core::Semaphore> acquired_semaphore{std::nullopt};
 
     bool prepared{false};
 

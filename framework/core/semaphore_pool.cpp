@@ -14,63 +14,37 @@ SemaphorePool::SemaphorePool(Device &device) : device{device} {
 
 SemaphorePool::~SemaphorePool() {
     reset();
-
-    // Destroy all semaphores
-    for (VkSemaphore semaphore : semaphores) {
-        vkDestroySemaphore(device.get_handle(), semaphore, nullptr);
-    }
-
     semaphores.clear();
 }
 
-VkSemaphore SemaphorePool::request_semaphore_with_ownership() {
+Semaphore SemaphorePool::request_semaphore_with_ownership() {
     // Check if there is an available semaphore, if so, just pilfer one.
     if (active_semaphore_count < semaphores.size()) {
-        VkSemaphore semaphore = semaphores.back();
+        Semaphore semaphore = std::move(semaphores.back());
         semaphores.pop_back();
         return semaphore;
     }
 
-    // Otherwise, we need to create one, and don't keep track of it, app will release.
-    VkSemaphore semaphore{VK_NULL_HANDLE};
-
-    VkSemaphoreCreateInfo create_info{VK_STRUCTURE_TYPE_SEMAPHORE_CREATE_INFO};
-
-    VkResult result = vkCreateSemaphore(device.get_handle(), &create_info, nullptr, &semaphore);
-
-    if (result != VK_SUCCESS) {
-        throw std::runtime_error("Failed to create semaphore.");
-    }
-
-    return semaphore;
+    return Semaphore(device);
 }
 
-void SemaphorePool::release_owned_semaphore(VkSemaphore semaphore) {
+void SemaphorePool::release_owned_semaphore(Semaphore semaphore) {
     // We cannot reuse this semaphore until ::reset().
-    released_semaphores.push_back(semaphore);
+    released_semaphores.push_back(std::move(semaphore));
 }
 
-VkSemaphore SemaphorePool::request_semaphore() {
+Semaphore &SemaphorePool::request_semaphore() {
     // Check if there is an available semaphore
     if (active_semaphore_count < semaphores.size()) {
         return semaphores[active_semaphore_count++];
     }
 
-    VkSemaphore semaphore{VK_NULL_HANDLE};
-
-    VkSemaphoreCreateInfo create_info{VK_STRUCTURE_TYPE_SEMAPHORE_CREATE_INFO};
-
-    VkResult result = vkCreateSemaphore(device.get_handle(), &create_info, nullptr, &semaphore);
-
-    if (result != VK_SUCCESS) {
-        throw std::runtime_error("Failed to create semaphore.");
-    }
-
-    semaphores.push_back(semaphore);
+    auto semaphore = Semaphore(device);
+    semaphores.push_back(std::move(semaphore));
 
     active_semaphore_count++;
 
-    return semaphore;
+    return semaphores.back();
 }
 
 void SemaphorePool::reset() {
@@ -78,7 +52,7 @@ void SemaphorePool::reset() {
 
     // Now we can safely recycle the released semaphores.
     for (auto &sem : released_semaphores) {
-        semaphores.push_back(sem);
+        semaphores.push_back(std::move(sem));
     }
 
     released_semaphores.clear();
@@ -86,22 +60,6 @@ void SemaphorePool::reset() {
 
 uint32_t SemaphorePool::get_active_semaphore_count() const {
     return active_semaphore_count;
-}
-
-int SemaphorePool::get_semaphore_handle(VkDevice device, VkSemaphore semaphore, VkExternalSemaphoreHandleTypeFlagBits handleType) {
-    int fd;
-
-    VkSemaphoreGetFdInfoKHR semaphoreGetFdInfoKHR = {};
-    semaphoreGetFdInfoKHR.sType = VK_STRUCTURE_TYPE_SEMAPHORE_GET_FD_INFO_KHR;
-    semaphoreGetFdInfoKHR.pNext = NULL;
-    semaphoreGetFdInfoKHR.semaphore = semaphore;
-    semaphoreGetFdInfoKHR.handleType = handleType;
-
-    if (vkGetSemaphoreFdKHR(device, &semaphoreGetFdInfoKHR, &fd) != VK_SUCCESS) {
-        LOGE("Failed to retrieve handle for semaphore!");
-    }
-
-    return fd;
 }
 
 }// namespace vox::core

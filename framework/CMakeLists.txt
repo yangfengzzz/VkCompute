@@ -146,6 +146,7 @@ set(CORE_FILES
         core/pipeline_state.h
         core/fence_pool.h
         core/timestamp_query_pool.h
+        core/semaphore.h
         core/semaphore_pool.h
         core/resource_cache.h
         core/frame_resource.h
@@ -179,6 +180,7 @@ set(CORE_FILES
         core/pipeline_state.cpp
         core/fence_pool.cpp
         core/timestamp_query_pool.cpp
+        core/semaphore.cpp
         core/semaphore_pool.cpp
         core/resource_cache.cpp
         core/frame_resource.cpp

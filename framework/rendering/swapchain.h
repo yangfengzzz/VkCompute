@@ -12,6 +12,7 @@
 namespace vox {
 namespace core {
 class Device;
+class Semaphore;
 }// namespace core
 namespace rendering {
 
@@ -105,7 +106,7 @@ public:
 
     [[nodiscard]] VkSwapchainKHR get_handle() const;
 
-    VkResult acquire_next_image(uint32_t &image_index, VkSemaphore image_acquired_semaphore, VkFence fence = VK_NULL_HANDLE) const;
+    VkResult acquire_next_image(uint32_t &image_index, const core::Semaphore& image_acquired_semaphore, VkFence fence = VK_NULL_HANDLE) const;
 
     [[nodiscard]] const VkExtent2D &get_extent() const;
 

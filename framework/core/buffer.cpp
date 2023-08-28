@@ -4,9 +4,9 @@
 //  personal capacity and am not conveying any rights to any intellectual
 //  property of any third parties.
 
-#include "buffer.h"
-
-#include "device.h"
+#include "core/buffer.h"
+#include "core/buffer_pool.h"
+#include "core/device.h"
 
 namespace vox::core {
 Buffer::Buffer(Device const &device, VkDeviceSize size, VkBufferUsageFlags buffer_usage,
@@ -30,6 +30,12 @@ Buffer::Buffer(Device const &device, VkDeviceSize size, VkBufferUsageFlags buffe
         buffer_info.sharingMode = VK_SHARING_MODE_CONCURRENT;
         buffer_info.queueFamilyIndexCount = static_cast<uint32_t>(queue_family_indices.size());
         buffer_info.pQueueFamilyIndices = queue_family_indices.data();
+    }
+    if (pool && pool->is_exported()) {
+        VkExternalMemoryBufferCreateInfo externalMemoryBufferInfo = {};
+        externalMemoryBufferInfo.sType = VK_STRUCTURE_TYPE_EXTERNAL_MEMORY_BUFFER_CREATE_INFO;
+        externalMemoryBufferInfo.handleTypes = get_default_mem_handle_type();
+        buffer_info.pNext = &externalMemoryBufferInfo;
     }
 
     VmaAllocationCreateInfo memory_info{};

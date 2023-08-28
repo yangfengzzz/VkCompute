@@ -122,16 +122,16 @@ const SemaphorePool &FrameResource::get_semaphore_pool() const {
     return semaphore_pool;
 }
 
-VkSemaphore FrameResource::request_semaphore() {
+Semaphore& FrameResource::request_semaphore() {
     return semaphore_pool.request_semaphore();
 }
 
-VkSemaphore FrameResource::request_semaphore_with_ownership() {
+Semaphore FrameResource::request_semaphore_with_ownership() {
     return semaphore_pool.request_semaphore_with_ownership();
 }
 
-void FrameResource::release_owned_semaphore(VkSemaphore semaphore) {
-    semaphore_pool.release_owned_semaphore(semaphore);
+void FrameResource::release_owned_semaphore(Semaphore semaphore) {
+    semaphore_pool.release_owned_semaphore(std::move(semaphore));
 }
 
 CommandBuffer &FrameResource::request_command_buffer(const Queue &queue, CommandBuffer::ResetMode reset_mode,

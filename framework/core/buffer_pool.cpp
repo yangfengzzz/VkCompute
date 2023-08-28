@@ -34,6 +34,9 @@ BufferPool::BufferPool(core::Device &device, VkDeviceSize block_size, VkBufferUs
     poolCreateInfo.blockSize = block_size;
     poolCreateInfo.maxBlockCount = 2;
     poolCreateInfo.pMemoryAllocateNext = info;
+    if (info) {
+        is_exported_ = true;
+    }
 
     result = vmaCreatePool(device.get_memory_allocator(), &poolCreateInfo, &pool);
     if (result != VK_SUCCESS) {
