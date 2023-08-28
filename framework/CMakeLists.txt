@@ -31,7 +31,6 @@ set(COMMON_FILES
         common/timer.h
         common/utils.h
         common/vk_common.h
-        common/vk_initializers.h
         common/filesystem.h
         # Source Files
         common/logging.cpp

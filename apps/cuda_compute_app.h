@@ -7,8 +7,11 @@
 #pragma once
 
 #include "application/forward_application.h"
+#include "mesh/buffer_mesh.h"
 #include "cuda/cuda_device.h"
 #include "cuda/cuda_stream.h"
+#include "cuda/cuda_external_buffer.h"
+#include "cuda/cuda_external_semaphore.h"
 #include "cuda/sine_wave_simulation.h"
 
 namespace vox {
@@ -20,11 +23,25 @@ public:
 
     void update_gpu_task(core::CommandBuffer &command_buffer) override;
 
+public:
+    void init_buffer(core::Buffer& index_buffer);
+
+    static void get_vertex_descriptions(
+        std::vector<VkVertexInputBindingDescription> &bindingDesc,
+        std::vector<VkVertexInputAttributeDescription> &attribDesc);
+
 private:
     std::unique_ptr<compute::CudaDevice> cuda_device{nullptr};
     std::unique_ptr<compute::CudaStream> cuda_stream{nullptr};
     std::unique_ptr<compute::SineWaveSimulation> cuda_sim{nullptr};
 
+    std::unique_ptr<compute::CudaExternalBuffer> cuda_height_buffer{nullptr};
+
+    std::unique_ptr<core::BufferPool> external_pool{nullptr};
+    std::unique_ptr<core::Buffer> height_buffer{nullptr};
+    std::unique_ptr<core::Buffer> xy_buffer{nullptr};
+
+    std::shared_ptr<BufferMesh> mesh{nullptr};
     std::shared_ptr<Material> material_{nullptr};
 };
 

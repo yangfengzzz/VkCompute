@@ -13,7 +13,6 @@
 #include "mesh/index_buffer_binding.h"
 #include "mesh/sub_mesh.h"
 #include "framework/core/pipeline_state.h"
-#include "framework/common/vk_initializers.h"
 
 namespace vox {
 class Mesh {

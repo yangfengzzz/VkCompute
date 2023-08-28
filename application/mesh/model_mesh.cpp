@@ -282,72 +282,72 @@ void ModelMesh::upload_data(bool no_longer_accessible) {
 void ModelMesh::update_vertex_state() {
     auto &vertex_input_attributes = vertex_input_state_.attributes;
     vertex_input_attributes.resize(1);
-    vertex_input_attributes[0] = initializers::vertex_input_attribute_description(0, 0, VK_FORMAT_R32G32B32_SFLOAT, 0);
+    vertex_input_attributes[0] = vertex_input_attribute_description(0, 0, VK_FORMAT_R32G32B32_SFLOAT, 0);
 
     uint32_t offset = 12;
     uint32_t element_count = 3;
     if (!normals_.empty()) {
-        vertex_input_attributes.push_back(initializers::vertex_input_attribute_description(
+        vertex_input_attributes.push_back(vertex_input_attribute_description(
             0, (uint32_t)Attributes::NORMAL, VK_FORMAT_R32G32B32_SFLOAT, offset));
         offset += 12;
         element_count += 3;
     }
     if (!colors_.empty()) {
-        vertex_input_attributes.push_back(initializers::vertex_input_attribute_description(
+        vertex_input_attributes.push_back(vertex_input_attribute_description(
             0, (uint32_t)Attributes::COLOR_0, VK_FORMAT_R32G32B32A32_SFLOAT, offset));
         offset += 16;
         element_count += 4;
     }
     if (!tangents_.empty()) {
-        vertex_input_attributes.push_back(initializers::vertex_input_attribute_description(
+        vertex_input_attributes.push_back(vertex_input_attribute_description(
             0, (uint32_t)Attributes::TANGENT, VK_FORMAT_R32G32B32A32_SFLOAT, offset));
         offset += 16;
         element_count += 4;
     }
     if (!uv_.empty()) {
-        vertex_input_attributes.push_back(initializers::vertex_input_attribute_description(
+        vertex_input_attributes.push_back(vertex_input_attribute_description(
             0, (uint32_t)Attributes::UV_0, VK_FORMAT_R32G32_SFLOAT, offset));
         offset += 8;
         element_count += 2;
     }
     if (!uv_1_.empty()) {
-        vertex_input_attributes.push_back(initializers::vertex_input_attribute_description(
+        vertex_input_attributes.push_back(vertex_input_attribute_description(
             0, (uint32_t)Attributes::UV_1, VK_FORMAT_R32G32_SFLOAT, offset));
         offset += 8;
         element_count += 2;
     }
     if (!uv_2_.empty()) {
-        vertex_input_attributes.push_back(initializers::vertex_input_attribute_description(
+        vertex_input_attributes.push_back(vertex_input_attribute_description(
             0, (uint32_t)Attributes::UV_2, VK_FORMAT_R32G32_SFLOAT, offset));
         offset += 8;
         element_count += 2;
     }
     if (!uv_3_.empty()) {
-        vertex_input_attributes.push_back(initializers::vertex_input_attribute_description(
+        vertex_input_attributes.push_back(vertex_input_attribute_description(
             0, (uint32_t)Attributes::UV_3, VK_FORMAT_R32G32_SFLOAT, offset));
         offset += 8;
         element_count += 2;
     }
     if (!uv_4_.empty()) {
-        vertex_input_attributes.push_back(initializers::vertex_input_attribute_description(
+        vertex_input_attributes.push_back(vertex_input_attribute_description(
             0, (uint32_t)Attributes::UV_4, VK_FORMAT_R32G32_SFLOAT, offset));
         offset += 8;
         element_count += 2;
     }
     if (!uv_5_.empty()) {
-        vertex_input_attributes.push_back(initializers::vertex_input_attribute_description(
+        vertex_input_attributes.push_back(vertex_input_attribute_description(
             0, (uint32_t)Attributes::UV_5, VK_FORMAT_R32G32_SFLOAT, offset));
         offset += 8;
         element_count += 2;
     }
     if (!uv_6_.empty()) {
-        vertex_input_attributes.push_back(initializers::vertex_input_attribute_description(
+        vertex_input_attributes.push_back(vertex_input_attribute_description(
             0, (uint32_t)Attributes::UV_6, VK_FORMAT_R32G32_SFLOAT, offset));
         offset += 8;
         element_count += 2;
     }
     if (!uv_7_.empty()) {
-        vertex_input_attributes.push_back(initializers::vertex_input_attribute_description(
+        vertex_input_attributes.push_back(vertex_input_attribute_description(
             0, (uint32_t)Attributes::UV_7, VK_FORMAT_R32G32_SFLOAT, offset));
         offset += 8;
         element_count += 2;
@@ -355,8 +355,7 @@ void ModelMesh::update_vertex_state() {
 
     auto &vertex_input_bindings = vertex_input_state_.bindings;
     vertex_input_bindings.resize(1);
-    vertex_input_bindings[0] =
-        vox::initializers::vertex_input_binding_description(0, element_count * 4, VK_VERTEX_INPUT_RATE_VERTEX);
+    vertex_input_bindings[0] = vertex_input_binding_description(0, element_count * 4, VK_VERTEX_INPUT_RATE_VERTEX);
 
     element_count_ = element_count;
 }

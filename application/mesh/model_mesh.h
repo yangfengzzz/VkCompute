@@ -146,6 +146,30 @@ public:
     void upload_data(bool no_longer_accessible);
 
 private:
+    static inline VkVertexInputAttributeDescription vertex_input_attribute_description(
+        uint32_t binding,
+        uint32_t location,
+        VkFormat format,
+        uint32_t offset) {
+        VkVertexInputAttributeDescription vertex_input_attribute_description{};
+        vertex_input_attribute_description.location = location;
+        vertex_input_attribute_description.binding = binding;
+        vertex_input_attribute_description.format = format;
+        vertex_input_attribute_description.offset = offset;
+        return vertex_input_attribute_description;
+    }
+
+    static inline VkVertexInputBindingDescription vertex_input_binding_description(
+        uint32_t binding,
+        uint32_t stride,
+        VkVertexInputRate input_rate) {
+        VkVertexInputBindingDescription vertex_input_binding_description{};
+        vertex_input_binding_description.binding = binding;
+        vertex_input_binding_description.stride = stride;
+        vertex_input_binding_description.inputRate = input_rate;
+        return vertex_input_binding_description;
+    }
+
     core::Device &device_;
     std::vector<std::unique_ptr<core::Buffer>> vertex_buffer_bindings_{};
 

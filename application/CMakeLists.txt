@@ -62,6 +62,8 @@ set(MESH_FILES
         mesh/model_mesh.cpp
         mesh/primitive_mesh.h
         mesh/primitive_mesh.cpp
+        mesh/buffer_mesh.h
+        mesh/buffer_mesh.cpp
         )
 
 set(SHADER_FILES
