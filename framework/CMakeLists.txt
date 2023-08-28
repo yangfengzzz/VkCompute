@@ -244,10 +244,6 @@ set(LINUX_D2D_FILES
         platform/unix/unix_d2d_platform.cpp
         platform/unix/direct_window.cpp)
 
-set(CUDA_INTEROP_FILES
-        cuda-interop/VulkanBaseApp.cpp
-        cuda-interop/main.cpp)
-
 source_group("\\" FILES ${FRAMEWORK_FILES})
 source_group("common\\" FILES ${COMMON_FILES})
 source_group("platform\\" FILES ${PLATFORM_FILES})
@@ -269,7 +265,6 @@ set(PROJECT_FILES
         ${COMPUTE_FILES}
         ${STATS_FILES}
         ${SHADER_FILES}
-#        ${CUDA_INTEROP_FILES}
 )
 
 # Add files based on platform

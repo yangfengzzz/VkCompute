@@ -11,17 +11,16 @@ namespace vox::core {
 Semaphore::Semaphore(Device &device, bool is_exported) : VulkanResource{VK_NULL_HANDLE, &device} {
     VkSemaphoreCreateInfo create_info{VK_STRUCTURE_TYPE_SEMAPHORE_CREATE_INFO};
 
+    VkExportSemaphoreCreateInfoKHR exportSemaphoreCreateInfo = {};
+    exportSemaphoreCreateInfo.sType = VK_STRUCTURE_TYPE_EXPORT_SEMAPHORE_CREATE_INFO_KHR;
+    exportSemaphoreCreateInfo.pNext = nullptr;
+    exportSemaphoreCreateInfo.handleTypes = get_default_semaphore_handle_type();
+
     if (is_exported) {
-        VkExportSemaphoreCreateInfoKHR exportSemaphoreCreateInfo = {};
-        exportSemaphoreCreateInfo.sType = VK_STRUCTURE_TYPE_EXPORT_SEMAPHORE_CREATE_INFO_KHR;
-        exportSemaphoreCreateInfo.pNext = nullptr;
-        exportSemaphoreCreateInfo.handleTypes = get_default_semaphore_handle_type();
         create_info.pNext = &exportSemaphoreCreateInfo;
     }
 
-    VkResult result = vkCreateSemaphore(device.get_handle(), &create_info, nullptr, &handle);
-
-    if (result != VK_SUCCESS) {
+    if (vkCreateSemaphore(device.get_handle(), &create_info, nullptr, &handle) != VK_SUCCESS) {
         throw std::runtime_error("Failed to create semaphore.");
     }
 }

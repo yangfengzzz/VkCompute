@@ -43,17 +43,38 @@ public:
         cuda_sim = &app->get_cuda_sim();
         cuda_height_buffer = std::make_unique<compute::CudaExternalBuffer>(app->get_height_buffer());
         cuda_stream = std::make_unique<compute::CudaStream>(app->get_cuda_device());
-        cuda_wait_semaphore = std::make_unique<compute::CudaExternalSemaphore>(app->get_wait_semaphore());
-        cuda_signal_semaphore = std::make_unique<compute::CudaExternalSemaphore>(app->get_signal_semaphore());
+        cuda_wait_semaphore = std::make_unique<compute::CudaExternalSemaphore>(app->get_signal_semaphore());
+        cuda_signal_semaphore = std::make_unique<compute::CudaExternalSemaphore>(app->get_wait_semaphore());
+
+        app->get_render_context().external_signal_semaphores = [&](std::vector<VkSemaphore> &signal) {
+            // Add this semaphore for vulkan to signal once the vertex buffer is ready
+            // for cuda to modify
+            signal.push_back(app->get_signal_semaphore().get_handle());
+        };
+        app->get_render_context().external_wait_semaphores = [&](std::vector<VkSemaphore> &wait, std::vector<VkPipelineStageFlags> &flags) {
+            if (frame_count > 1) {
+                // Have vulkan wait until cuda is done with the vertex buffer before
+                // rendering, We don't do this on the first frame, as the wait semaphore
+                // hasn't been initialized yet
+                wait.push_back(app->get_wait_semaphore().get_handle());
+                // We want to wait until all the pipeline commands are complete before
+                // letting cuda work
+                flags.push_back(VK_PIPELINE_STAGE_ALL_COMMANDS_BIT);
+            }
+        };
     }
 
     void on_update(float delta_time) override {
-        //        cuda_wait_semaphore->wait(*cuda_stream);
-        cuda_sim->step_simulation(delta_time, static_cast<float *>(cuda_height_buffer->get_cuda_buffer()), *cuda_stream);
-        //        cuda_signal_semaphore->signal(*cuda_stream);
+        frame_count++;
+        total_time += delta_time;
+        cuda_wait_semaphore->wait(*cuda_stream);
+        cuda_sim->step_simulation(total_time, static_cast<float *>(cuda_height_buffer->get_cuda_buffer()), *cuda_stream);
+        cuda_signal_semaphore->signal(*cuda_stream);
     }
 
 private:
+    uint64_t frame_count{0};
+    float total_time{};
     CudaComputeApp *app{};
 
     std::unique_ptr<compute::CudaExternalBuffer> cuda_height_buffer{nullptr};
@@ -113,8 +134,6 @@ bool CudaComputeApp::prepare(const ApplicationOptions &options) {
 
     wait_semaphore = std::make_unique<core::Semaphore>(*device, true);
     signal_semaphore = std::make_unique<core::Semaphore>(*device, true);
-    //    render_context->external_signal_semaphores.emplace_back(signal_semaphore.get());
-    //    render_context->external_wait_semaphores.emplace_back(wait_semaphore.get());
 
     return true;
 }

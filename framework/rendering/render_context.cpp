@@ -297,24 +297,23 @@ core::Semaphore &RenderContext::submit(const core::Queue &queue, const std::vect
     submit_info.commandBufferCount = to_u32(cmd_buf_handles.size());
     submit_info.pCommandBuffers = cmd_buf_handles.data();
 
-    std::vector<VkSemaphore> wait_semaphores;
-    wait_semaphores.reserve(external_wait_semaphores.size());
-    for (const auto &external : external_wait_semaphores) {
-        wait_semaphores.emplace_back(external->get_handle());
-    }
+    std::vector<VkSemaphore> wait_semaphores{};
+    std::vector<VkPipelineStageFlags> wait_stages{};
+    external_wait_semaphores(wait_semaphores, wait_stages);
 
+    wait_stages.emplace_back(wait_pipeline_stage);
     if (wait_semaphore != nullptr) {
         wait_semaphores.emplace_back(wait_semaphore->get_handle());
+    }
+
+    if (!wait_semaphores.empty()) {
         submit_info.waitSemaphoreCount = wait_semaphores.size();
         submit_info.pWaitSemaphores = wait_semaphores.data();
-        submit_info.pWaitDstStageMask = &wait_pipeline_stage;
+        submit_info.pWaitDstStageMask = wait_stages.data();
     }
 
     std::vector<VkSemaphore> signal_semaphores;
-    signal_semaphores.reserve(external_signal_semaphores.size() + 1);
-    for (const auto &external : external_signal_semaphores) {
-        signal_semaphores.emplace_back(external->get_handle());
-    }
+    external_signal_semaphores(signal_semaphores);
     signal_semaphores.emplace_back(signal_semaphore.get_handle());
     submit_info.signalSemaphoreCount = signal_semaphores.size();
     submit_info.pSignalSemaphores = signal_semaphores.data();

@@ -48,8 +48,8 @@ namespace rendering {
  */
 class RenderContext {
 public:
-    std::vector<core::Semaphore *> external_wait_semaphores{};
-    std::vector<core::Semaphore *> external_signal_semaphores{};
+    std::function<void(std::vector<VkSemaphore> &, std::vector<VkPipelineStageFlags> &)> external_wait_semaphores{};
+    std::function<void(std::vector<VkSemaphore> &)> external_signal_semaphores{};
 
     // The format to use for the RenderTargets if a swapchain isn't created
     static VkFormat DEFAULT_VK_FORMAT;
