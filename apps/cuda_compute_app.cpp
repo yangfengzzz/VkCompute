@@ -29,12 +29,16 @@ public:
     explicit CudaExecuteScript(Entity *pEntity) : Script(pEntity) {
     }
 
-    void init(compute::SineWaveSimulation *sim, core::Buffer &buffer, core::Semaphore &wait_semaphore, core::Semaphore &signal_semaphore) {
-        cuda_sim = sim;
-        cuda_height_buffer = std::make_unique<compute::CudaExternalBuffer>(buffer);
-        cuda_stream = std::make_unique<compute::CudaStream>(sim->get_device());
-        cuda_wait_semaphore = std::make_unique<compute::CudaExternalSemaphore>(wait_semaphore);
-        cuda_signal_semaphore = std::make_unique<compute::CudaExternalSemaphore>(signal_semaphore);
+    void init(CudaComputeApp *cuda_app) {
+        app = cuda_app;
+    }
+
+    void on_start() override {
+        cuda_sim = &app->get_cuda_sim();
+        cuda_height_buffer = std::make_unique<compute::CudaExternalBuffer>(app->get_height_buffer());
+        cuda_stream = std::make_unique<compute::CudaStream>(app->get_cuda_device());
+        cuda_wait_semaphore = std::make_unique<compute::CudaExternalSemaphore>(app->get_wait_semaphore());
+        cuda_signal_semaphore = std::make_unique<compute::CudaExternalSemaphore>(app->get_signal_semaphore());
     }
 
     void on_update(float delta_time) override {
@@ -44,6 +48,8 @@ public:
     }
 
 private:
+    CudaComputeApp *app{};
+
     std::unique_ptr<compute::CudaExternalBuffer> cuda_height_buffer{nullptr};
     std::unique_ptr<compute::CudaStream> cuda_stream{nullptr};
     compute::SineWaveSimulation *cuda_sim{nullptr};
@@ -55,6 +61,14 @@ private:
 }// namespace
 
 bool CudaComputeApp::prepare(const ApplicationOptions &options) {
+    add_instance_extension(VK_KHR_EXTERNAL_MEMORY_CAPABILITIES_EXTENSION_NAME);
+    add_instance_extension(VK_KHR_EXTERNAL_SEMAPHORE_CAPABILITIES_EXTENSION_NAME);
+
+    add_device_extension(VK_KHR_EXTERNAL_MEMORY_EXTENSION_NAME);
+    add_device_extension(VK_KHR_EXTERNAL_SEMAPHORE_EXTENSION_NAME);
+    add_device_extension(VK_KHR_EXTERNAL_MEMORY_FD_EXTENSION_NAME);
+    add_device_extension(VK_KHR_EXTERNAL_SEMAPHORE_FD_EXTENSION_NAME);
+
     ForwardApplication::prepare(options);
     cuda_device = std::make_unique<compute::CudaDevice>(device->get_gpu().get_device_id_properties().deviceUUID, VK_UUID_SIZE);
     cuda_sim = std::make_unique<compute::SineWaveSimulation>((1ULL << 8ULL), (1ULL << 8ULL), *cuda_device);
@@ -91,8 +105,8 @@ bool CudaComputeApp::prepare(const ApplicationOptions &options) {
     mesh->set_vertex_buffer_binding(0, height_buffer.get());
     mesh->set_vertex_buffer_binding(1, xy_buffer.get());
 
-    wait_semaphore = std::make_unique<core::Semaphore>(*device);
-    signal_semaphore = std::make_unique<core::Semaphore>(*device);
+    wait_semaphore = std::make_unique<core::Semaphore>(*device, true);
+    signal_semaphore = std::make_unique<core::Semaphore>(*device, true);
     render_context->external_signal_semaphores.emplace_back(signal_semaphore.get());
     render_context->external_wait_semaphores.emplace_back(wait_semaphore.get());
 
@@ -116,7 +130,7 @@ void CudaComputeApp::load_scene() {
     renderer->set_material(material_);
 
     auto cuda_execute = cube_entity->add_component<CudaExecuteScript>();
-    cuda_execute->init(cuda_sim.get(), *height_buffer, *wait_semaphore, *signal_semaphore);
+    cuda_execute->init(this);
 
     scene->play();
 }

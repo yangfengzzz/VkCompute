@@ -22,11 +22,31 @@ public:
     void load_scene() override;
 
 public:
-    void init_buffer(core::Buffer& index_buffer);
+    void init_buffer(core::Buffer &index_buffer);
 
     static void get_vertex_descriptions(
         std::vector<VkVertexInputBindingDescription> &bindingDesc,
         std::vector<VkVertexInputAttributeDescription> &attribDesc);
+
+    compute::CudaDevice &get_cuda_device() {
+        return *cuda_device;
+    }
+
+    compute::SineWaveSimulation &get_cuda_sim() {
+        return *cuda_sim;
+    }
+
+    core::Buffer &get_height_buffer() {
+        return *height_buffer;
+    }
+
+    core::Semaphore &get_wait_semaphore() {
+        return *wait_semaphore;
+    }
+
+    core::Semaphore &get_signal_semaphore() {
+        return *signal_semaphore;
+    }
 
 private:
     std::unique_ptr<compute::CudaDevice> cuda_device{nullptr};

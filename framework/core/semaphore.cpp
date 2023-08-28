@@ -14,7 +14,7 @@ Semaphore::Semaphore(Device &device, bool is_exported) : VulkanResource{VK_NULL_
     if (is_exported) {
         VkExportSemaphoreCreateInfoKHR exportSemaphoreCreateInfo = {};
         exportSemaphoreCreateInfo.sType = VK_STRUCTURE_TYPE_EXPORT_SEMAPHORE_CREATE_INFO_KHR;
-        exportSemaphoreCreateInfo.pNext = NULL;
+        exportSemaphoreCreateInfo.pNext = nullptr;
         exportSemaphoreCreateInfo.handleTypes = get_default_semaphore_handle_type();
         create_info.pNext = &exportSemaphoreCreateInfo;
     }
@@ -40,7 +40,7 @@ int Semaphore::get_semaphore_handle(VkExternalSemaphoreHandleTypeFlagBits handle
 
     VkSemaphoreGetFdInfoKHR semaphoreGetFdInfoKHR = {};
     semaphoreGetFdInfoKHR.sType = VK_STRUCTURE_TYPE_SEMAPHORE_GET_FD_INFO_KHR;
-    semaphoreGetFdInfoKHR.pNext = NULL;
+    semaphoreGetFdInfoKHR.pNext = nullptr;
     semaphoreGetFdInfoKHR.semaphore = handle;
     semaphoreGetFdInfoKHR.handleType = handleType;
 
