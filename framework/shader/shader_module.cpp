@@ -56,7 +56,7 @@ ShaderModule::ShaderModule(core::Device &device, VkShaderStageFlagBits stage, co
     include_file_finder_.search_path().emplace_back(fs::path::get(fs::path::Type::Shaders));
     auto includer = std::make_unique<FileIncluder>(&include_file_finder_);
     options.SetIncluder(std::move(includer));
-#ifdef VKB_VULKAN_DEBUG
+#ifdef VKB_DEBUG
     options.SetOptimizationLevel(shaderc_optimization_level_zero);
 #else
     options.SetOptimizationLevel(shaderc_optimization_level_performance);

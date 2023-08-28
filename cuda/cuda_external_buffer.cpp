@@ -26,6 +26,7 @@ CudaExternalBuffer::CudaExternalBuffer(core::Buffer &buffer, VkExternalMemoryHan
 CudaExternalBuffer::~CudaExternalBuffer() {
     if (cuda_buffer) {
         checkCudaErrors(cudaDestroyExternalMemory(cuda_mem));
+        cuda_buffer = nullptr;
     }
 }
 

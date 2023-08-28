@@ -7,6 +7,14 @@
 #include "device.h"
 
 VKBP_DISABLE_WARNINGS()
+#ifdef __clang__
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wtautological-compare" // comparison of unsigned expression < 0 is always false
+#pragma clang diagnostic ignored "-Wunused-private-field"
+#pragma clang diagnostic ignored "-Wunused-parameter"
+#pragma clang diagnostic ignored "-Wmissing-field-initializers"
+#pragma clang diagnostic ignored "-Wnullability-completeness"
+#endif
 #define VMA_IMPLEMENTATION
 #include <vk_mem_alloc.h>
 VKBP_ENABLE_WARNINGS()
@@ -214,10 +222,10 @@ Device::~Device() {
     fence_pool.reset();
 
     if (memory_allocator != VK_NULL_HANDLE) {
-        VmaStats stats;
-        vmaCalculateStats(memory_allocator, &stats);
+        VmaTotalStatistics stats;
+        vmaCalculateStatistics(memory_allocator, &stats);
 
-        LOGI("Total device memory leaked: {} bytes.", stats.total.usedBytes)
+        LOGI("Total device memory leaked: {} bytes.", stats.total.statistics.allocationBytes)
 
         vmaDestroyAllocator(memory_allocator);
     }

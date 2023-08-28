@@ -268,7 +268,7 @@ set(PROJECT_FILES
         ${COMPUTE_FILES}
         ${STATS_FILES}
         ${SHADER_FILES}
-        ${CUDA_INTEROP_FILES}
+#        ${CUDA_INTEROP_FILES}
 )
 
 # Add files based on platform
@@ -333,7 +333,7 @@ if (${VKB_ENABLE_PORTABILITY})
     target_compile_definitions(${PROJECT_NAME} PUBLIC VKB_ENABLE_PORTABILITY)
 endif ()
 
-if (${VKB_WARNINGS_AS_ERRORS})
+if (VKB_WARNINGS_AS_ERRORS)
     message(STATUS "Warnings as Errors Enabled")
     if ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang" OR "${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU")
         target_compile_options(${PROJECT_NAME} PRIVATE -Werror)
@@ -351,7 +351,7 @@ target_link_libraries(${PROJECT_NAME} PUBLIC
         shaderc
         shaderc_util
         glslc
-        vma
+        VulkanMemoryAllocator
         hwcpipe
         spirv-cross-glsl
         spdlog
