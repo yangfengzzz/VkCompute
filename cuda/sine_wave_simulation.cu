@@ -31,7 +31,7 @@ __global__ void sinewave(float *heightMap, unsigned int width,
 }
 
 SineWaveSimulation::SineWaveSimulation(size_t width, size_t height, CudaDevice &device)
-    : m_heightMap(nullptr), m_width(width), m_height(height) {
+    : m_width(width), m_height(height) {
     // We don't need large block sizes, since there's not much inter-thread
     // communication
     m_threads = device.get_prop().warpSize;
@@ -46,14 +46,8 @@ SineWaveSimulation::SineWaveSimulation(size_t width, size_t height, CudaDevice &
     m_blocks = std::min(m_blocks, (int)((m_width * m_height + m_threads - 1) / m_threads));
 }
 
-SineWaveSimulation::~SineWaveSimulation() { m_heightMap = nullptr; }
-
-void SineWaveSimulation::init_simulation(float *heights) {
-    m_heightMap = heights;
-}
-
-void SineWaveSimulation::step_simulation(float time, CudaStream &stream) {
-    sinewave<<<m_blocks, m_threads, 0, stream.get_handle()>>>(m_heightMap, m_width, m_height, time);
+void SineWaveSimulation::step_simulation(float time, float *heights, CudaStream &stream) {
+    sinewave<<<m_blocks, m_threads, 0, stream.get_handle()>>>(heights, m_width, m_height, time);
     getLastCudaError("Failed to launch CUDA simulation");
 }
 

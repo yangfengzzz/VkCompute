@@ -13,6 +13,7 @@ project(apps LANGUAGES C CXX)
 set(SRC
         main.cpp
         atomic_compute_app.cpp
+        cuda_compute_app.cpp
         primitive_app.cpp
         )
 
@@ -29,7 +30,12 @@ else ()
     add_executable(${PROJECT_NAME} WIN32 ${SRC})
 endif ()
 
-target_link_libraries(${PROJECT_NAME} PRIVATE vkb__core framework application)
+target_link_libraries(${PROJECT_NAME} PRIVATE
+        vkb__core
+        framework
+        cuda-framework
+        application
+)
 
 # Create android project
 if (ANDROID)

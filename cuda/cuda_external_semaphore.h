@@ -6,14 +6,14 @@
 
 #pragma once
 
-#include "core/semaphore_pool.h"
+#include "core/semaphore.h"
 #include <cuda_runtime_api.h>
 
 namespace vox::compute {
 class CudaExternalSemaphore {
 public:
-    CudaExternalSemaphore(VkDevice device, VkSemaphore semaphore,
-                          VkExternalSemaphoreHandleTypeFlagBits handleType = core::SemaphorePool::get_default_semaphore_handle_type());
+    CudaExternalSemaphore(core::Semaphore semaphore,
+                          VkExternalSemaphoreHandleTypeFlagBits handleType = core::Semaphore::get_default_semaphore_handle_type());
 
     ~CudaExternalSemaphore();
 

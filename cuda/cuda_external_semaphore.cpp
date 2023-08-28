@@ -8,10 +8,10 @@
 #include "utils/helper_cuda.h"
 
 namespace vox::compute {
-CudaExternalSemaphore::CudaExternalSemaphore(VkDevice device, VkSemaphore semaphore, VkExternalSemaphoreHandleTypeFlagBits handleType) {
+CudaExternalSemaphore::CudaExternalSemaphore(core::Semaphore semaphore, VkExternalSemaphoreHandleTypeFlagBits handleType) {
     cudaExternalSemaphoreHandleDesc externalSemaphoreHandleDesc = {};
     externalSemaphoreHandleDesc.type = cudaExternalSemaphoreHandleTypeOpaqueFd;
-    externalSemaphoreHandleDesc.handle.fd = core::SemaphorePool::get_semaphore_handle(device, semaphore, handleType);
+    externalSemaphoreHandleDesc.handle.fd = semaphore.get_semaphore_handle(handleType);
     externalSemaphoreHandleDesc.flags = 0;
     checkCudaErrors(cudaImportExternalSemaphore(&cuda_semaphore, &externalSemaphoreHandleDesc));
 }

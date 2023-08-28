@@ -46,6 +46,8 @@ public:
 
     [[nodiscard]] const std::vector<VkQueueFamilyProperties> &get_queue_family_properties() const;
 
+    [[nodiscard]] VkPhysicalDeviceIDProperties get_device_id_properties() const;
+
     uint32_t get_queue_family_performance_query_passes(
         const VkQueryPoolPerformanceCreateInfoKHR *perf_query_create_info) const;
 

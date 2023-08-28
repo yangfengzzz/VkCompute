@@ -10,15 +10,12 @@
 
 namespace vox::compute {
 class SineWaveSimulation {
-    float *m_heightMap;
     size_t m_width, m_height;
     int m_blocks, m_threads;
 
 public:
     SineWaveSimulation(size_t width, size_t height, CudaDevice &device);
-    ~SineWaveSimulation();
-    void init_simulation(float *heightMap);
-    void step_simulation(float time, CudaStream &stream);
+    void step_simulation(float time, float *heightMap, CudaStream &stream);
 
     [[nodiscard]] size_t get_width() const { return m_width; }
     [[nodiscard]] size_t get_height() const { return m_height; }

@@ -22,6 +22,7 @@
 
 #include "primitive_app.h"
 #include "atomic_compute_app.h"
+#include "cuda_compute_app.h"
 
 CUSTOM_MAIN(context) {
 #if defined(PLATFORM__ANDROID)

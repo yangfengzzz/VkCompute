@@ -51,19 +51,6 @@ include(sample_helper)
 include(check_atomic)
 include(component_helper)
 
-# Add third party libraries
-add_subdirectory(third_party)
-
-vkb__enable_testing()
-
-add_subdirectory(math)
-add_subdirectory(test.math)
-
-add_subdirectory(framework)
-add_subdirectory(application)
-add_subdirectory(apps)
-add_subdirectory(benchmark)
-
 # CUDA
 option(USE_CUDA "Use CUDA features" ON)
 if (USE_CUDA)
@@ -79,6 +66,19 @@ if (USE_CUDA)
         set(USE_CUDA OFF)
     endif()
 endif()
+
+# Add third party libraries
+add_subdirectory(third_party)
+
+vkb__enable_testing()
+
+add_subdirectory(math)
+add_subdirectory(test.math)
+
+add_subdirectory(framework)
+add_subdirectory(application)
+add_subdirectory(apps)
+add_subdirectory(benchmark)
 
 if (USE_CUDA)
     add_subdirectory(cuda)

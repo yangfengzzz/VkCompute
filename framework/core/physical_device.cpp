@@ -31,6 +31,18 @@ PhysicalDevice::PhysicalDevice(Instance &instance, VkPhysicalDevice physical_dev
     vkGetPhysicalDeviceQueueFamilyProperties(physical_device, &queue_family_properties_count, queue_family_properties.data());
 }
 
+VkPhysicalDeviceIDProperties PhysicalDevice::get_device_id_properties() const {
+    VkPhysicalDeviceIDProperties vkPhysicalDeviceIDProperties = {};
+    vkPhysicalDeviceIDProperties.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_ID_PROPERTIES;
+    vkPhysicalDeviceIDProperties.pNext = nullptr;
+
+    VkPhysicalDeviceProperties2 properties2 = {};
+    properties2.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_PROPERTIES_2;
+    properties2.pNext = &vkPhysicalDeviceIDProperties;
+    vkGetPhysicalDeviceProperties2(handle, &properties2);
+    return vkPhysicalDeviceIDProperties;
+}
+
 Instance &PhysicalDevice::get_instance() const {
     return instance;
 }
