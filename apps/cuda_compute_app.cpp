@@ -19,6 +19,12 @@ namespace {
 class CustomMaterial : public BaseMaterial {
 public:
     explicit CustomMaterial(core::Device &device) : BaseMaterial(device, "waveRender") {
+        input_assembly_state_.topology = VK_PRIMITIVE_TOPOLOGY_TRIANGLE_LIST;
+        input_assembly_state_.primitive_restart_enable = false;
+        rasterization_state_.polygon_mode = VK_POLYGON_MODE_LINE;
+        rasterization_state_.cull_mode = VK_CULL_MODE_NONE;
+        rasterization_state_.front_face = VK_FRONT_FACE_CLOCKWISE;
+
         vertex_source_ = ShaderManager::get_singleton().load_shader("base/sinewave.vert", VK_SHADER_STAGE_VERTEX_BIT);
         fragment_source_ = ShaderManager::get_singleton().load_shader("base/sinewave.frag", VK_SHADER_STAGE_FRAGMENT_BIT);
     }
@@ -42,9 +48,9 @@ public:
     }
 
     void on_update(float delta_time) override {
-        cuda_wait_semaphore->wait(*cuda_stream);
+        //        cuda_wait_semaphore->wait(*cuda_stream);
         cuda_sim->step_simulation(delta_time, static_cast<float *>(cuda_height_buffer->get_cuda_buffer()), *cuda_stream);
-        cuda_signal_semaphore->signal(*cuda_stream);
+        //        cuda_signal_semaphore->signal(*cuda_stream);
     }
 
 private:
@@ -96,7 +102,6 @@ bool CudaComputeApp::prepare(const ApplicationOptions &options) {
                                                VMA_MEMORY_USAGE_GPU_ONLY);
     init_buffer(index_buffer);
 
-    mesh = std::make_shared<BufferMesh>();
     std::vector<VkVertexInputBindingDescription> bindingDesc;
     std::vector<VkVertexInputAttributeDescription> attribDesc;
     get_vertex_descriptions(bindingDesc, attribDesc);
@@ -104,11 +109,12 @@ bool CudaComputeApp::prepare(const ApplicationOptions &options) {
     mesh->set_index_buffer_binding(std::make_unique<IndexBufferBinding>(std::move(index_buffer), VK_INDEX_TYPE_UINT32));
     mesh->set_vertex_buffer_binding(0, height_buffer.get());
     mesh->set_vertex_buffer_binding(1, xy_buffer.get());
+    mesh->add_sub_mesh(0, n_inds);
 
     wait_semaphore = std::make_unique<core::Semaphore>(*device, true);
     signal_semaphore = std::make_unique<core::Semaphore>(*device, true);
-    render_context->external_signal_semaphores.emplace_back(signal_semaphore.get());
-    render_context->external_wait_semaphores.emplace_back(wait_semaphore.get());
+    //    render_context->external_signal_semaphores.emplace_back(signal_semaphore.get());
+    //    render_context->external_wait_semaphores.emplace_back(wait_semaphore.get());
 
     return true;
 }
@@ -121,10 +127,12 @@ void CudaComputeApp::load_scene() {
     camera_entity->transform->set_position(10, 10, 10);
     camera_entity->transform->look_at(Point3F(0, 0, 0));
     main_camera_ = camera_entity->add_component<Camera>();
+    main_camera_->enable_frustum_culling_ = false;
     camera_entity->add_component<control::OrbitControl>();
 
     auto cube_entity = root_entity->create_child();
     auto renderer = cube_entity->add_component<MeshRenderer>();
+    mesh = std::make_shared<BufferMesh>();
     renderer->set_mesh(mesh);
     material_ = std::make_shared<CustomMaterial>(*device);
     renderer->set_material(material_);
