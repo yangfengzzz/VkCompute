@@ -1444,8 +1444,7 @@ void VulkanBaseApp::createExternalBuffer(
     bufferInfo.sharingMode = VK_SHARING_MODE_EXCLUSIVE;
 
     VkExternalMemoryBufferCreateInfo externalMemoryBufferInfo = {};
-    externalMemoryBufferInfo.sType =
-        VK_STRUCTURE_TYPE_EXTERNAL_MEMORY_BUFFER_CREATE_INFO;
+    externalMemoryBufferInfo.sType = VK_STRUCTURE_TYPE_EXTERNAL_MEMORY_BUFFER_CREATE_INFO;
     externalMemoryBufferInfo.handleTypes = extMemHandleType;
     bufferInfo.pNext = &externalMemoryBufferInfo;
 
@@ -1456,30 +1455,11 @@ void VulkanBaseApp::createExternalBuffer(
     VkMemoryRequirements memRequirements;
     vkGetBufferMemoryRequirements(m_device, buffer, &memRequirements);
 
-#ifdef _WIN64
-    WindowsSecurityAttributes winSecurityAttributes;
-
-    VkExportMemoryWin32HandleInfoKHR vulkanExportMemoryWin32HandleInfoKHR = {};
-    vulkanExportMemoryWin32HandleInfoKHR.sType =
-        VK_STRUCTURE_TYPE_EXPORT_MEMORY_WIN32_HANDLE_INFO_KHR;
-    vulkanExportMemoryWin32HandleInfoKHR.pNext = NULL;
-    vulkanExportMemoryWin32HandleInfoKHR.pAttributes = &winSecurityAttributes;
-    vulkanExportMemoryWin32HandleInfoKHR.dwAccess =
-        DXGI_SHARED_RESOURCE_READ | DXGI_SHARED_RESOURCE_WRITE;
-    vulkanExportMemoryWin32HandleInfoKHR.name = (LPCWSTR)NULL;
-#endif /* _WIN64 */
     VkExportMemoryAllocateInfoKHR vulkanExportMemoryAllocateInfoKHR = {};
-    vulkanExportMemoryAllocateInfoKHR.sType =
-        VK_STRUCTURE_TYPE_EXPORT_MEMORY_ALLOCATE_INFO_KHR;
-#ifdef _WIN64
-    vulkanExportMemoryAllocateInfoKHR.pNext =
-        extMemHandleType & VK_EXTERNAL_MEMORY_HANDLE_TYPE_OPAQUE_WIN32_BIT_KHR ? &vulkanExportMemoryWin32HandleInfoKHR : NULL;
-    vulkanExportMemoryAllocateInfoKHR.handleTypes = extMemHandleType;
-#else
-    vulkanExportMemoryAllocateInfoKHR.pNext = NULL;
-    vulkanExportMemoryAllocateInfoKHR.handleTypes =
-        VK_EXTERNAL_MEMORY_HANDLE_TYPE_OPAQUE_FD_BIT;
-#endif /* _WIN64 */
+    vulkanExportMemoryAllocateInfoKHR.sType = VK_STRUCTURE_TYPE_EXPORT_MEMORY_ALLOCATE_INFO_KHR;
+    vulkanExportMemoryAllocateInfoKHR.pNext = nullptr;
+    vulkanExportMemoryAllocateInfoKHR.handleTypes = VK_EXTERNAL_MEMORY_HANDLE_TYPE_OPAQUE_FD_BIT;
+
     VkMemoryAllocateInfo allocInfo = {};
     allocInfo.sType = VK_STRUCTURE_TYPE_MEMORY_ALLOCATE_INFO;
     allocInfo.pNext = &vulkanExportMemoryAllocateInfoKHR;
@@ -1497,29 +1477,6 @@ void VulkanBaseApp::createExternalBuffer(
 
 void *VulkanBaseApp::getMemHandle(
     VkDeviceMemory memory, VkExternalMemoryHandleTypeFlagBits handleType) {
-#ifdef _WIN64
-    HANDLE handle = 0;
-
-    VkMemoryGetWin32HandleInfoKHR vkMemoryGetWin32HandleInfoKHR = {};
-    vkMemoryGetWin32HandleInfoKHR.sType =
-        VK_STRUCTURE_TYPE_MEMORY_GET_WIN32_HANDLE_INFO_KHR;
-    vkMemoryGetWin32HandleInfoKHR.pNext = NULL;
-    vkMemoryGetWin32HandleInfoKHR.memory = memory;
-    vkMemoryGetWin32HandleInfoKHR.handleType = handleType;
-
-    PFN_vkGetMemoryWin32HandleKHR fpGetMemoryWin32HandleKHR;
-    fpGetMemoryWin32HandleKHR =
-        (PFN_vkGetMemoryWin32HandleKHR)vkGetDeviceProcAddr(
-            m_device, "vkGetMemoryWin32HandleKHR");
-    if (!fpGetMemoryWin32HandleKHR) {
-        throw std::runtime_error("Failed to retrieve vkGetMemoryWin32HandleKHR!");
-    }
-    if (fpGetMemoryWin32HandleKHR(m_device, &vkMemoryGetWin32HandleInfoKHR,
-                                  &handle) != VK_SUCCESS) {
-        throw std::runtime_error("Failed to retrieve handle for buffer!");
-    }
-    return (void *)handle;
-#else
     int fd = -1;
 
     VkMemoryGetFdInfoKHR vkMemoryGetFdInfoKHR = {};
@@ -1538,35 +1495,9 @@ void *VulkanBaseApp::getMemHandle(
         throw std::runtime_error("Failed to retrieve handle for buffer!");
     }
     return (void *)(uintptr_t)fd;
-#endif /* _WIN64 */
 }
 
-void *VulkanBaseApp::getSemaphoreHandle(
-    VkSemaphore semaphore, VkExternalSemaphoreHandleTypeFlagBits handleType) {
-#ifdef _WIN64
-    HANDLE handle;
-
-    VkSemaphoreGetWin32HandleInfoKHR semaphoreGetWin32HandleInfoKHR = {};
-    semaphoreGetWin32HandleInfoKHR.sType =
-        VK_STRUCTURE_TYPE_SEMAPHORE_GET_WIN32_HANDLE_INFO_KHR;
-    semaphoreGetWin32HandleInfoKHR.pNext = NULL;
-    semaphoreGetWin32HandleInfoKHR.semaphore = semaphore;
-    semaphoreGetWin32HandleInfoKHR.handleType = handleType;
-
-    PFN_vkGetSemaphoreWin32HandleKHR fpGetSemaphoreWin32HandleKHR;
-    fpGetSemaphoreWin32HandleKHR =
-        (PFN_vkGetSemaphoreWin32HandleKHR)vkGetDeviceProcAddr(
-            m_device, "vkGetSemaphoreWin32HandleKHR");
-    if (!fpGetSemaphoreWin32HandleKHR) {
-        throw std::runtime_error("Failed to retrieve vkGetMemoryWin32HandleKHR!");
-    }
-    if (fpGetSemaphoreWin32HandleKHR(m_device, &semaphoreGetWin32HandleInfoKHR,
-                                     &handle) != VK_SUCCESS) {
-        throw std::runtime_error("Failed to retrieve handle for buffer!");
-    }
-
-    return (void *)handle;
-#else
+void *VulkanBaseApp::getSemaphoreHandle(VkSemaphore semaphore, VkExternalSemaphoreHandleTypeFlagBits handleType) {
     int fd;
 
     VkSemaphoreGetFdInfoKHR semaphoreGetFdInfoKHR = {};
@@ -1587,27 +1518,16 @@ void *VulkanBaseApp::getSemaphoreHandle(
     }
 
     return (void *)(uintptr_t)fd;
-#endif /* _WIN64 */
 }
 
 void VulkanBaseApp::createExternalSemaphore(
     VkSemaphore &semaphore, VkExternalSemaphoreHandleTypeFlagBits handleType) {
     VkSemaphoreCreateInfo semaphoreInfo = {};
     semaphoreInfo.sType = VK_STRUCTURE_TYPE_SEMAPHORE_CREATE_INFO;
-    VkExportSemaphoreCreateInfoKHR exportSemaphoreCreateInfo = {};
-    exportSemaphoreCreateInfo.sType =
-        VK_STRUCTURE_TYPE_EXPORT_SEMAPHORE_CREATE_INFO_KHR;
 
-#ifdef _VK_TIMELINE_SEMAPHORE
-    VkSemaphoreTypeCreateInfo timelineCreateInfo;
-    timelineCreateInfo.sType = VK_STRUCTURE_TYPE_SEMAPHORE_TYPE_CREATE_INFO;
-    timelineCreateInfo.pNext = NULL;
-    timelineCreateInfo.semaphoreType = VK_SEMAPHORE_TYPE_TIMELINE;
-    timelineCreateInfo.initialValue = 0;
-    exportSemaphoreCreateInfo.pNext = &timelineCreateInfo;
-#else
+    VkExportSemaphoreCreateInfoKHR exportSemaphoreCreateInfo = {};
+    exportSemaphoreCreateInfo.sType = VK_STRUCTURE_TYPE_EXPORT_SEMAPHORE_CREATE_INFO_KHR;
     exportSemaphoreCreateInfo.pNext = NULL;
-#endif /* _VK_TIMELINE_SEMAPHORE */
     exportSemaphoreCreateInfo.handleTypes = handleType;
     semaphoreInfo.pNext = &exportSemaphoreCreateInfo;
 

@@ -26,8 +26,6 @@ public:
 
     void set_buffer_functor(const std::string &property_name, const std::function<core::Buffer *()> &functor);
 
-    void set_data(const std::string &property_name, core::BufferAllocation &&value);
-
     template<typename T>
     void set_data(const std::string &property_name, T &value) {
         auto iter = shader_buffers_.find(property_name);
@@ -95,7 +93,6 @@ public:
 
 private:
     core::Device &device_;
-    std::unordered_map<std::string, core::BufferAllocation> shader_buffer_pools_{};
     std::unordered_map<std::string, std::function<core::Buffer *()>> shader_buffer_functors_{};
     std::unordered_map<std::string, std::unique_ptr<core::Buffer>> shader_buffers_{};
     std::unordered_map<std::string, std::unique_ptr<core::SampledImage>> sampled_textures_{};

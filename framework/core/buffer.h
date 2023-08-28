@@ -12,6 +12,7 @@
 
 namespace vox::core {
 class Device;
+class BufferPool;
 
 class Buffer : public VulkanResource<VkBuffer, VK_OBJECT_TYPE_BUFFER, const Device> {
 public:
@@ -28,6 +29,7 @@ public:
            VkDeviceSize size,
            VkBufferUsageFlags buffer_usage,
            VmaMemoryUsage memory_usage,
+           BufferPool* pool = nullptr,
            VmaAllocationCreateFlags flags = VMA_ALLOCATION_CREATE_MAPPED_BIT,
            const std::vector<uint32_t> &queue_family_indices = {});
 

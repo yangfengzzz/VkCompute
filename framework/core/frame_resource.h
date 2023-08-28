@@ -23,11 +23,6 @@
 
 namespace vox::core {
 
-enum BufferAllocationStrategy {
-    OneAllocationPerBuffer,
-    MultipleAllocationsPerBuffer
-};
-
 enum DescriptorManagementStrategy {
     StoreInCache,
     CreateDirectly
@@ -103,12 +98,6 @@ public:
     void clear_descriptors();
 
     /**
-	 * @brief Sets a new buffer allocation strategy
-	 * @param new_strategy The new buffer allocation strategy
-	 */
-    void set_buffer_allocation_strategy(BufferAllocationStrategy new_strategy);
-
-    /**
 	 * @brief Sets a new descriptor set management strategy
 	 * @param new_strategy The new descriptor set management strategy
 	 */
@@ -120,7 +109,7 @@ public:
 	 * @param thread_index Index of the buffer pool to be used by the current thread
 	 * @return The requested allocation, it may be empty
 	 */
-    BufferAllocation allocate_buffer(VkBufferUsageFlags usage, VkDeviceSize size, size_t thread_index = 0);
+    Buffer& allocate_buffer(VkBufferUsageFlags usage, VkDeviceSize size, VmaMemoryUsage memory_usage, size_t thread_index = 0);
 
     /**
 	 * @brief Updates all the descriptor sets in the current frame at a specific thread index
@@ -154,10 +143,10 @@ protected:
 
     size_t thread_count;
 
-    BufferAllocationStrategy buffer_allocation_strategy{BufferAllocationStrategy::MultipleAllocationsPerBuffer};
     DescriptorManagementStrategy descriptor_management_strategy{DescriptorManagementStrategy::StoreInCache};
 
-    std::map<VkBufferUsageFlags, std::vector<std::pair<BufferPool, BufferBlock *>>> buffer_pools;
+    std::map<VkBufferUsageFlags, std::vector<std::unique_ptr<BufferPool>>> buffer_pools;
+    std::vector<std::unique_ptr<Buffer>> used_buffer;
 
     static std::vector<uint32_t> collect_bindings_to_update(const DescriptorSetLayout &descriptor_set_layout,
                                                             const BindingMap<VkDescriptorBufferInfo> &buffer_infos,

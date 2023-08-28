@@ -104,13 +104,6 @@ void PostProcessingSubpass::draw(core::CommandBuffer &command_buffer) {
 
     auto &render_target = *parent->draw_render_target;
     const auto &target_views = render_target.get_views();
-
-    if (parent->uniform_buffer_alloc != nullptr) {
-        // Bind buffer to set = 0, binding = 0
-        auto &uniform_alloc = *parent->uniform_buffer_alloc;
-        command_buffer.bind_buffer(uniform_alloc.get_buffer(), uniform_alloc.get_offset(), uniform_alloc.get_size(), 0, 0, 0);
-    }
-
     const auto &bindings = pipeline_layout.get_descriptor_set_layout(0);
 
     // Bind subpass inputs to set = 0, binding = <according to name>
@@ -408,13 +401,6 @@ void PostProcessingRenderPass::prepare_draw(core::CommandBuffer &command_buffer,
 
 void PostProcessingRenderPass::draw(core::CommandBuffer &command_buffer, RenderTarget &default_render_target) {
     prepare_draw(command_buffer, default_render_target);
-
-    if (!uniform_data.empty()) {
-        // Allocate a buffer (using the buffer pool from the active frame to store uniform values) and bind it
-        auto &render_frame = parent->get_render_context().get_active_frame();
-        uniform_buffer_alloc = std::make_shared<core::BufferAllocation>(render_frame.allocate_buffer(VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT, uniform_data.size()));
-        uniform_buffer_alloc->update(uniform_data);
-    }
 
     // Update render target for this draw
     draw_render_target = render_target ? render_target : &default_render_target;

@@ -279,7 +279,6 @@ private:
     std::vector<LoadStoreInfo> load_stores{};
     bool load_stores_dirty{true};
     std::vector<uint8_t> uniform_data{};
-    std::shared_ptr<core::BufferAllocation> uniform_buffer_alloc{};
 };
 
 }// namespace vox::rendering

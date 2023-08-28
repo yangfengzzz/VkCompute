@@ -17,9 +17,9 @@ FrameResource::FrameResource(Device &device,
       semaphore_pool{device},
       thread_count{thread_count} {
     for (auto &usage_it : supported_usage_map) {
-        std::vector<std::pair<BufferPool, BufferBlock *>> usage_buffer_pools;
+        std::vector<std::unique_ptr<BufferPool>> usage_buffer_pools;
         for (size_t i = 0; i < thread_count; ++i) {
-            usage_buffer_pools.emplace_back(BufferPool{device, BUFFER_POOL_BLOCK_SIZE * 1024 * usage_it.second, usage_it.first}, nullptr);
+            usage_buffer_pools.emplace_back(std::make_unique<BufferPool>(device, BUFFER_POOL_BLOCK_SIZE * 1024 * usage_it.second, usage_it.first));
         }
 
         auto res_ins_it = buffer_pools.emplace(usage_it.first, std::move(usage_buffer_pools));
@@ -50,13 +50,7 @@ void FrameResource::reset() {
         }
     }
 
-    for (auto &buffer_pools_per_usage : buffer_pools) {
-        for (auto &buffer_pool : buffer_pools_per_usage.second) {
-            buffer_pool.first.reset();
-            buffer_pool.second = nullptr;
-        }
-    }
-
+    used_buffer.clear();
     semaphore_pool.reset();
 
     if (descriptor_management_strategy == DescriptorManagementStrategy::CreateDirectly) {
@@ -200,46 +194,26 @@ void FrameResource::clear_descriptors() {
     }
 }
 
-void FrameResource::set_buffer_allocation_strategy(BufferAllocationStrategy new_strategy) {
-    buffer_allocation_strategy = new_strategy;
-}
-
 void FrameResource::set_descriptor_management_strategy(DescriptorManagementStrategy new_strategy) {
     descriptor_management_strategy = new_strategy;
 }
 
-BufferAllocation FrameResource::allocate_buffer(const VkBufferUsageFlags usage, const VkDeviceSize size, size_t thread_index) {
+Buffer &FrameResource::allocate_buffer(const VkBufferUsageFlags usage, const VkDeviceSize size,
+                                       VmaMemoryUsage memory_usage, size_t thread_index) {
     assert(thread_index < thread_count && "Thread index is out of bounds");
 
     // Find a pool for this usage
     auto buffer_pool_it = buffer_pools.find(usage);
     if (buffer_pool_it == buffer_pools.end()) {
         LOGE("No buffer pool for buffer usage {}", usage)
-        return BufferAllocation{};
     }
 
     assert(thread_index < buffer_pool_it->second.size());
-    auto &buffer_pool = buffer_pool_it->second[thread_index].first;
-    auto &buffer_block = buffer_pool_it->second[thread_index].second;
-
-    bool want_minimal_block = buffer_allocation_strategy == BufferAllocationStrategy::OneAllocationPerBuffer;
-
-    if (want_minimal_block || !buffer_block) {
-        // If there is no block associated with the pool or we are creating a buffer for each allocation,
-        // request a new buffer block
-        buffer_block = &buffer_pool.request_buffer_block(to_u32(size), want_minimal_block);
-    }
-
-    auto data = buffer_block->allocate(to_u32(size));
-
-    // Check if the buffer block can allocate the requested size
-    if (data.empty()) {
-        buffer_block = &buffer_pool.request_buffer_block(to_u32(size), want_minimal_block);
-
-        data = buffer_block->allocate(to_u32(size));
-    }
-
-    return data;
+    auto &buffer_pool = buffer_pool_it->second[thread_index];
+    auto data = std::make_unique<Buffer>(device, size, usage, memory_usage, buffer_pool.get());
+    auto data_ptr = data.get();
+    used_buffer.emplace_back(std::move(data));
+    return *data_ptr;
 }
 
 }// namespace vox::core

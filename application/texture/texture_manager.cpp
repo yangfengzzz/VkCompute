@@ -172,9 +172,9 @@ std::shared_ptr<Texture> TextureManager::generate_ibl(const std::string &file, r
         auto &render_frame = render_context.get_active_frame();
         for (uint32_t lod = 0; lod < baker_mipmap_count; lod++) {
             float lod_roughness = float(lod) / float(baker_mipmap_count - 1);// linear
-            auto allocation = render_frame.allocate_buffer(VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT, sizeof(float), 0);
-            allocation.update(lod_roughness);
-            shader_data_.set_data("lodRoughness", std::move(allocation));
+            auto& buffer = render_frame.allocate_buffer(VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT, sizeof(float), VMA_MEMORY_USAGE_GPU_ONLY, 0);
+            buffer.convert_and_update(lod_roughness);
+            // shader_data_.set_data("lodRoughness", buffer);
 
             shader_data_.set_storage_texture("o_results", target->get_vk_image_view(VK_IMAGE_VIEW_TYPE_CUBE, lod, 0, 1, 0));
 
