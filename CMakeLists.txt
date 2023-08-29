@@ -57,6 +57,7 @@ if (USE_CUDA)
     find_package(CUDA)
 
     if (CUDA_FOUND)
+        find_package(CUDAToolkit)
         set(CMAKE_CUDA_ARCHITECTURES 86)
         set(CMAKE_CUDA_COMPILER /usr/local/cuda/bin/nvcc)
         enable_language(CUDA)

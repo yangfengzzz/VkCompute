@@ -11,10 +11,11 @@
 namespace vox::core {
 Buffer::Buffer(Device const &device, VkDeviceSize size, VkBufferUsageFlags buffer_usage,
                VmaMemoryUsage memory_usage,
-               BufferPool* pool,
+               BufferPool *pool,
                VmaAllocationCreateFlags flags,
-               const std::vector<uint32_t> &queue_family_indices) : VulkanResource{VK_NULL_HANDLE, &device},
-                                                                    size{size} {
+               const std::vector<uint32_t> &queue_family_indices)
+    : VulkanResource{VK_NULL_HANDLE, &device},
+      size{size} {
 #ifdef VK_USE_PLATFORM_METAL_EXT
     // Workaround for Mac (MoltenVK requires unmapping https://github.com/KhronosGroup/MoltenVK/issues/175)
     // Force cleares the flag VMA_ALLOCATION_CREATE_MAPPED_BIT

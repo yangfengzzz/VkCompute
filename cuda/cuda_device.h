@@ -14,7 +14,9 @@ class CudaDevice {
 public:
     CudaDevice(uint8_t *vkDeviceUUID, size_t UUID_SIZE);
 
-    const cudaDeviceProp &get_prop() const;
+    [[nodiscard]] const cudaDeviceProp &get_prop() const;
+
+    [[nodiscard]] int get_cuda_device() const { return cuda_device; }
 
 private:
     int cuda_device = -1;

@@ -9,11 +9,13 @@ cmake_minimum_required(VERSION 3.16)
 project(cuda-framework LANGUAGES C CXX CUDA)
 
 set(PROJECT_FILES
+        utils/helper_multiprocess.cpp
         cuda_device.cpp
         cuda_stream.cpp
         cuda_external_buffer.cpp
         cuda_external_semaphore.cpp
         sine_wave_simulation.cu
+        monte_carlo_pi.cu
 )
 
 # mask out the min/max macros from minwindef.h
@@ -31,6 +33,7 @@ target_include_directories(${PROJECT_NAME} PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})
 target_link_libraries(${PROJECT_NAME} PUBLIC
         framework
         spdlog
+        CUDA::cuda_driver
 )
 
 if (${NEED_LINK_ATOMIC})

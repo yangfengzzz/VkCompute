@@ -28,7 +28,7 @@ public:
 
 private:
     Device &device;
-    VmaPool pool;
+    VmaPool pool{};
     bool is_exported_{false};
 };
 }// namespace vox::core
