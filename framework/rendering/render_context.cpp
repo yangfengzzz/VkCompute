@@ -299,7 +299,9 @@ core::Semaphore &RenderContext::submit(const core::Queue &queue, const std::vect
 
     std::vector<VkSemaphore> wait_semaphores{};
     std::vector<VkPipelineStageFlags> wait_stages{};
-    external_wait_semaphores(wait_semaphores, wait_stages);
+    if (external_wait_semaphores) {
+        external_wait_semaphores(wait_semaphores, wait_stages);
+    }
 
     wait_stages.emplace_back(wait_pipeline_stage);
     if (wait_semaphore != nullptr) {
@@ -313,7 +315,9 @@ core::Semaphore &RenderContext::submit(const core::Queue &queue, const std::vect
     }
 
     std::vector<VkSemaphore> signal_semaphores;
-    external_signal_semaphores(signal_semaphores);
+    if (external_signal_semaphores) {
+        external_signal_semaphores(signal_semaphores);
+    }
     signal_semaphores.emplace_back(signal_semaphore.get_handle());
     submit_info.signalSemaphoreCount = signal_semaphores.size();
     submit_info.pSignalSemaphores = signal_semaphores.data();
