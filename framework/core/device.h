@@ -151,11 +151,6 @@ public:
     void create_internal_command_pool();
 
     /**
-	 * @brief Creates and sets up the Vulkan memory allocator
-	 */
-    void prepare_memory_allocator();
-
-    /**
 	 * @brief Requests a fence to the fence pool
 	 * @return A vulkan fence
 	 */

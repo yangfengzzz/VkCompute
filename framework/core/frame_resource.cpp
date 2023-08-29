@@ -114,6 +114,10 @@ const FencePool &FrameResource::get_fence_pool() const {
     return fence_pool;
 }
 
+FencePool &FrameResource::get_fence_pool() {
+    return fence_pool;
+}
+
 VkFence FrameResource::request_fence() {
     return fence_pool.request_fence();
 }
@@ -122,7 +126,11 @@ const SemaphorePool &FrameResource::get_semaphore_pool() const {
     return semaphore_pool;
 }
 
-Semaphore& FrameResource::request_semaphore() {
+SemaphorePool &FrameResource::get_semaphore_pool() {
+    return semaphore_pool;
+}
+
+Semaphore &FrameResource::request_semaphore() {
     return semaphore_pool.request_semaphore();
 }
 

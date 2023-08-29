@@ -66,11 +66,15 @@ public:
 
     [[nodiscard]] const FencePool &get_fence_pool() const;
 
+    [[nodiscard]] FencePool &get_fence_pool();
+
     VkFence request_fence();
 
     [[nodiscard]] const SemaphorePool &get_semaphore_pool() const;
 
-    Semaphore& request_semaphore();
+    [[nodiscard]] SemaphorePool &get_semaphore_pool();
+
+    Semaphore &request_semaphore();
 
     Semaphore request_semaphore_with_ownership();
 
@@ -111,7 +115,7 @@ public:
 	 * @param thread_index Index of the buffer pool to be used by the current thread
 	 * @return The requested allocation, it may be empty
 	 */
-    Buffer& allocate_buffer(VkBufferUsageFlags usage, VkDeviceSize size, VmaMemoryUsage memory_usage, size_t thread_index = 0);
+    Buffer &allocate_buffer(VkBufferUsageFlags usage, VkDeviceSize size, VmaMemoryUsage memory_usage, size_t thread_index = 0);
 
     /**
 	 * @brief Updates all the descriptor sets in the current frame at a specific thread index

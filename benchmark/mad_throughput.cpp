@@ -96,8 +96,8 @@ static void throughput(::benchmark::State &state,
         cmd.end();
         resource->submit(cmd);
     }
-    device.get_fence_pool().wait();
-    device.get_fence_pool().reset();
+    resource->get_fence_pool().wait();
+    resource->get_fence_pool().reset();
 
     //===-------------------------------------------------------------------===/
     // Verify destination buffer data
