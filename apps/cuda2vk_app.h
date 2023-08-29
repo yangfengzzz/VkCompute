@@ -15,7 +15,7 @@
 #include "cuda/sine_wave_simulation.h"
 
 namespace vox {
-class CudaComputeApp : public ForwardApplication {
+class Cuda2VkApp : public ForwardApplication {
 public:
     bool prepare(const ApplicationOptions &options) override;
 

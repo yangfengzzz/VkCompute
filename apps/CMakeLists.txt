@@ -13,7 +13,8 @@ project(apps LANGUAGES C CXX)
 set(SRC
         main.cpp
         atomic_compute_app.cpp
-        cuda_compute_app.cpp
+        vk2cuda_app.cpp
+        cuda2vk_app.cpp
         primitive_app.cpp
         )
 

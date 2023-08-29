@@ -4,7 +4,7 @@
 //  personal capacity and am not conveying any rights to any intellectual
 //  property of any third parties.
 
-#include "cuda_compute_app.h"
+#include "vk2cuda_app.h"
 
 #include "application/components/camera.h"
 #include "application/controls/orbit_control.h"
@@ -35,7 +35,7 @@ public:
     explicit CudaExecuteScript(Entity *pEntity) : Script(pEntity) {
     }
 
-    void init(CudaComputeApp *cuda_app) {
+    void init(Vk2CudaApp *cuda_app) {
         app = cuda_app;
     }
 
@@ -75,7 +75,7 @@ public:
 private:
     uint64_t frame_count{0};
     float total_time{};
-    CudaComputeApp *app{};
+    Vk2CudaApp *app{};
 
     std::unique_ptr<compute::CudaExternalBuffer> cuda_height_buffer{nullptr};
     std::unique_ptr<compute::CudaStream> cuda_stream{nullptr};
@@ -87,7 +87,7 @@ private:
 
 }// namespace
 
-bool CudaComputeApp::prepare(const ApplicationOptions &options) {
+bool Vk2CudaApp::prepare(const ApplicationOptions &options) {
     add_instance_extension(VK_KHR_EXTERNAL_MEMORY_CAPABILITIES_EXTENSION_NAME);
     add_instance_extension(VK_KHR_EXTERNAL_SEMAPHORE_CAPABILITIES_EXTENSION_NAME);
 
@@ -138,7 +138,7 @@ bool CudaComputeApp::prepare(const ApplicationOptions &options) {
     return true;
 }
 
-void CudaComputeApp::load_scene() {
+void Vk2CudaApp::load_scene() {
     auto scene = scene_manager_->get_current_scene();
     auto root_entity = scene->create_root_entity();
 
@@ -162,7 +162,7 @@ void CudaComputeApp::load_scene() {
     scene->play();
 }
 
-void CudaComputeApp::get_vertex_descriptions(
+void Vk2CudaApp::get_vertex_descriptions(
     std::vector<VkVertexInputBindingDescription> &bindingDesc,
     std::vector<VkVertexInputAttributeDescription> &attribDesc) {
     bindingDesc.resize(2);
@@ -187,7 +187,7 @@ void CudaComputeApp::get_vertex_descriptions(
     attribDesc[1].offset = 0;
 }
 
-void CudaComputeApp::init_buffer(core::Buffer &index_buffer) {
+void Vk2CudaApp::init_buffer(core::Buffer &index_buffer) {
     compute::set_device_buffer_via_staging_buffer(
         *device, *height_buffer, height_buffer->get_size(),
         [&](void *ptr, size_t) {
