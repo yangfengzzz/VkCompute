@@ -89,6 +89,16 @@ const std::vector<VkQueueFamilyProperties> &PhysicalDevice::get_queue_family_pro
     return queue_family_properties;
 }
 
+uint32_t PhysicalDevice::find_memory_type(uint32_t typeFilter, VkMemoryPropertyFlags flags) const {
+    auto& memProperties = get_memory_properties();
+    for (uint32_t i = 0; i < memProperties.memoryTypeCount; i++) {
+        if (typeFilter & (1 << i) && (memProperties.memoryTypes[i].propertyFlags & flags) == flags) {
+            return i;
+        }
+    }
+    return ~0;
+}
+
 uint32_t PhysicalDevice::get_queue_family_performance_query_passes(
     const VkQueryPoolPerformanceCreateInfoKHR *perf_query_create_info) const {
     uint32_t passes_needed;

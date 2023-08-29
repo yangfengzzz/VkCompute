@@ -29,9 +29,23 @@ public:
            VkDeviceSize size,
            VkBufferUsageFlags buffer_usage,
            VmaMemoryUsage memory_usage,
-           BufferPool* pool = nullptr,
+           BufferPool *pool = nullptr,
            VmaAllocationCreateFlags flags = VMA_ALLOCATION_CREATE_MAPPED_BIT,
            const std::vector<uint32_t> &queue_family_indices = {});
+
+    /**
+     * import external raw_buffer(etc. cuda) into vulkan buffer
+     * @param device A valid Vulkan device
+     * @param raw_buffer The buffer pointer
+     * @param size The size in bytes of the buffer
+     * @param usage The usage flags for the VkBuffer
+     * @param properties Memory property
+     */
+    Buffer(Device const &device,
+           void *raw_buffer,
+           VkDeviceSize size,
+           VkBufferUsageFlags usage,
+           VkMemoryPropertyFlags properties = VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT);
 
     Buffer(const Buffer &) = delete;
 

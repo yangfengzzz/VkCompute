@@ -60,6 +60,50 @@ Buffer::Buffer(Device const &device, VkDeviceSize size, VkBufferUsageFlags buffe
     }
 }
 
+Buffer::Buffer(Device const &device,
+               void *raw_buffer,
+               VkDeviceSize size,
+               VkBufferUsageFlags usage,
+               VkMemoryPropertyFlags properties)
+    : VulkanResource{VK_NULL_HANDLE, &device},
+      size{size} {
+    VkBufferCreateInfo bufferInfo = {};
+    bufferInfo.sType = VK_STRUCTURE_TYPE_BUFFER_CREATE_INFO;
+    bufferInfo.size = size;
+    bufferInfo.usage = usage;
+    bufferInfo.sharingMode = VK_SHARING_MODE_EXCLUSIVE;
+
+    VkExternalMemoryBufferCreateInfo externalMemoryBufferInfo = {};
+    externalMemoryBufferInfo.sType = VK_STRUCTURE_TYPE_EXTERNAL_MEMORY_BUFFER_CREATE_INFO;
+    externalMemoryBufferInfo.handleTypes = VK_EXTERNAL_MEMORY_HANDLE_TYPE_OPAQUE_WIN32_BIT;
+    bufferInfo.pNext = &externalMemoryBufferInfo;
+
+    if (vkCreateBuffer(device.get_handle(), &bufferInfo, nullptr, &handle) != VK_SUCCESS) {
+        throw std::runtime_error("failed to create buffer!");
+    }
+
+    VkMemoryRequirements memRequirements;
+    vkGetBufferMemoryRequirements(device.get_handle(), handle, &memRequirements);
+
+    VkImportMemoryFdInfoKHR handleInfo = {};
+    handleInfo.sType = VK_STRUCTURE_TYPE_IMPORT_MEMORY_FD_INFO_KHR;
+    handleInfo.pNext = nullptr;
+    handleInfo.fd = (int)(uintptr_t)raw_buffer;
+    handleInfo.handleType = get_default_mem_handle_type();
+
+    VkMemoryAllocateInfo memAllocation = {};
+    memAllocation.sType = VK_STRUCTURE_TYPE_MEMORY_ALLOCATE_INFO;
+    memAllocation.pNext = (void *)&handleInfo;
+    memAllocation.allocationSize = memRequirements.size;
+    memAllocation.memoryTypeIndex = device.get_gpu().find_memory_type(memRequirements.memoryTypeBits, properties);
+
+    if (vkAllocateMemory(device.get_handle(), &memAllocation, nullptr, &memory) != VK_SUCCESS) {
+        throw std::runtime_error("Failed to import allocation!");
+    }
+
+    vkBindBufferMemory(device.get_handle(), handle, memory, 0);
+}
+
 Buffer::Buffer(Buffer &&other) noexcept : VulkanResource{other.handle, other.device},
                                           allocation{other.allocation},
                                           memory{other.memory},
