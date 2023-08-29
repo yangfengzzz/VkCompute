@@ -11,13 +11,13 @@
 namespace vox::compute {
 class CudaStream {
 public:
-    CudaStream(CudaDevice &device);
+    explicit CudaStream(CudaDevice &device);
 
     ~CudaStream();
 
     cudaStream_t get_handle();
 
 private:
-    cudaStream_t m_stream;
+    cudaStream_t m_stream{};
 };
 }// namespace vox::compute

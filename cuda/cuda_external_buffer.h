@@ -12,8 +12,8 @@
 namespace vox::compute {
 class CudaExternalBuffer {
 public:
-    CudaExternalBuffer(core::Buffer &buffer,
-                       VkExternalMemoryHandleTypeFlagBits handleType = core::Buffer::get_default_mem_handle_type());
+    explicit CudaExternalBuffer(core::Buffer &buffer,
+                                VkExternalMemoryHandleTypeFlagBits handleType = core::Buffer::get_default_mem_handle_type());
 
     ~CudaExternalBuffer();
 
@@ -23,6 +23,6 @@ public:
 
 private:
     void *cuda_buffer{nullptr};
-    cudaExternalMemory_t cuda_mem;
+    cudaExternalMemory_t cuda_mem{};
 };
 }// namespace vox::compute
