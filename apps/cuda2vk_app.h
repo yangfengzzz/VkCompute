@@ -19,9 +19,11 @@ class Cuda2VkApp : public ForwardApplication {
 public:
     static constexpr size_t NUM_SIMULATION_POINTS = 50000;
 
-    bool prepare(const ApplicationOptions &options) override;
+    void before_prepare() override;
 
-    void load_scene() override;
+    void after_prepare() override;
+
+    Camera *load_scene() override;
 
 public:
     static void get_vertex_descriptions(

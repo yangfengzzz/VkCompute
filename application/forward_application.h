@@ -19,12 +19,12 @@ class ForwardApplication : public GraphicsApplication {
 public:
     ForwardApplication() = default;
 
-    virtual ~ForwardApplication();
+    ~ForwardApplication() override;
 
     /**
      * @brief Additional sample initialization
      */
-    bool prepare(const ApplicationOptions &options) override;
+    bool prepare(const ApplicationOptions &options) final;
 
     /**
      * @brief Main loop sample events
@@ -37,11 +37,17 @@ public:
 
     void render(core::CommandBuffer &command_buffer) override;
 
-    virtual void load_scene() = 0;
+    virtual void before_prepare() {}
+
+    virtual void after_prepare() {}
+
+    virtual Camera *load_scene() = 0;
+
+    virtual void after_load_scene() {}
 
     virtual void update_gpu_task(core::CommandBuffer &command_buffer);
 
-protected:
+private:
     Camera *main_camera_{nullptr};
 
     /**

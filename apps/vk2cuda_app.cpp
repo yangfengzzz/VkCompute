@@ -87,7 +87,7 @@ private:
 
 }// namespace
 
-bool Vk2CudaApp::prepare(const ApplicationOptions &options) {
+void Vk2CudaApp::before_prepare() {
     add_instance_extension(VK_KHR_EXTERNAL_MEMORY_CAPABILITIES_EXTENSION_NAME);
     add_instance_extension(VK_KHR_EXTERNAL_SEMAPHORE_CAPABILITIES_EXTENSION_NAME);
 
@@ -95,8 +95,9 @@ bool Vk2CudaApp::prepare(const ApplicationOptions &options) {
     add_device_extension(VK_KHR_EXTERNAL_SEMAPHORE_EXTENSION_NAME);
     add_device_extension(VK_KHR_EXTERNAL_MEMORY_FD_EXTENSION_NAME);
     add_device_extension(VK_KHR_EXTERNAL_SEMAPHORE_FD_EXTENSION_NAME);
+}
 
-    ForwardApplication::prepare(options);
+void Vk2CudaApp::after_prepare() {
     cuda_device = std::make_unique<compute::CudaDevice>(device->get_gpu().get_device_id_properties().deviceUUID, VK_UUID_SIZE);
     cuda_sim = std::make_unique<compute::SineWaveSimulation>((1ULL << 8ULL), (1ULL << 8ULL), *cuda_device);
 
@@ -123,6 +124,7 @@ bool Vk2CudaApp::prepare(const ApplicationOptions &options) {
                                                VMA_MEMORY_USAGE_GPU_ONLY);
     init_buffer(index_buffer);
 
+    mesh = std::make_shared<BufferMesh>();
     std::vector<VkVertexInputBindingDescription> bindingDesc;
     std::vector<VkVertexInputAttributeDescription> attribDesc;
     get_vertex_descriptions(bindingDesc, attribDesc);
@@ -134,24 +136,21 @@ bool Vk2CudaApp::prepare(const ApplicationOptions &options) {
 
     wait_semaphore = std::make_unique<core::Semaphore>(*device, true);
     signal_semaphore = std::make_unique<core::Semaphore>(*device, true);
-
-    return true;
 }
 
-void Vk2CudaApp::load_scene() {
-    auto scene = scene_manager_->get_current_scene();
+Camera *Vk2CudaApp::load_scene() {
+    auto scene = SceneManager::get_singleton().get_current_scene();
     auto root_entity = scene->create_root_entity();
 
     auto camera_entity = root_entity->create_child();
     camera_entity->transform->set_position(10, 10, 10);
     camera_entity->transform->look_at(Point3F(0, 0, 0));
-    main_camera_ = camera_entity->add_component<Camera>();
-    main_camera_->enable_frustum_culling_ = false;
+    auto main_camera = camera_entity->add_component<Camera>();
+    main_camera->enable_frustum_culling_ = false;
     camera_entity->add_component<control::OrbitControl>();
 
     auto cube_entity = root_entity->create_child();
     auto renderer = cube_entity->add_component<MeshRenderer>();
-    mesh = std::make_shared<BufferMesh>();
     renderer->set_mesh(mesh);
     material_ = std::make_shared<CustomMaterial>(*device);
     renderer->set_material(material_);
@@ -160,6 +159,7 @@ void Vk2CudaApp::load_scene() {
     cuda_execute->init(this);
 
     scene->play();
+    return main_camera;
 }
 
 void Vk2CudaApp::get_vertex_descriptions(

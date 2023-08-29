@@ -17,9 +17,11 @@
 namespace vox {
 class Vk2CudaApp : public ForwardApplication {
 public:
-    bool prepare(const ApplicationOptions &options) override;
+    void before_prepare() override;
 
-    void load_scene() override;
+    void after_prepare() override;
+
+    Camera *load_scene() override;
 
 public:
     void init_buffer(core::Buffer &index_buffer);

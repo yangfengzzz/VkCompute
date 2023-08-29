@@ -16,7 +16,7 @@ set(SRC
         vk2cuda_app.cpp
         cuda2vk_app.cpp
         primitive_app.cpp
-        )
+)
 
 source_group("\\" FILES ${SRC})
 

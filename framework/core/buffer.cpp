@@ -192,7 +192,7 @@ int Buffer::get_memory_handle(VkExternalMemoryHandleTypeFlagBits handleType) con
 
     VkMemoryGetFdInfoKHR vkMemoryGetFdInfoKHR = {};
     vkMemoryGetFdInfoKHR.sType = VK_STRUCTURE_TYPE_MEMORY_GET_FD_INFO_KHR;
-    vkMemoryGetFdInfoKHR.pNext = NULL;
+    vkMemoryGetFdInfoKHR.pNext = nullptr;
     vkMemoryGetFdInfoKHR.memory = memory;
     vkMemoryGetFdInfoKHR.handleType = handleType;
 

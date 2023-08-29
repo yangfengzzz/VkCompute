@@ -11,7 +11,7 @@
 namespace vox {
 class PrimitiveApp : public ForwardApplication {
 public:
-    void load_scene() override;
+    Camera *load_scene() override;
 };
 
 }// namespace vox

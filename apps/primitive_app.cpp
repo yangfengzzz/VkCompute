@@ -30,14 +30,14 @@ private:
 
 }// namespace
 
-void PrimitiveApp::load_scene() {
-    auto scene = scene_manager_->get_current_scene();
+Camera *PrimitiveApp::load_scene() {
+    auto scene = SceneManager::get_singleton().get_current_scene();
     auto root_entity = scene->create_root_entity();
 
     auto camera_entity = root_entity->create_child();
     camera_entity->transform->set_position(10, 10, 10);
     camera_entity->transform->look_at(Point3F(0, 0, 0));
-    main_camera_ = camera_entity->add_component<Camera>();
+    auto main_camera = camera_entity->add_component<Camera>();
     camera_entity->add_component<control::OrbitControl>();
 
     // init point light
@@ -64,6 +64,7 @@ void PrimitiveApp::load_scene() {
     plane_renderer->set_material(textured_material);
 
     scene->play();
+    return main_camera;
 }
 
 }// namespace vox

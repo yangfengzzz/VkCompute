@@ -27,7 +27,9 @@ ForwardApplication::~ForwardApplication() {
 }
 
 bool ForwardApplication::prepare(const ApplicationOptions &options) {
+    before_prepare();
     GraphicsApplication::prepare(options);
+    after_prepare();
 
     // resource loader
     texture_manager_ = std::make_unique<TextureManager>(*device);
@@ -41,7 +43,7 @@ bool ForwardApplication::prepare(const ApplicationOptions &options) {
 
     light_manager_ = std::make_unique<LightManager>(scene);
     {
-        load_scene();
+        main_camera_ = load_scene();
         auto extent = options.window->get_extent();
         auto factor = static_cast<uint32_t>(options.window->get_content_scale_factor());
         components_manager_->call_script_resize(extent.width, extent.height, factor * extent.width,
@@ -53,6 +55,8 @@ bool ForwardApplication::prepare(const ApplicationOptions &options) {
     std::vector<std::unique_ptr<rendering::Subpass>> scene_subpasses{};
     scene_subpasses.emplace_back(std::make_unique<GeometrySubpass>(get_render_context(), scene, main_camera_));
     set_render_pipeline(rendering::RenderPipeline(std::move(scene_subpasses)));
+
+    after_load_scene();
 
     return true;
 }

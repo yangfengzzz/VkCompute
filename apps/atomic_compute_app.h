@@ -12,9 +12,9 @@
 namespace vox {
 class AtomicComputeApp : public ForwardApplication {
 public:
-    bool prepare(const ApplicationOptions &options) override;
+    void after_load_scene() override;
 
-    void load_scene() override;
+    Camera *load_scene() override;
 
     void update_gpu_task(core::CommandBuffer &command_buffer) override;
 

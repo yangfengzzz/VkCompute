@@ -31,14 +31,14 @@ public:
 };
 
 // MARK: - AtomicComputeApp
-void AtomicComputeApp::load_scene() {
-    auto scene = scene_manager_->get_current_scene();
+Camera *AtomicComputeApp::load_scene() {
+    auto scene = SceneManager::get_singleton().get_current_scene();
     auto root_entity = scene->create_root_entity();
 
     auto camera_entity = root_entity->create_child();
     camera_entity->transform->set_position(10, 10, 10);
     camera_entity->transform->look_at(Point3F(0, 0, 0));
-    main_camera_ = camera_entity->add_component<Camera>();
+    auto main_camera = camera_entity->add_component<Camera>();
     camera_entity->add_component<control::OrbitControl>();
 
     // init point light
@@ -54,17 +54,14 @@ void AtomicComputeApp::load_scene() {
     renderer->set_material(material_);
 
     scene->play();
+    return main_camera;
 }
 
-bool AtomicComputeApp::prepare(const ApplicationOptions &options) {
-    ForwardApplication::prepare(options);
-
+void AtomicComputeApp::after_load_scene() {
     atomic_pass = std::make_unique<compute::ComputePass>(
         ShaderManager::get_singleton().load_shader("base/compute/atomic_counter.comp", VK_SHADER_STAGE_COMPUTE_BIT));
     atomic_pass->set_dispatch_size({1, 1, 1});
     atomic_pass->attach_shader_data(&material_->shader_data_);
-
-    return true;
 }
 
 void AtomicComputeApp::update_gpu_task(core::CommandBuffer &command_buffer) {
