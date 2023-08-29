@@ -12,18 +12,18 @@
 #include "cuda/cuda_stream.h"
 #include "cuda/cuda_external_buffer.h"
 #include "cuda/cuda_external_semaphore.h"
-#include "cuda/sine_wave_simulation.h"
+#include "cuda/monte_carlo_pi.h"
 
 namespace vox {
 class Cuda2VkApp : public ForwardApplication {
 public:
+    static constexpr size_t NUM_SIMULATION_POINTS = 50000;
+
     bool prepare(const ApplicationOptions &options) override;
 
     void load_scene() override;
 
 public:
-    void init_buffer(core::Buffer &index_buffer);
-
     static void get_vertex_descriptions(
         std::vector<VkVertexInputBindingDescription> &bindingDesc,
         std::vector<VkVertexInputAttributeDescription> &attribDesc);
@@ -32,12 +32,12 @@ public:
         return *cuda_device;
     }
 
-    compute::SineWaveSimulation &get_cuda_sim() {
-        return *cuda_sim;
+    std::shared_ptr<Material> get_material() {
+        return material_;
     }
 
-    core::Buffer &get_height_buffer() {
-        return *height_buffer;
+    compute::MonteCarloPiSimulation &get_cuda_sim() {
+        return *cuda_sim;
     }
 
     core::Semaphore &get_wait_semaphore() {
@@ -50,11 +50,10 @@ public:
 
 private:
     std::unique_ptr<compute::CudaDevice> cuda_device{nullptr};
-    std::unique_ptr<compute::SineWaveSimulation> cuda_sim{nullptr};
+    std::unique_ptr<compute::MonteCarloPiSimulation> cuda_sim{nullptr};
 
-    std::unique_ptr<core::BufferPool> external_pool{nullptr};
-    std::unique_ptr<core::Buffer> height_buffer{nullptr};
-    std::unique_ptr<core::Buffer> xy_buffer{nullptr};
+    std::unique_ptr<core::Buffer> xy_position_buffer{nullptr};
+    std::unique_ptr<core::Buffer> in_circle_buffer{nullptr};
 
     std::shared_ptr<BufferMesh> mesh{nullptr};
     std::shared_ptr<Material> material_{nullptr};
