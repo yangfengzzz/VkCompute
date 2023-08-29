@@ -20,7 +20,7 @@ out gl_PerVertex
  
 void main() {
     gl_PointSize = 1.0;
-    gl_Position = vec4(xyPos.xy, 0.0f, 1.0f);
+    gl_Position = vec4(xyPos.xy, 0.5f, 1.0f);
     float color_r = 1.0f + 0.5f * sin(ubo.frame / 100.0f);
     float color_g = 1.0f + 0.5f * sin((ubo.frame / 100.0f) + (2.0f*PI/3.0f));
     float color_b = 1.0f;
