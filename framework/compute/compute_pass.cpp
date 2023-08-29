@@ -34,7 +34,8 @@ void ComputePass::detach_shader_data(ShaderData *data) {
 void ComputePass::prepare(core::CommandBuffer &command_buffer) {
 }
 
-void ComputePass::compute(core::CommandBuffer &command_buffer) {
+void ComputePass::compute(core::CommandBuffer &command_buffer,
+                          uint32_t group_count_x, uint32_t group_count_y, uint32_t group_count_z) {
     // Get cache
     auto &resource_cache = command_buffer.get_device().get_resource_cache();
 
@@ -54,7 +55,7 @@ void ComputePass::compute(core::CommandBuffer &command_buffer) {
     }
 
     // Dispatch compute
-    command_buffer.dispatch(n_workgroups[0], n_workgroups[1], n_workgroups[2]);
+    command_buffer.dispatch(group_count_x, group_count_y, group_count_z);
 }
 
 }// namespace vox::compute

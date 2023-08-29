@@ -60,13 +60,12 @@ Camera *AtomicComputeApp::load_scene() {
 void AtomicComputeApp::after_load_scene() {
     atomic_pass = std::make_unique<compute::ComputePass>(
         ShaderManager::get_singleton().load_shader("base/compute/atomic_counter.comp", VK_SHADER_STAGE_COMPUTE_BIT));
-    atomic_pass->set_dispatch_size({1, 1, 1});
     atomic_pass->attach_shader_data(&material_->shader_data_);
 }
 
 void AtomicComputeApp::update_gpu_task(core::CommandBuffer &command_buffer) {
     ForwardApplication::update_gpu_task(command_buffer);
-    atomic_pass->compute(command_buffer);
+    atomic_pass->compute(command_buffer, 1);
 }
 
 }// namespace vox

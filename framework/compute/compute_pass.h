@@ -26,24 +26,10 @@ public:
 
     void prepare(core::CommandBuffer &command_buffer);
 
-    void compute(core::CommandBuffer &command_buffer);
+    void compute(core::CommandBuffer &command_buffer,
+                 uint32_t group_count_x, uint32_t group_count_y = 1, uint32_t group_count_z = 1);
 
 public:
-    /**
-	 * @brief Sets the number of workgroups to be dispatched each draw().
-	 */
-    inline ComputePass &set_dispatch_size(std::array<uint32_t, 3> new_size) {
-        n_workgroups = new_size;
-        return *this;
-    }
-
-    /**
-	 * @brief Gets the number of workgroups that will be dispatched each draw().
-	 */
-    [[nodiscard]] inline std::array<uint32_t, 3> get_dispatch_size() const {
-        return n_workgroups;
-    }
-
     void attach_shader_data(ShaderData *data);
 
     void detach_shader_data(ShaderData *data);
@@ -71,7 +57,6 @@ public:
 
 private:
     std::shared_ptr<ShaderModule> cs_source;
-    std::array<uint32_t, 3> n_workgroups{1, 1, 1};
 
     std::vector<ShaderData *> data_{};
     std::vector<uint8_t> push_constants_data{};

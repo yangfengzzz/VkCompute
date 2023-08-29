@@ -88,12 +88,11 @@ static void throughput(::benchmark::State &state,
     shader_data->set_buffer_functor("InputB", [&]() -> core::Buffer * { return &src1_buffer; });
     shader_data->set_buffer_functor("Output", [&]() -> core::Buffer * { return &dst_buffer; });
 
-    pass->set_dispatch_size({(uint32_t)num_element / (4 * 16), 1, 1});
     {
         core::CommandBuffer &cmd = resource->begin();
         cmd.begin(VK_COMMAND_BUFFER_USAGE_ONE_TIME_SUBMIT_BIT);
         cmd.set_specialization_constant(0, loop_count);
-        pass->compute(cmd);
+        pass->compute(cmd, (uint32_t)num_element / (4 * 16));
         cmd.end();
         resource->submit(cmd);
     }
@@ -150,7 +149,7 @@ static void throughput(::benchmark::State &state,
                 cmd.write_timestamp(VK_PIPELINE_STAGE_TOP_OF_PIPE_BIT, query_pool->get_query_pool(), 0);
             }
             cmd.set_specialization_constant(0, loop_count);
-            pass->compute(cmd);
+            pass->compute(cmd, (uint32_t)num_element / (4 * 16));
             if (use_timestamp) {
                 cmd.write_timestamp(VK_PIPELINE_STAGE_BOTTOM_OF_PIPE_BIT, query_pool->get_query_pool(), 1);
             }
