@@ -22,6 +22,32 @@ set(CORE_FILES
         core/cuda_external_buffer.cpp
 )
 
+set(MATH_FILES
+        math/crt.cpp)
+
+set(STRUCTURE_FILES
+        structure/bvh.cpp
+        structure/bvh.cu
+        structure/cuda_util.cpp
+        structure/hashgrid.cpp
+        structure/hashgrid.cu
+        structure/marching.cu
+        structure/mesh.cpp
+        structure/mesh.cu
+        structure/reduce.cpp
+        structure/reduce.cu
+        structure/runlength_encode.cpp
+        structure/runlength_encode.cu
+        structure/scan.cpp
+        structure/scan.cu
+        structure/sort.cpp
+        structure/sort.cu
+        structure/sparse.cpp
+        structure/sparse.cu
+        structure/cuda_context.cpp
+        structure/cuda_context.cu
+)
+
 set(SOLVER_FILES
         solver/sine_wave_simulation.cu
         solver/monte_carlo_pi.cu
@@ -30,6 +56,8 @@ set(SOLVER_FILES
 set(PROJECT_FILES
         ${UTILS_FILES}
         ${CORE_FILES}
+        ${MATH_FILES}
+        ${STRUCTURE_FILES}
         ${SOLVER_FILES}
 )
 
@@ -49,6 +77,7 @@ target_link_libraries(${PROJECT_NAME} PUBLIC
         framework
         spdlog
         CUDA::cuda_driver
+        nanovdb
 )
 
 if (${NEED_LINK_ATOMIC})
