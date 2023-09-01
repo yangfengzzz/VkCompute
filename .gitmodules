@@ -34,3 +34,9 @@
 [submodule "third_party/shaderc"]
 	path = third_party/shaderc
 	url = https://github.com/google/shaderc.git
+[submodule "third_party/imgui"]
+	path = third_party/imgui
+	url = https://github.com/ocornut/imgui.git
+[submodule "third_party/tinygltf"]
+	path = third_party/tinygltf
+	url = https://github.com/syoyo/tinygltf.git
