@@ -84,6 +84,7 @@ std::shared_ptr<Texture> TextureManager::load_texture_cubemap(const std::string 
 void TextureManager::upload_texture(vox::Texture *image) {
     const auto &queue = device_.get_queue_by_flags(VK_QUEUE_TRANSFER_BIT, 0);
     core::CommandBuffer& command_buffer = device_.request_command_buffer();
+    command_buffer.begin(VK_COMMAND_BUFFER_USAGE_ONE_TIME_SUBMIT_BIT);
 
     vox::core::Buffer stage_buffer{device_, image->get_data().size(), VK_BUFFER_USAGE_TRANSFER_SRC_BIT,
                                    VMA_MEMORY_USAGE_CPU_ONLY};
@@ -92,10 +93,9 @@ void TextureManager::upload_texture(vox::Texture *image) {
     // Setup buffer copy regions for each mip level
     std::vector<VkBufferImageCopy> buffer_copy_regions;
 
-    auto &mipmaps = image->get_mipmaps();
+    const auto &mipmaps = image->get_mipmaps();
     const auto &layers = image->get_layers();
-
-    auto &offsets = image->get_offsets();
+    const auto &offsets = image->get_offsets();
 
     for (uint32_t layer = 0; layer < layers; layer++) {
         for (size_t i = 0; i < mipmaps.size(); i++) {
@@ -130,6 +130,8 @@ void TextureManager::upload_texture(vox::Texture *image) {
     command_buffer.image_memory_barrier(image->get_vk_image(), VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL);
     command_buffer.end();
     queue.submit(command_buffer, device_.request_fence());
+    device_.get_fence_pool().wait();
+    device_.get_fence_pool().reset();
 }
 
 void TextureManager::collect_garbage() {
