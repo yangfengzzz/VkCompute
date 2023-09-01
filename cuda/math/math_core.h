@@ -270,78 +270,28 @@ CUDA_CALLABLE float cast_float(T x) { return (float)(x); }
 template<typename T>
 CUDA_CALLABLE int cast_int(T x) { return (int)(x); }
 
-template<typename T>
-CUDA_CALLABLE void adj_cast_float(T x, T &adj_x, float adj_ret) { adj_x += T(adj_ret); }
-
-template<typename T>
-CUDA_CALLABLE void adj_cast_int(T x, T &adj_x, int adj_ret) { adj_x += adj_ret; }
-
-template<typename T>
-CUDA_CALLABLE inline void adj_int8(T, T &, int8) {}
-template<typename T>
-CUDA_CALLABLE inline void adj_uint8(T, T &, uint8) {}
-template<typename T>
-CUDA_CALLABLE inline void adj_int16(T, T &, int16) {}
-template<typename T>
-CUDA_CALLABLE inline void adj_uint16(T, T &, uint16) {}
-template<typename T>
-CUDA_CALLABLE inline void adj_int32(T, T &, int32) {}
-template<typename T>
-CUDA_CALLABLE inline void adj_uint32(T, T &, uint32) {}
-template<typename T>
-CUDA_CALLABLE inline void adj_int64(T, T &, int64) {}
-template<typename T>
-CUDA_CALLABLE inline void adj_uint64(T, T &, uint64) {}
-
-template<typename T>
-CUDA_CALLABLE inline void adj_float16(T x, T &adj_x, float16 adj_ret) { adj_x += T(adj_ret); }
-template<typename T>
-CUDA_CALLABLE inline void adj_float32(T x, T &adj_x, float32 adj_ret) { adj_x += T(adj_ret); }
-template<typename T>
-CUDA_CALLABLE inline void adj_float64(T x, T &adj_x, float64 adj_ret) { adj_x += T(adj_ret); }
-
 #define kEps 0.0f
 
 // basic ops for integer types
-#define DECLARE_INT_OPS(T)                                                                         \
-    inline CUDA_CALLABLE T mul(T a, T b) { return a * b; }                                         \
-    inline CUDA_CALLABLE T div(T a, T b) { return a / b; }                                         \
-    inline CUDA_CALLABLE T add(T a, T b) { return a + b; }                                         \
-    inline CUDA_CALLABLE T sub(T a, T b) { return a - b; }                                         \
-    inline CUDA_CALLABLE T mod(T a, T b) { return a % b; }                                         \
-    inline CUDA_CALLABLE T min(T a, T b) { return a < b ? a : b; }                                 \
-    inline CUDA_CALLABLE T max(T a, T b) { return a > b ? a : b; }                                 \
-    inline CUDA_CALLABLE T clamp(T x, T a, T b) { return min(max(a, x), b); }                      \
-    inline CUDA_CALLABLE T floordiv(T a, T b) { return a / b; }                                    \
-    inline CUDA_CALLABLE T nonzero(T x) { return x == T(0) ? T(0) : T(1); }                        \
-    inline CUDA_CALLABLE T sqrt(T x) { return 0; }                                                 \
-    inline CUDA_CALLABLE T bit_and(T a, T b) { return a & b; }                                     \
-    inline CUDA_CALLABLE T bit_or(T a, T b) { return a | b; }                                      \
-    inline CUDA_CALLABLE T bit_xor(T a, T b) { return a ^ b; }                                     \
-    inline CUDA_CALLABLE T lshift(T a, T b) { return a << b; }                                     \
-    inline CUDA_CALLABLE T rshift(T a, T b) { return a >> b; }                                     \
-    inline CUDA_CALLABLE T invert(T x) { return ~x; }                                              \
-    inline CUDA_CALLABLE bool isfinite(T x) { return true; }                                       \
-    inline CUDA_CALLABLE void adj_mul(T a, T b, T &adj_a, T &adj_b, T adj_ret) {}                  \
-    inline CUDA_CALLABLE void adj_div(T a, T b, T &adj_a, T &adj_b, T adj_ret) {}                  \
-    inline CUDA_CALLABLE void adj_add(T a, T b, T &adj_a, T &adj_b, T adj_ret) {}                  \
-    inline CUDA_CALLABLE void adj_sub(T a, T b, T &adj_a, T &adj_b, T adj_ret) {}                  \
-    inline CUDA_CALLABLE void adj_mod(T a, T b, T &adj_a, T &adj_b, T adj_ret) {}                  \
-    inline CUDA_CALLABLE void adj_min(T a, T b, T &adj_a, T &adj_b, T adj_ret) {}                  \
-    inline CUDA_CALLABLE void adj_max(T a, T b, T &adj_a, T &adj_b, T adj_ret) {}                  \
-    inline CUDA_CALLABLE void adj_abs(T x, T adj_x, T &adj_ret) {}                                 \
-    inline CUDA_CALLABLE void adj_sign(T x, T adj_x, T &adj_ret) {}                                \
-    inline CUDA_CALLABLE void adj_clamp(T x, T a, T b, T &adj_x, T &adj_a, T &adj_b, T adj_ret) {} \
-    inline CUDA_CALLABLE void adj_floordiv(T a, T b, T &adj_a, T &adj_b, T adj_ret) {}             \
-    inline CUDA_CALLABLE void adj_step(T x, T &adj_x, T adj_ret) {}                                \
-    inline CUDA_CALLABLE void adj_nonzero(T x, T &adj_x, T adj_ret) {}                             \
-    inline CUDA_CALLABLE void adj_sqrt(T x, T adj_x, T &adj_ret) {}                                \
-    inline CUDA_CALLABLE void adj_bit_and(T a, T b, T &adj_a, T &adj_b, T adj_ret) {}              \
-    inline CUDA_CALLABLE void adj_bit_or(T a, T b, T &adj_a, T &adj_b, T adj_ret) {}               \
-    inline CUDA_CALLABLE void adj_bit_xor(T a, T b, T &adj_a, T &adj_b, T adj_ret) {}              \
-    inline CUDA_CALLABLE void adj_lshift(T a, T b, T &adj_a, T &adj_b, T adj_ret) {}               \
-    inline CUDA_CALLABLE void adj_rshift(T a, T b, T &adj_a, T &adj_b, T adj_ret) {}               \
-    inline CUDA_CALLABLE void adj_invert(T x, T adj_x, T &adj_ret) {}
+#define DECLARE_INT_OPS(T)                                                    \
+    inline CUDA_CALLABLE T mul(T a, T b) { return a * b; }                    \
+    inline CUDA_CALLABLE T div(T a, T b) { return a / b; }                    \
+    inline CUDA_CALLABLE T add(T a, T b) { return a + b; }                    \
+    inline CUDA_CALLABLE T sub(T a, T b) { return a - b; }                    \
+    inline CUDA_CALLABLE T mod(T a, T b) { return a % b; }                    \
+    inline CUDA_CALLABLE T min(T a, T b) { return a < b ? a : b; }            \
+    inline CUDA_CALLABLE T max(T a, T b) { return a > b ? a : b; }            \
+    inline CUDA_CALLABLE T clamp(T x, T a, T b) { return min(max(a, x), b); } \
+    inline CUDA_CALLABLE T floordiv(T a, T b) { return a / b; }               \
+    inline CUDA_CALLABLE T nonzero(T x) { return x == T(0) ? T(0) : T(1); }   \
+    inline CUDA_CALLABLE T sqrt(T x) { return 0; }                            \
+    inline CUDA_CALLABLE T bit_and(T a, T b) { return a & b; }                \
+    inline CUDA_CALLABLE T bit_or(T a, T b) { return a | b; }                 \
+    inline CUDA_CALLABLE T bit_xor(T a, T b) { return a ^ b; }                \
+    inline CUDA_CALLABLE T lshift(T a, T b) { return a << b; }                \
+    inline CUDA_CALLABLE T rshift(T a, T b) { return a >> b; }                \
+    inline CUDA_CALLABLE T invert(T x) { return ~x; }                         \
+    inline CUDA_CALLABLE bool isfinite(T x) { return true; }
 
 inline CUDA_CALLABLE int8 abs(int8 x) { return ::abs(x); }
 inline CUDA_CALLABLE int16 abs(int16 x) { return ::abs(x); }
@@ -402,80 +352,23 @@ inline CUDA_CALLABLE void print(double f) {
 }
 
 // basic ops for float types
-#define DECLARE_FLOAT_OPS(T)                                                                                                                         \
-    inline CUDA_CALLABLE T mul(T a, T b) { return a * b; }                                                                                           \
-    inline CUDA_CALLABLE T add(T a, T b) { return a + b; }                                                                                           \
-    inline CUDA_CALLABLE T sub(T a, T b) { return a - b; }                                                                                           \
-    inline CUDA_CALLABLE T min(T a, T b) { return a < b ? a : b; }                                                                                   \
-    inline CUDA_CALLABLE T max(T a, T b) { return a > b ? a : b; }                                                                                   \
-    inline CUDA_CALLABLE T sign(T x) { return x < T(0) ? -1 : 1; }                                                                                   \
-    inline CUDA_CALLABLE T step(T x) { return x < T(0) ? T(1) : T(0); }                                                                              \
-    inline CUDA_CALLABLE T nonzero(T x) { return x == T(0) ? T(0) : T(1); }                                                                          \
-    inline CUDA_CALLABLE T clamp(T x, T a, T b) { return min(max(a, x), b); }                                                                        \
-    inline CUDA_CALLABLE void adj_abs(T x, T &adj_x, T adj_ret) {                                                                                    \
-        if (x < T(0))                                                                                                                                \
-            adj_x -= adj_ret;                                                                                                                        \
-        else                                                                                                                                         \
-            adj_x += adj_ret;                                                                                                                        \
-    }                                                                                                                                                \
-    inline CUDA_CALLABLE void adj_mul(T a, T b, T &adj_a, T &adj_b, T adj_ret) {                                                                     \
-        adj_a += b * adj_ret;                                                                                                                        \
-        adj_b += a * adj_ret;                                                                                                                        \
-    }                                                                                                                                                \
-    inline CUDA_CALLABLE void adj_add(T a, T b, T &adj_a, T &adj_b, T adj_ret) {                                                                     \
-        adj_a += adj_ret;                                                                                                                            \
-        adj_b += adj_ret;                                                                                                                            \
-    }                                                                                                                                                \
-    inline CUDA_CALLABLE void adj_sub(T a, T b, T &adj_a, T &adj_b, T adj_ret) {                                                                     \
-        adj_a += adj_ret;                                                                                                                            \
-        adj_b -= adj_ret;                                                                                                                            \
-    }                                                                                                                                                \
-    inline CUDA_CALLABLE void adj_min(T a, T b, T &adj_a, T &adj_b, T adj_ret) {                                                                     \
-        if (a < b)                                                                                                                                   \
-            adj_a += adj_ret;                                                                                                                        \
-        else                                                                                                                                         \
-            adj_b += adj_ret;                                                                                                                        \
-    }                                                                                                                                                \
-    inline CUDA_CALLABLE void adj_max(T a, T b, T &adj_a, T &adj_b, T adj_ret) {                                                                     \
-        if (a > b)                                                                                                                                   \
-            adj_a += adj_ret;                                                                                                                        \
-        else                                                                                                                                         \
-            adj_b += adj_ret;                                                                                                                        \
-    }                                                                                                                                                \
-    inline CUDA_CALLABLE void adj_floordiv(T a, T b, T &adj_a, T &adj_b, T adj_ret) {}                                                               \
-    inline CUDA_CALLABLE void adj_mod(T a, T b, T &adj_a, T &adj_b, T adj_ret) { adj_a += adj_ret; }                                                 \
-    inline CUDA_CALLABLE void adj_sign(T x, T adj_x, T &adj_ret) {}                                                                                  \
-    inline CUDA_CALLABLE void adj_step(T x, T &adj_x, T adj_ret) {}                                                                                  \
-    inline CUDA_CALLABLE void adj_nonzero(T x, T &adj_x, T adj_ret) {}                                                                               \
-    inline CUDA_CALLABLE void adj_clamp(T x, T a, T b, T &adj_x, T &adj_a, T &adj_b, T adj_ret) {                                                    \
-        if (x < a)                                                                                                                                   \
-            adj_a += adj_ret;                                                                                                                        \
-        else if (x > b)                                                                                                                              \
-            adj_b += adj_ret;                                                                                                                        \
-        else                                                                                                                                         \
-            adj_x += adj_ret;                                                                                                                        \
-    }                                                                                                                                                \
-    inline CUDA_CALLABLE void adj_round(T x, T &adj_x, T adj_ret) {}                                                                                 \
-    inline CUDA_CALLABLE void adj_rint(T x, T &adj_x, T adj_ret) {}                                                                                  \
-    inline CUDA_CALLABLE void adj_trunc(T x, T &adj_x, T adj_ret) {}                                                                                 \
-    inline CUDA_CALLABLE void adj_floor(T x, T &adj_x, T adj_ret) {}                                                                                 \
-    inline CUDA_CALLABLE void adj_ceil(T x, T &adj_x, T adj_ret) {}                                                                                  \
-    inline CUDA_CALLABLE T div(T a, T b) {                                                                                                           \
-        DO_IF_FPCHECK(                                                                                                                               \
-            if (!isfinite(a) || !isfinite(b) || b == T(0)) {                                                                                         \
-                printf("%s:%d div(%f, %f)\n", __FILE__, __LINE__, float(a), float(b));                                                               \
-                assert(0);                                                                                                                           \
-            })                                                                                                                                       \
-        return a / b;                                                                                                                                \
-    }                                                                                                                                                \
-    inline CUDA_CALLABLE void adj_div(T a, T b, T &adj_a, T &adj_b, T adj_ret) {                                                                     \
-        adj_a += adj_ret / b;                                                                                                                        \
-        adj_b -= adj_ret * (a / b) / b;                                                                                                              \
-        DO_IF_FPCHECK(                                                                                                                               \
-            if (!isfinite(adj_a) || !isfinite(adj_b)) {                                                                                              \
-                printf("%s:%d - adj_div(%f, %f, %f, %f, %f)\n", __FILE__, __LINE__, float(a), float(b), float(adj_a), float(adj_b), float(adj_ret)); \
-                assert(0);                                                                                                                           \
-            })                                                                                                                                       \
+#define DECLARE_FLOAT_OPS(T)                                                           \
+    inline CUDA_CALLABLE T mul(T a, T b) { return a * b; }                             \
+    inline CUDA_CALLABLE T add(T a, T b) { return a + b; }                             \
+    inline CUDA_CALLABLE T sub(T a, T b) { return a - b; }                             \
+    inline CUDA_CALLABLE T min(T a, T b) { return a < b ? a : b; }                     \
+    inline CUDA_CALLABLE T max(T a, T b) { return a > b ? a : b; }                     \
+    inline CUDA_CALLABLE T sign(T x) { return x < T(0) ? -1 : 1; }                     \
+    inline CUDA_CALLABLE T step(T x) { return x < T(0) ? T(1) : T(0); }                \
+    inline CUDA_CALLABLE T nonzero(T x) { return x == T(0) ? T(0) : T(1); }            \
+    inline CUDA_CALLABLE T clamp(T x, T a, T b) { return min(max(a, x), b); }          \
+    inline CUDA_CALLABLE T div(T a, T b) {                                             \
+        DO_IF_FPCHECK(                                                                 \
+            if (!isfinite(a) || !isfinite(b) || b == T(0)) {                           \
+                printf("%s:%d div(%f, %f)\n", __FILE__, __LINE__, float(a), float(b)); \
+                assert(0);                                                             \
+            })                                                                         \
+        return a / b;                                                                  \
     }
 
 DECLARE_FLOAT_OPS(float16)
@@ -784,158 +677,15 @@ inline CUDA_CALLABLE float trunc(float x) { return ::truncf(x); }
 inline CUDA_CALLABLE float floor(float x) { return ::floorf(x); }
 inline CUDA_CALLABLE float ceil(float x) { return ::ceilf(x); }
 
-#define DECLARE_ADJOINTS(T)                                                                                                                                      \
-    inline CUDA_CALLABLE void adj_log(T a, T &adj_a, T adj_ret) {                                                                                                \
-        adj_a += (T(1) / a) * adj_ret;                                                                                                                           \
-        DO_IF_FPCHECK(if (!isfinite(adj_a)) {                                                                                                                    \
-            printf("%s:%d - adj_log(%f, %f, %f)\n", __FILE__, __LINE__, float(a), float(adj_a), float(adj_ret));                                                 \
-            assert(0);                                                                                                                                           \
-        })                                                                                                                                                       \
-    }                                                                                                                                                            \
-    inline CUDA_CALLABLE void adj_log2(T a, T &adj_a, T adj_ret) {                                                                                               \
-        adj_a += (T(1) / a) * (T(1) / log(T(2))) * adj_ret;                                                                                                      \
-        DO_IF_FPCHECK(if (!isfinite(adj_a)) {                                                                                                                    \
-            printf("%s:%d - adj_log2(%f, %f, %f)\n", __FILE__, __LINE__, float(a), float(adj_a), float(adj_ret));                                                \
-            assert(0);                                                                                                                                           \
-        })                                                                                                                                                       \
-    }                                                                                                                                                            \
-    inline CUDA_CALLABLE void adj_log10(T a, T &adj_a, T adj_ret) {                                                                                              \
-        adj_a += (T(1) / a) * (T(1) / log(T(10))) * adj_ret;                                                                                                     \
-        DO_IF_FPCHECK(if (!isfinite(adj_a)) {                                                                                                                    \
-            printf("%s:%d - adj_log10(%f, %f, %f)\n", __FILE__, __LINE__, float(a), float(adj_a), float(adj_ret));                                               \
-            assert(0);                                                                                                                                           \
-        })                                                                                                                                                       \
-    }                                                                                                                                                            \
-    inline CUDA_CALLABLE void adj_exp(T a, T &adj_a, T adj_ret) { adj_a += exp(a) * adj_ret; }                                                                   \
-    inline CUDA_CALLABLE void adj_pow(T a, T b, T &adj_a, T &adj_b, T adj_ret) {                                                                                 \
-        adj_a += b * pow(a, b - T(1)) * adj_ret;                                                                                                                 \
-        adj_b += log(a) * pow(a, b) * adj_ret;                                                                                                                   \
-        DO_IF_FPCHECK(if (!isfinite(adj_a) || !isfinite(adj_b)) {                                                                                                \
-            printf("%s:%d - adj_pow(%f, %f, %f, %f, %f)\n", __FILE__, __LINE__, float(a), float(b), float(adj_a), float(adj_b), float(adj_ret));                 \
-            assert(0);                                                                                                                                           \
-        })                                                                                                                                                       \
-    }                                                                                                                                                            \
-    inline CUDA_CALLABLE void adj_leaky_min(T a, T b, T r, T &adj_a, T &adj_b, T &adj_r, T adj_ret) {                                                            \
-        if (a < b)                                                                                                                                               \
-            adj_a += adj_ret;                                                                                                                                    \
-        else {                                                                                                                                                   \
-            adj_a += r * adj_ret;                                                                                                                                \
-            adj_b += adj_ret;                                                                                                                                    \
-        }                                                                                                                                                        \
-    }                                                                                                                                                            \
-    inline CUDA_CALLABLE void adj_leaky_max(T a, T b, T r, T &adj_a, T &adj_b, T &adj_r, T adj_ret) {                                                            \
-        if (a > b)                                                                                                                                               \
-            adj_a += adj_ret;                                                                                                                                    \
-        else {                                                                                                                                                   \
-            adj_a += r * adj_ret;                                                                                                                                \
-            adj_b += adj_ret;                                                                                                                                    \
-        }                                                                                                                                                        \
-    }                                                                                                                                                            \
-    inline CUDA_CALLABLE void adj_acos(T x, T &adj_x, T adj_ret) {                                                                                               \
-        T d = sqrt(T(1) - x * x);                                                                                                                                \
-        DO_IF_FPCHECK(adj_x -= (T(1) / d) * adj_ret;                                                                                                             \
-                      if (!isfinite(d) || !isfinite(adj_x)) {                                                                                                    \
-                          printf("%s:%d - adj_acos(%f, %f, %f)\n", __FILE__, __LINE__, float(x), float(adj_x), float(adj_ret));                                  \
-                          assert(0);                                                                                                                             \
-                      })                                                                                                                                         \
-        DO_IF_NO_FPCHECK(if (d > T(0))                                                                                                                           \
-                             adj_x -= (T(1) / d) * adj_ret;)                                                                                                     \
-    }                                                                                                                                                            \
-    inline CUDA_CALLABLE void adj_asin(T x, T &adj_x, T adj_ret) {                                                                                               \
-        T d = sqrt(T(1) - x * x);                                                                                                                                \
-        DO_IF_FPCHECK(adj_x += (T(1) / d) * adj_ret;                                                                                                             \
-                      if (!isfinite(d) || !isfinite(adj_x)) {                                                                                                    \
-                          printf("%s:%d - adj_asin(%f, %f, %f)\n", __FILE__, __LINE__, float(x), float(adj_x), float(adj_ret));                                  \
-                          assert(0);                                                                                                                             \
-                      })                                                                                                                                         \
-        DO_IF_NO_FPCHECK(if (d > T(0))                                                                                                                           \
-                             adj_x += (T(1) / d) * adj_ret;)                                                                                                     \
-    }                                                                                                                                                            \
-    inline CUDA_CALLABLE void adj_tan(T x, T &adj_x, T adj_ret) {                                                                                                \
-        T cos_x = cos(x);                                                                                                                                        \
-        DO_IF_FPCHECK(adj_x += (T(1) / (cos_x * cos_x)) * adj_ret;                                                                                               \
-                      if (!isfinite(adj_x) || cos_x == T(0)) {                                                                                                   \
-                          printf("%s:%d - adj_tan(%f, %f, %f)\n", __FILE__, __LINE__, float(x), float(adj_x), float(adj_ret));                                   \
-                          assert(0);                                                                                                                             \
-                      })                                                                                                                                         \
-        DO_IF_NO_FPCHECK(if (cos_x != T(0))                                                                                                                      \
-                             adj_x += (T(1) / (cos_x * cos_x)) * adj_ret;)                                                                                       \
-    }                                                                                                                                                            \
-    inline CUDA_CALLABLE void adj_atan(T x, T &adj_x, T adj_ret) {                                                                                               \
-        adj_x += adj_ret / (x * x + T(1));                                                                                                                       \
-    }                                                                                                                                                            \
-    inline CUDA_CALLABLE void adj_atan2(T y, T x, T &adj_y, T &adj_x, T adj_ret) {                                                                               \
-        T d = x * x + y * y;                                                                                                                                     \
-        DO_IF_FPCHECK(adj_x -= y / d * adj_ret;                                                                                                                  \
-                      adj_y += x / d * adj_ret;                                                                                                                  \
-                      if (!isfinite(adj_x) || !isfinite(adj_y) || d == T(0)) {                                                                                   \
-                          printf("%s:%d - adj_atan2(%f, %f, %f, %f, %f)\n", __FILE__, __LINE__, float(y), float(x), float(adj_y), float(adj_x), float(adj_ret)); \
-                          assert(0);                                                                                                                             \
-                      })                                                                                                                                         \
-        DO_IF_NO_FPCHECK(if (d > T(0)) {                                                                                                                         \
-            adj_x -= (y / d) * adj_ret;                                                                                                                          \
-            adj_y += (x / d) * adj_ret;                                                                                                                          \
-        })                                                                                                                                                       \
-    }                                                                                                                                                            \
-    inline CUDA_CALLABLE void adj_sin(T x, T &adj_x, T adj_ret) {                                                                                                \
-        adj_x += cos(x) * adj_ret;                                                                                                                               \
-    }                                                                                                                                                            \
-    inline CUDA_CALLABLE void adj_cos(T x, T &adj_x, T adj_ret) {                                                                                                \
-        adj_x -= sin(x) * adj_ret;                                                                                                                               \
-    }                                                                                                                                                            \
-    inline CUDA_CALLABLE void adj_sinh(T x, T &adj_x, T adj_ret) {                                                                                               \
-        adj_x += cosh(x) * adj_ret;                                                                                                                              \
-    }                                                                                                                                                            \
-    inline CUDA_CALLABLE void adj_cosh(T x, T &adj_x, T adj_ret) {                                                                                               \
-        adj_x += sinh(x) * adj_ret;                                                                                                                              \
-    }                                                                                                                                                            \
-    inline CUDA_CALLABLE void adj_tanh(T x, T &adj_x, T adj_ret) {                                                                                               \
-        T tanh_x = tanh(x);                                                                                                                                      \
-        adj_x += (T(1) - tanh_x * tanh_x) * adj_ret;                                                                                                             \
-    }                                                                                                                                                            \
-    inline CUDA_CALLABLE void adj_sqrt(T x, T &adj_x, T adj_ret) {                                                                                               \
-        adj_x += T(0.5) * (T(1) / sqrt(x)) * adj_ret;                                                                                                            \
-        DO_IF_FPCHECK(if (!isfinite(adj_x)) {                                                                                                                    \
-            printf("%s:%d - adj_sqrt(%f, %f, %f)\n", __FILE__, __LINE__, float(x), float(adj_x), float(adj_ret));                                                \
-            assert(0);                                                                                                                                           \
-        })                                                                                                                                                       \
-    }                                                                                                                                                            \
-    inline CUDA_CALLABLE void adj_degrees(T x, T &adj_x, T adj_ret) {                                                                                            \
-        adj_x += RAD_TO_DEG * adj_ret;                                                                                                                           \
-    }                                                                                                                                                            \
-    inline CUDA_CALLABLE void adj_radians(T x, T &adj_x, T adj_ret) {                                                                                            \
-        adj_x += DEG_TO_RAD * adj_ret;                                                                                                                           \
-    }
-
-DECLARE_ADJOINTS(float16)
-DECLARE_ADJOINTS(float32)
-DECLARE_ADJOINTS(float64)
-
 template<typename C, typename T>
 CUDA_CALLABLE inline T select(const C &cond, const T &a, const T &b) {
     // The double NOT operator !! casts to bool without compiler warnings.
     return (!!cond) ? b : a;
 }
 
-template<typename C, typename T>
-CUDA_CALLABLE inline void adj_select(const C &cond, const T &a, const T &b, C &adj_cond, T &adj_a, T &adj_b, const T &adj_ret) {
-    // The double NOT operator !! casts to bool without compiler warnings.
-    if (!!cond)
-        adj_b += adj_ret;
-    else
-        adj_a += adj_ret;
-}
-
 template<typename T>
 CUDA_CALLABLE inline void copy(T &dest, const T &src) {
     dest = src;
-}
-
-template<typename T>
-CUDA_CALLABLE inline void adj_copy(T &dest, const T &src, T &adj_dest, T &adj_src) {
-    // nop, this is non-differentiable operation since it violates SSA
-    adj_src = adj_dest;
-    adj_dest = T(0);
 }
 
 // some helpful operator overloads (just for C++ use, these are not adjointed)
@@ -960,21 +710,15 @@ CUDA_CALLABLE inline T operator-(const T &a, const T &b) { return sub(a, b); }
 
 template<typename T>
 CUDA_CALLABLE inline T pos(const T &x) { return x; }
-template<typename T>
-CUDA_CALLABLE inline void adj_pos(const T &x, T &adj_x, const T &adj_ret) { adj_x += T(adj_ret); }
 
 // unary negation implemented as negative multiply, not sure the fp implications of this
 // may be better as 0.0 - x?
 template<typename T>
 CUDA_CALLABLE inline T neg(const T &x) { return T(0.0) - x; }
-template<typename T>
-CUDA_CALLABLE inline void adj_neg(const T &x, T &adj_x, const T &adj_ret) { adj_x += T(-adj_ret); }
 
 // unary boolean negation
 template<typename T>
 CUDA_CALLABLE inline bool unot(const T &b) { return !b; }
-template<typename T>
-CUDA_CALLABLE inline void adj_unot(const T &b, T &adj_b, const bool &adj_ret) {}
 
 const int LAUNCH_MAX_DIMS = 4;// should match types.py
 

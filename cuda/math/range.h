@@ -6,6 +6,8 @@
 
 #pragma once
 
+#include "vec.h"
+
 namespace wp {
 
 // All iterable types should implement 3 methods:
@@ -61,10 +63,6 @@ CUDA_CALLABLE inline range_t range(int start, int end, int step) {
 
     return r;
 }
-
-CUDA_CALLABLE inline void adj_range(int end, int adj_end, range_t &adj_ret) {}
-CUDA_CALLABLE inline void adj_range(int start, int end, int adj_start, int adj_end, range_t &adj_ret) {}
-CUDA_CALLABLE inline void adj_range(int start, int end, int step, int adj_start, int adj_end, int adj_step, range_t &adj_ret) {}
 
 CUDA_CALLABLE inline int iter_next(range_t &r) {
     int iter = r.i;

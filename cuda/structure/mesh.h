@@ -856,41 +856,6 @@ CUDA_CALLABLE inline bool mesh_query_point_sign_winding_number(uint64_t id, cons
     }
 }
 
-CUDA_CALLABLE inline void adj_mesh_query_point_no_sign(uint64_t id, const vec3 &point, float max_dist, int &face, float &u, float &v,
-                                                       uint64_t adj_id, vec3 &adj_point, float &adj_max_dist, int &adj_face, float &adj_u, float &adj_v, bool &adj_ret) {
-    Mesh mesh = mesh_get(id);
-
-    // face is determined by BVH in forward pass
-    int i = mesh.indices[face * 3 + 0];
-    int j = mesh.indices[face * 3 + 1];
-    int k = mesh.indices[face * 3 + 2];
-
-    vec3 p = mesh.points[i];
-    vec3 q = mesh.points[j];
-    vec3 r = mesh.points[k];
-
-    vec3 adj_p, adj_q, adj_r;
-
-    vec2 adj_uv(adj_u, adj_v);
-
-    adj_closest_point_to_triangle(p, q, r, point, adj_p, adj_q, adj_r, adj_point, adj_uv);
-}
-
-CUDA_CALLABLE inline void adj_mesh_query_point(uint64_t id, const vec3 &point, float max_dist, float &inside, int &face, float &u, float &v,
-                                               uint64_t adj_id, vec3 &adj_point, float &adj_max_dist, float &adj_inside, int &adj_face, float &adj_u, float &adj_v, bool &adj_ret) {
-    adj_mesh_query_point_no_sign(id, point, max_dist, face, u, v, adj_id, adj_point, adj_max_dist, adj_face, adj_u, adj_v, adj_ret);
-}
-
-CUDA_CALLABLE inline void adj_mesh_query_point_sign_normal(uint64_t id, const vec3 &point, float max_dist, float &inside, int &face, float &u, float &v, const float epsilon,
-                                                           uint64_t adj_id, vec3 &adj_point, float &adj_max_dist, float &adj_inside, int &adj_face, float &adj_u, float &adj_v, float &adj_epsilon, bool &adj_ret) {
-    adj_mesh_query_point_no_sign(id, point, max_dist, face, u, v, adj_id, adj_point, adj_max_dist, adj_face, adj_u, adj_v, adj_ret);
-}
-
-CUDA_CALLABLE inline void adj_mesh_query_point_sign_winding_number(uint64_t id, const vec3 &point, float max_dist, float &inside, int &face, float &u, float &v, const float accuracy, const float winding_number_threshold,
-                                                                   uint64_t adj_id, vec3 &adj_point, float &adj_max_dist, float &adj_inside, int &adj_face, float &adj_u, float &adj_v, float &adj_accuracy, float &adj_winding_number_threshold, bool &adj_ret) {
-    adj_mesh_query_point_no_sign(id, point, max_dist, face, u, v, adj_id, adj_point, adj_max_dist, adj_face, adj_u, adj_v, adj_ret);
-}
-
 CUDA_CALLABLE inline bool mesh_query_ray(uint64_t id, const vec3 &start, const vec3 &dir, float max_t, float &t, float &u, float &v, float &sign, vec3 &normal, int &face) {
     Mesh mesh = mesh_get(id);
 
@@ -968,26 +933,6 @@ CUDA_CALLABLE inline bool mesh_query_ray(uint64_t id, const vec3 &start, const v
     } else {
         return false;
     }
-}
-
-CUDA_CALLABLE inline void adj_mesh_query_ray(
-    uint64_t id, const vec3 &start, const vec3 &dir, float max_t, float &t, float &u, float &v, float &sign, vec3 &n, int &face,
-    uint64_t adj_id, vec3 &adj_start, vec3 &adj_dir, float &adj_max_t, float &adj_t, float &adj_u, float &adj_v, float &adj_sign, vec3 &adj_n, int &adj_face, bool adj_ret) {
-
-    Mesh mesh = mesh_get(id);
-
-    // face is determined by BVH in forward pass
-    int i = mesh.indices[face * 3 + 0];
-    int j = mesh.indices[face * 3 + 1];
-    int k = mesh.indices[face * 3 + 2];
-
-    vec3 a = mesh.points[i];
-    vec3 b = mesh.points[j];
-    vec3 c = mesh.points[k];
-
-    vec3 adj_a, adj_b, adj_c;
-
-    adj_intersect_ray_tri_woop(start, dir, a, b, c, t, u, v, sign, &n, adj_start, adj_dir, adj_a, adj_b, adj_c, adj_t, adj_u, adj_v, adj_sign, &adj_n, adj_ret);
 }
 
 // determine if a point is inside (ret < 0 ) or outside the mesh (ret > 0)
@@ -1092,11 +1037,6 @@ CUDA_CALLABLE inline mesh_query_aabb_t mesh_query_aabb(
     return query;
 }
 
-//Stub
-CUDA_CALLABLE inline void adj_mesh_query_aabb(uint64_t id, const vec3 &lower, const vec3 &upper,
-                                              uint64_t, vec3 &, vec3 &, mesh_query_aabb_t &) {
-}
-
 CUDA_CALLABLE inline bool mesh_query_aabb_next(mesh_query_aabb_t &query, int &index) {
     Mesh mesh = query.mesh;
 
@@ -1147,10 +1087,6 @@ CUDA_CALLABLE inline mesh_query_aabb_t iter_reverse(const mesh_query_aabb_t &que
     return query;
 }
 
-// stub
-CUDA_CALLABLE inline void adj_mesh_query_aabb_next(mesh_query_aabb_t &query, int &index, mesh_query_aabb_t &, int &, bool &) {
-}
-
 CUDA_CALLABLE inline vec3 mesh_eval_position(uint64_t id, int tri, float u, float v) {
     Mesh mesh = mesh_get(id);
 
@@ -1189,48 +1125,6 @@ CUDA_CALLABLE inline vec3 mesh_eval_velocity(uint64_t id, int tri, float u, floa
     return vp * u + vq * v + vr * (1.0f - u - v);
 }
 
-CUDA_CALLABLE inline void adj_mesh_eval_position(uint64_t id, int tri, float u, float v,
-                                                 uint64_t &adj_id, int &adj_tri, float &adj_u, float &adj_v, const vec3 &adj_ret) {
-    Mesh mesh = mesh_get(id);
-
-    if (!mesh.points)
-        return;
-
-    assert(tri < mesh.num_tris);
-
-    int i = mesh.indices[tri * 3 + 0];
-    int j = mesh.indices[tri * 3 + 1];
-    int k = mesh.indices[tri * 3 + 2];
-
-    vec3 p = mesh.points[i];
-    vec3 q = mesh.points[j];
-    vec3 r = mesh.points[k];
-
-    adj_u += (p[0] - r[0]) * adj_ret[0] + (p[1] - r[1]) * adj_ret[1] + (p[2] - r[2]) * adj_ret[2];
-    adj_v += (q[0] - r[0]) * adj_ret[0] + (q[1] - r[1]) * adj_ret[1] + (q[2] - r[2]) * adj_ret[2];
-}
-
-CUDA_CALLABLE inline void adj_mesh_eval_velocity(uint64_t id, int tri, float u, float v,
-                                                 uint64_t &adj_id, int &adj_tri, float &adj_u, float &adj_v, const vec3 &adj_ret) {
-    Mesh mesh = mesh_get(id);
-
-    if (!mesh.velocities)
-        return;
-
-    assert(tri < mesh.num_tris);
-
-    int i = mesh.indices[tri * 3 + 0];
-    int j = mesh.indices[tri * 3 + 1];
-    int k = mesh.indices[tri * 3 + 2];
-
-    vec3 vp = mesh.velocities[i];
-    vec3 vq = mesh.velocities[j];
-    vec3 vr = mesh.velocities[k];
-
-    adj_u += (vp[0] - vr[0]) * adj_ret[0] + (vp[1] - vr[1]) * adj_ret[1] + (vp[2] - vr[2]) * adj_ret[2];
-    adj_v += (vq[0] - vr[0]) * adj_ret[0] + (vq[1] - vr[1]) * adj_ret[1] + (vq[2] - vr[2]) * adj_ret[2];
-}
-
 CUDA_CALLABLE inline vec3 mesh_eval_face_normal(uint64_t id, int tri) {
     Mesh mesh = mesh_get(id);
 
@@ -1250,11 +1144,6 @@ CUDA_CALLABLE inline vec3 mesh_eval_face_normal(uint64_t id, int tri) {
     return normalize(cross(q - p, r - p));
 }
 
-CUDA_CALLABLE inline void adj_mesh_eval_face_normal(uint64_t id, int tri,
-                                                    uint64_t &adj_id, int &adj_tri, const vec3 &adj_ret) {
-    // no-op
-}
-
 CUDA_CALLABLE inline vec3 mesh_get_point(uint64_t id, int index) {
     Mesh mesh = mesh_get(id);
 
@@ -1270,11 +1159,6 @@ CUDA_CALLABLE inline vec3 mesh_get_point(uint64_t id, int index) {
 
     int i = mesh.indices[index];
     return mesh.points[i];
-}
-
-CUDA_CALLABLE inline void adj_mesh_get_point(uint64_t id, int index,
-                                             uint64_t &adj_id, int &adj_index, const vec3 &adj_ret) {
-    // no-op
 }
 
 CUDA_CALLABLE inline vec3 mesh_get_velocity(uint64_t id, int index) {
@@ -1294,11 +1178,6 @@ CUDA_CALLABLE inline vec3 mesh_get_velocity(uint64_t id, int index) {
     return mesh.velocities[i];
 }
 
-CUDA_CALLABLE inline void adj_mesh_get_velocity(uint64_t id, int index,
-                                                uint64_t &adj_id, int &adj_index, const vec3 &adj_ret) {
-    // no-op
-}
-
 CUDA_CALLABLE inline int mesh_get_index(uint64_t id, int face_vertex_index) {
     Mesh mesh = mesh_get(id);
 
@@ -1308,11 +1187,6 @@ CUDA_CALLABLE inline int mesh_get_index(uint64_t id, int face_vertex_index) {
     assert(face_vertex_index < mesh.num_tris * 3);
 
     return mesh.indices[face_vertex_index];
-}
-
-CUDA_CALLABLE inline void adj_mesh_get_index(uint64_t id, int index,
-                                             uint64_t &adj_id, int &adj_index, const vec3 &adj_ret) {
-    // no-op
 }
 
 CUDA_CALLABLE bool mesh_get_descriptor(uint64_t id, Mesh &mesh);
