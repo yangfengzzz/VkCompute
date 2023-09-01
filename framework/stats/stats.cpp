@@ -10,7 +10,6 @@
 #include "core/device.h"
 
 #include "frame_time_stats_provider.h"
-#include "hwcpipe_stats_provider.h"
 #include "vulkan_stats_provider.h"
 
 namespace vox {
@@ -46,7 +45,6 @@ void Stats::request_stats(const std::set<StatIndex> &wanted_stats,
     // All supported stats will be removed from the given 'stats' set by the provider's constructor
     // so subsequent providers only see requests for stats that aren't already supported.
     providers.emplace_back(std::make_unique<FrameTimeStatsProvider>(stats));
-    providers.emplace_back(std::make_unique<HWCPipeStatsProvider>(stats));
     providers.emplace_back(std::make_unique<VulkanStatsProvider>(stats, sampling_config, render_context));
 
     // In continuous sampling mode we still need to update the frame times as if we are polling
