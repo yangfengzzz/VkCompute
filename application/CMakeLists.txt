@@ -27,7 +27,7 @@ set(COMMON_FILES
         graphics_application.cpp
         forward_application.h
         forward_application.cpp
-        )
+)
 
 set(BASE_FILES
         base/debug_info.h
@@ -62,7 +62,7 @@ set(MESH_FILES
         mesh/primitive_mesh.cpp
         mesh/buffer_mesh.h
         mesh/buffer_mesh.cpp
-        )
+)
 
 set(SHADER_FILES
         shader/shader_manager.h
@@ -128,6 +128,12 @@ set(SUBPASS_FILES
         subpasses/geometry_subpass.h
         subpasses/geometry_subpass.cpp)
 
+set(GUI_FILES
+        ui/imgui_impl_glfw.cpp
+        ui/imgui_impl_vulkan.cpp
+        ui/ui_manager.cpp
+)
+
 source_group("\\" FILES ${FRAMEWORK_FILES})
 source_group("common\\" FILES ${COMMON_FILES})
 
@@ -143,7 +149,8 @@ set(PROJECT_FILES
         ${LIGHT_FILES}
         ${CONTROL_FILES}
         ${SUBPASS_FILES}
-        )
+        ${GUI_FILES}
+)
 
 # mask out the min/max macros from minwindef.h
 if (MSVC)
@@ -221,7 +228,8 @@ target_link_libraries(${PROJECT_NAME} PUBLIC
         spdlog
         stb
         ktx
-        )
+        imgui
+)
 
 if (${NEED_LINK_ATOMIC})
     target_link_libraries(${PROJECT_NAME} PUBLIC atomic)

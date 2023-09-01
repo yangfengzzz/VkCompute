@@ -6,7 +6,7 @@
 
 #include "graphics_application.h"
 
-#include "framework/platform/platform.h"
+#include "framework/platform/glfw_window.h"
 
 #if defined(VK_USE_PLATFORM_ANDROID_KHR)
 #include "framework/platform/android/android_platform.h"
@@ -17,7 +17,7 @@ GraphicsApplication::~GraphicsApplication() {
     if (device) {
         device->wait_idle();
     }
-
+    gui_.reset();
     stats.reset();
     render_context.reset();
     device.reset();
@@ -144,6 +144,15 @@ bool GraphicsApplication::prepare(const ApplicationOptions &options) {
     create_render_context();
     prepare_render_context();
 
+    gui_ = std::make_unique<ui::UiManager>(static_cast<GlfwWindow *>(window)->get_handle(),
+                                           render_context.get());
+    gui_->load_font("Ruda_Big", "Fonts/Ruda-Bold.ttf", 16);
+    gui_->load_font("Ruda_Medium", "Fonts/Ruda-Bold.ttf", 14);
+    gui_->load_font("Ruda_Small", "Fonts/Ruda-Bold.ttf", 12);
+    gui_->use_font("Ruda_Medium");
+    gui_->set_editor_layout_auto_save_frequency(60.0f);
+    gui_->enable_editor_layout_save(true);
+
     stats = std::make_unique<Stats>(*render_context);
 
     return true;
@@ -255,6 +264,11 @@ void GraphicsApplication::draw(core::CommandBuffer &command_buffer, rendering::R
 void GraphicsApplication::draw_renderpass(core::CommandBuffer &command_buffer, rendering::RenderTarget &render_target) {
     set_viewport_and_scissor(command_buffer, render_target.get_extent());
     render(command_buffer);
+
+    if (gui_) {
+        gui_->draw(command_buffer);
+    }
+
     command_buffer.end_render_pass();
 }
 

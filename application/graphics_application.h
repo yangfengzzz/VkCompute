@@ -13,6 +13,7 @@
 #include "framework/rendering/render_pipeline.h"
 #include "framework/stats/stats.h"
 #include "application.h"
+#include "ui/ui_manager.h"
 
 namespace vox {
 /**
@@ -135,6 +136,8 @@ protected:
 	 * @brief Pipeline used for rendering, it should be set up by the concrete sample
 	 */
     std::unique_ptr<rendering::RenderPipeline> render_pipeline{nullptr};
+
+    std::unique_ptr<ui::UiManager> gui_{nullptr};
 
     std::unique_ptr<Stats> stats{nullptr};
 

@@ -43,40 +43,40 @@ target_include_directories(vulkan INTERFACE ${VULKAN_INCLUDE_DIR})
 target_compile_definitions(vulkan INTERFACE VK_NO_PROTOTYPES)
 
 
-if(ANDROID)
+if (ANDROID)
     target_compile_definitions(vulkan INTERFACE VK_USE_PLATFORM_ANDROID_KHR)
-elseif(WIN32)
+elseif (WIN32)
     target_compile_definitions(vulkan INTERFACE VK_USE_PLATFORM_WIN32_KHR)
-elseif(APPLE)
-	target_compile_definitions(vulkan INTERFACE VK_USE_PLATFORM_METAL_EXT)
-elseif(UNIX)
+elseif (APPLE)
+    target_compile_definitions(vulkan INTERFACE VK_USE_PLATFORM_METAL_EXT)
+elseif (UNIX)
     # Choose WSI based on VKB_WSI_SELECTION
     if (VKB_WSI_SELECTION STREQUAL XCB OR VKB_WSI_SELECTION STREQUAL XLIB OR VKB_WSI_SELECTION STREQUAL WAYLAND)
         find_package(PkgConfig REQUIRED)
-    endif()
+    endif ()
     if (VKB_WSI_SELECTION STREQUAL XCB)
         pkg_check_modules(XCB xcb REQUIRED)
         if (XCB_FOUND)
             target_compile_definitions(vulkan INTERFACE VK_USE_PLATFORM_XCB_KHR)
-        endif()
+        endif ()
     elseif (VKB_WSI_SELECTION STREQUAL XLIB)
         pkg_check_modules(X11 x11 REQUIRED)
         if (X11_FOUND)
             target_compile_definitions(vulkan INTERFACE VK_USE_PLATFORM_XLIB_KHR)
-        endif()
+        endif ()
     elseif (VKB_WSI_SELECTION STREQUAL WAYLAND)
         pkg_check_modules(WAYLAND wayland-client REQUIRED)
         if (WAYLAND_FOUND)
             target_compile_definitions(vulkan INTERFACE VK_USE_PLATFORM_WAYLAND_KHR)
-        endif()
+        endif ()
     elseif (VKB_WSI_SELECTION STREQUAL D2D)
         set(DIRECT_TO_DISPLAY TRUE)
         set(DIRECT_TO_DISPLAY TRUE PARENT_SCOPE)
         target_compile_definitions(vulkan INTERFACE VK_USE_PLATFORM_DISPLAY_KHR)
-    else()
+    else ()
         message(FATAL_ERROR "Unknown WSI")
-    endif()
-endif() 
+    endif ()
+endif ()
 
 # vma
 add_subdirectory(vma)
@@ -90,8 +90,8 @@ add_subdirectory(ktx)
 # volk
 set(VOLK_DIR "${CMAKE_CURRENT_SOURCE_DIR}/volk")
 set(VOLK_FILES
-    "${VOLK_DIR}/volk.c"
-    "${VOLK_DIR}/volk.h")
+        "${VOLK_DIR}/volk.c"
+        "${VOLK_DIR}/volk.h")
 
 add_library(volk STATIC ${VOLK_FILES})
 set_target_properties(volk PROPERTIES POSITION_INDEPENDENT_CODE ON)
@@ -105,23 +105,24 @@ elseif (VKB_WSI_SELECTION STREQUAL XLIB)
     target_include_directories(volk PUBLIC ${X11_INCLUDE_DIRS})
 elseif (VKB_WSI_SELECTION STREQUAL WAYLAND)
     target_include_directories(volk PUBLIC ${WAYLAND_INCLUDE_DIRS})
-endif()
+endif ()
 
 set_property(TARGET volk PROPERTY FOLDER "ThirdParty")
 
 # imgui
 set(IMGUI_DIR "${CMAKE_CURRENT_SOURCE_DIR}/imgui")
 set(IMGUI_FILES
-    "${IMGUI_DIR}/imgui.cpp"
-    "${IMGUI_DIR}/imgui_demo.cpp"
-    "${IMGUI_DIR}/imgui_draw.cpp"
-    "${IMGUI_DIR}/imgui_widgets.cpp"
-    "${IMGUI_DIR}/imconfig.h"
-    "${IMGUI_DIR}/imgui.h"
-    "${IMGUI_DIR}/imgui_internal.h"
-    "${IMGUI_DIR}/imstb_rectpack.h"
-    "${IMGUI_DIR}/imstb_textedit.h"
-    "${IMGUI_DIR}/imstb_truetype.h")
+        "${IMGUI_DIR}/imgui.cpp"
+        "${IMGUI_DIR}/imgui_demo.cpp"
+        "${IMGUI_DIR}/imgui_draw.cpp"
+        "${IMGUI_DIR}/imgui_tables.cpp"
+        "${IMGUI_DIR}/imgui_widgets.cpp"
+        "${IMGUI_DIR}/imconfig.h"
+        "${IMGUI_DIR}/imgui.h"
+        "${IMGUI_DIR}/imgui_internal.h"
+        "${IMGUI_DIR}/imstb_rectpack.h"
+        "${IMGUI_DIR}/imstb_textedit.h"
+        "${IMGUI_DIR}/imstb_truetype.h")
 add_library(imgui STATIC ${IMGUI_FILES})
 target_include_directories(imgui PUBLIC ${IMGUI_DIR})
 set_target_properties(imgui PROPERTIES FOLDER "ThirdParty" POSITION_INDEPENDENT_CODE ON)
@@ -143,7 +144,7 @@ add_library(stb INTERFACE)
 target_include_directories(stb INTERFACE "${CMAKE_CURRENT_SOURCE_DIR}/stb")
 
 # glfw
-if(NOT ANDROID)
+if (NOT ANDROID)
     if (NOT DIRECT_TO_DISPLAY)
         # GLFW
         option(GLFW_BUILD_DOCS OFF)
@@ -154,13 +155,13 @@ if(NOT ANDROID)
         option(BUILD_SHARED_LIBS ON)
         if (VKB_WSI_SELECTION STREQUAL WAYLAND)
             set(GLFW_USE_WAYLAND ON)
-        endif()
+        endif ()
 
         add_subdirectory(glfw)
 
         set_property(TARGET glfw PROPERTY FOLDER "ThirdParty")
-    endif()
-endif()
+    endif ()
+endif ()
 
 # spdlog
 add_subdirectory(spdlog)

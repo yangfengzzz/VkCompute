@@ -16,6 +16,7 @@ set(SRC
         vk2cuda_app.cpp
         cuda2vk_app.cpp
         primitive_app.cpp
+        gui_app.cpp
 )
 
 source_group("\\" FILES ${SRC})
@@ -36,6 +37,7 @@ target_link_libraries(${PROJECT_NAME} PRIVATE
         framework
         cuda-framework
         application
+        imgui
 )
 
 # Create android project

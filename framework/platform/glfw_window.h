@@ -39,6 +39,10 @@ public:
 
     [[nodiscard]] std::vector<const char *> get_required_surface_extensions() const override;
 
+    GLFWwindow *get_handle() {
+        return handle;
+    }
+
 private:
     GLFWwindow *handle = nullptr;
 };

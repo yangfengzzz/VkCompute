@@ -9,6 +9,8 @@
 #include "components/camera.h"
 #include "framework/platform/platform.h"
 #include "subpasses/geometry_subpass.h"
+#include "ui/imgui_impl_glfw.h"
+#include "ui/imgui_impl_vulkan.h"
 
 namespace vox {
 ForwardApplication::~ForwardApplication() {
@@ -62,6 +64,10 @@ bool ForwardApplication::prepare(const ApplicationOptions &options) {
 }
 
 void ForwardApplication::update(float delta_time) {
+    ImGui_ImplVulkan_NewFrame();
+    ImGui_ImplGlfw_NewFrame();
+    ImGui::NewFrame();
+
     {
         components_manager_->call_script_on_start();
 
