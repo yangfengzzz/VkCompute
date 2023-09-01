@@ -16,7 +16,6 @@ VKBP_DISABLE_WARNINGS()
 VKBP_ENABLE_WARNINGS()
 
 #include "framework/common/utils.h"
-#include "texture/astc.h"
 #include "texture/ktx.h"
 #include "texture/stb.h"
 
@@ -313,8 +312,6 @@ std::shared_ptr<Texture> Texture::load(const std::string &name, const std::strin
 
     if (extension == "png" || extension == "jpg") {
         image = std::make_shared<Stb>(name, data, content_type);
-    } else if (extension == "astc") {
-        image = std::make_shared<Astc>(name, data);
     } else if (extension == "ktx") {
         image = std::make_shared<Ktx>(name, data, content_type);
     } else if (extension == "ktx2") {

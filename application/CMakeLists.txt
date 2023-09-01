@@ -45,9 +45,7 @@ set(TEXTURE_FILES
         texture/stb.h
         texture/stb.cpp
         texture/ktx.h
-        texture/ktx.cpp
-        texture/astc.h
-        texture/astc.cpp)
+        texture/ktx.cpp)
 
 set(MESH_FILES
         mesh/index_buffer_binding.h
@@ -223,7 +221,6 @@ target_link_libraries(${PROJECT_NAME} PUBLIC
         glslang-default-resource-limits
         spdlog
         stb
-        astc
         ktx
         )
 
