@@ -9,7 +9,7 @@
 #include <cuda.h>
 #include <curand.h>
 #include <curand_kernel.h>
-#include "cuda_stream.h"
+#include "core/cuda_stream.h"
 #include "utils/helper_multiprocess.h"
 
 typedef float vec2[2];

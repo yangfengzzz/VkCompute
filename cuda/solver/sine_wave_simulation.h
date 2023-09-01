@@ -6,7 +6,7 @@
 
 #pragma once
 
-#include "cuda_stream.h"
+#include "core/cuda_stream.h"
 
 namespace vox::compute {
 class SineWaveSimulation {

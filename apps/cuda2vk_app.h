@@ -8,11 +8,11 @@
 
 #include "application/forward_application.h"
 #include "mesh/buffer_mesh.h"
-#include "cuda/cuda_device.h"
-#include "cuda/cuda_stream.h"
-#include "cuda/cuda_external_buffer.h"
-#include "cuda/cuda_external_semaphore.h"
-#include "cuda/monte_carlo_pi.h"
+#include "cuda/core/cuda_device.h"
+#include "cuda/core/cuda_stream.h"
+#include "cuda/core/cuda_external_buffer.h"
+#include "cuda/core/cuda_external_semaphore.h"
+#include "cuda/solver/monte_carlo_pi.h"
 
 namespace vox {
 class Cuda2VkApp : public ForwardApplication {

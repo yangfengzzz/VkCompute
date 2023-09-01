@@ -8,14 +8,29 @@ cmake_minimum_required(VERSION 3.16)
 
 project(cuda-framework LANGUAGES C CXX CUDA)
 
-set(PROJECT_FILES
+set(UTILS_FILES
         utils/helper_multiprocess.cpp
-        cuda_device.cpp
-        cuda_stream.cpp
-        cuda_external_buffer.cpp
-        cuda_external_semaphore.cpp
-        sine_wave_simulation.cu
-        monte_carlo_pi.cu
+        utils/helper_multiprocess.h
+        utils/helper_cuda.h
+        utils/helper_string.h
+)
+
+set(CORE_FILES
+        core/cuda_device.cpp
+        core/cuda_stream.cpp
+        core/cuda_external_semaphore.cpp
+        core/cuda_external_buffer.cpp
+)
+
+set(SOLVER_FILES
+        solver/sine_wave_simulation.cu
+        solver/monte_carlo_pi.cu
+)
+
+set(PROJECT_FILES
+        ${UTILS_FILES}
+        ${CORE_FILES}
+        ${SOLVER_FILES}
 )
 
 # mask out the min/max macros from minwindef.h
