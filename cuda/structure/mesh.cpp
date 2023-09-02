@@ -114,7 +114,8 @@ uint64_t mesh_create_host(array_t<wp::vec3> points, array_t<wp::vec3> velocities
     return (uint64_t)m;
 }
 
-uint64_t mesh_create_device(void *context, array_t<wp::vec3> points, array_t<wp::vec3> velocities, array_t<int> indices, int num_points, int num_tris, int support_winding_number) {
+uint64_t mesh_create_device(void *context, array_t<wp::vec3> points, array_t<wp::vec3> velocities, array_t<int> indices,
+                            int num_points, int num_tris, int support_winding_number) {
     ContextGuard guard(context);
 
     Mesh mesh(points, velocities, indices, num_points, num_tris);

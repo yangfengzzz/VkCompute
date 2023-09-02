@@ -6,7 +6,8 @@
 
 #pragma once
 
-#include "vec.h"
+#include "math/vec.h"
+#include "math/math_utils.h"
 #include <cmath>
 
 namespace wp {
@@ -202,11 +203,24 @@ __device__ inline bool intersect_ray_tri_rtcd(const vec3 &p, const vec3 &dir, co
     return true;
 }
 
-__device__ inline float xorf(float x, int y) {
+#ifndef __CUDA_ARCH__
+
+// these are provided as built-ins by CUDA
+inline float __int_as_float(int i) {
+    return *(float *)(&i);
+}
+
+inline int __float_as_int(float f) {
+    return *(int *)(&f);
+}
+
+#endif
+
+__device__ __host__ inline float xorf(float x, int y) {
     return __int_as_float(__float_as_int(x) ^ y);
 }
 
-__device__ inline int sign_mask(float x) {
+__device__ __host__ inline int sign_mask(float x) {
     return __float_as_int(x) & 0x80000000;
 }
 

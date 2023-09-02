@@ -172,7 +172,7 @@ int waitProcess(Process *process) {
 int ipcCreateSocket(ipcHandle *&handle, const char *name,
                     const std::vector<Process> &processes) {
     int server_fd;
-    struct sockaddr_un servaddr{};
+    struct sockaddr_un servaddr {};
 
     handle = new ipcHandle;
     memset(handle, 0, sizeof(*handle));
@@ -210,7 +210,7 @@ int ipcCreateSocket(ipcHandle *&handle, const char *name,
 
 int ipcOpenSocket(ipcHandle *&handle) {
     int sock = 0;
-    struct sockaddr_un cliaddr{};
+    struct sockaddr_un cliaddr {};
 
     handle = new ipcHandle;
     memset(handle, 0, sizeof(*handle));
@@ -257,7 +257,7 @@ int ipcCloseSocket(ipcHandle *handle) {
 int ipcRecvShareableHandle(ipcHandle *handle, ShareableHandle *shHandle) {
     struct msghdr msg = {nullptr};
     struct iovec iov[1];
-    struct cmsghdr cm{};
+    struct cmsghdr cm {};
 
     // Union to guarantee alignment requirements for control array
     union {
@@ -302,7 +302,7 @@ int ipcRecvShareableHandle(ipcHandle *handle, ShareableHandle *shHandle) {
 
 int ipcRecvDataFromClient(ipcHandle *serverHandle, void *data, size_t size) {
     ssize_t readResult;
-    struct sockaddr_un cliaddr{};
+    struct sockaddr_un cliaddr {};
     socklen_t len = sizeof(cliaddr);
 
     readResult = recvfrom(serverHandle->socket, data, size, 0,
@@ -317,7 +317,7 @@ int ipcRecvDataFromClient(ipcHandle *serverHandle, void *data, size_t size) {
 int ipcSendDataToServer(ipcHandle *handle, const char *serverName,
                         const void *data, size_t size) {
     ssize_t sendResult;
-    struct sockaddr_un serveraddr{};
+    struct sockaddr_un serveraddr {};
 
     bzero(&serveraddr, sizeof(serveraddr));
     serveraddr.sun_family = AF_UNIX;
@@ -335,7 +335,7 @@ int ipcSendDataToServer(ipcHandle *handle, const char *serverName,
 int ipcSendShareableHandle(ipcHandle *handle,
                            const std::vector<ShareableHandle> &shareableHandles,
                            Process process, int data) {
-    struct msghdr msg{};
+    struct msghdr msg {};
     struct iovec iov[1];
 
     union {
@@ -345,7 +345,7 @@ int ipcSendShareableHandle(ipcHandle *handle,
 
     struct cmsghdr *cmptr;
     ssize_t readResult;
-    struct sockaddr_un cliaddr{};
+    struct sockaddr_un cliaddr {};
     socklen_t len = sizeof(cliaddr);
 
     // Construct client address to send this SHareable handle to

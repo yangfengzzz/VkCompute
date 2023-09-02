@@ -53,7 +53,9 @@ __global__ void compute_average_mesh_edge_length(int n, float *sum_edge_lengths,
     m->average_edge_length = sum_edge_lengths[n - 1] / (3 * n);
 }
 
-__global__ void bvh_refit_with_solid_angle_kernel(int n, const int *__restrict__ parents, int *__restrict__ child_count, BVHPackedNodeHalf *__restrict__ lowers, BVHPackedNodeHalf *__restrict__ uppers, const vec3 *points, const int *indices, SolidAngleProps *solid_angle_props) {
+__global__ void bvh_refit_with_solid_angle_kernel(int n, const int *__restrict__ parents, int *__restrict__ child_count,
+                                                  BVHPackedNodeHalf *__restrict__ lowers, BVHPackedNodeHalf *__restrict__ uppers,
+                                                  const vec3 *points, const int *indices, SolidAngleProps *solid_angle_props) {
     int index = blockDim.x * blockIdx.x + threadIdx.x;
 
     if (index < n) {
@@ -62,7 +64,8 @@ __global__ void bvh_refit_with_solid_angle_kernel(int n, const int *__restrict__
         if (leaf) {
             // update the leaf node
             const int leaf_index = lowers[index].i;
-            precompute_triangle_solid_angle_props(points[indices[leaf_index * 3 + 0]], points[indices[leaf_index * 3 + 1]], points[indices[leaf_index * 3 + 2]], solid_angle_props[index]);
+            precompute_triangle_solid_angle_props(points[indices[leaf_index * 3 + 0]], points[indices[leaf_index * 3 + 1]],
+                                                  points[indices[leaf_index * 3 + 2]], solid_angle_props[index]);
 
             make_node(lowers + index, solid_angle_props[index].box.lower, leaf_index, true);
             make_node(uppers + index, solid_angle_props[index].box.upper, 0, false);
@@ -117,7 +120,7 @@ __global__ void bvh_refit_with_solid_angle_kernel(int n, const int *__restrict__
 
                 // combine
                 SolidAngleProps *left_child_data = &solid_angle_props[left_child];
-                SolidAngleProps *right_child_data = (left_child != right_child) ? &solid_angle_props[right_child] : NULL;
+                SolidAngleProps *right_child_data = (left_child != right_child) ? &solid_angle_props[right_child] : nullptr;
 
                 combine_precomputed_solid_angle_props(solid_angle_props[parent], left_child_data, right_child_data);
 
@@ -137,12 +140,13 @@ void bvh_refit_with_solid_angle_device(BVH &bvh, Mesh &mesh) {
     // clear child counters
     memset_device(WP_CURRENT_CONTEXT, bvh.node_counts, 0, sizeof(int) * bvh.max_nodes);
 
-    wp_launch_device(WP_CURRENT_CONTEXT, bvh_refit_with_solid_angle_kernel, bvh.max_nodes, (bvh.max_nodes, bvh.node_parents, bvh.node_counts, bvh.node_lowers, bvh.node_uppers, mesh.points, mesh.indices, mesh.solid_angle_props));
+    wp_launch_device(WP_CURRENT_CONTEXT, bvh_refit_with_solid_angle_kernel, bvh.max_nodes,
+                     (bvh.max_nodes, bvh.node_parents, bvh.node_counts,
+                      bvh.node_lowers, bvh.node_uppers, mesh.points, mesh.indices, mesh.solid_angle_props));
 }
 }// namespace wp
 
 void mesh_refit_device(uint64_t id) {
-
     // recompute triangle bounds
     wp::Mesh m;
     if (mesh_get_descriptor(id, m)) {
@@ -153,22 +157,24 @@ void mesh_refit_device(uint64_t id) {
         // since it relies on an epsilon for welding
 
         // re-use bounds memory temporarily for computing edge lengths
-        float *length_tmp_ptr = (float *)m.bounds;
-        wp_launch_device(WP_CURRENT_CONTEXT, wp::compute_mesh_edge_lengths, m.num_tris, (m.num_tris, m.points, m.indices, length_tmp_ptr));
+        auto *length_tmp_ptr = (float *)m.bounds;
+        wp_launch_device(WP_CURRENT_CONTEXT, wp::compute_mesh_edge_lengths, m.num_tris,
+                         (m.num_tris, m.points, m.indices, length_tmp_ptr));
 
         thrust::inclusive_scan(
             thrust::device_ptr<float>(length_tmp_ptr),
             thrust::device_ptr<float>(length_tmp_ptr + m.num_tris),
             thrust::device_ptr<float>(length_tmp_ptr));
 
-        wp_launch_device(WP_CURRENT_CONTEXT, wp::compute_average_mesh_edge_length, 1, (m.num_tris, length_tmp_ptr, (wp::Mesh *)id));
-        wp_launch_device(WP_CURRENT_CONTEXT, wp::compute_triangle_bounds, m.num_tris, (m.num_tris, m.points, m.indices, m.bounds));
+        wp_launch_device(WP_CURRENT_CONTEXT, wp::compute_average_mesh_edge_length, 1,
+                         (m.num_tris, length_tmp_ptr, (wp::Mesh *)id));
+        wp_launch_device(WP_CURRENT_CONTEXT, wp::compute_triangle_bounds, m.num_tris,
+                         (m.num_tris, m.points, m.indices, m.bounds));
 
         if (m.solid_angle_props) {
             bvh_refit_with_solid_angle_device(m.bvh, m);
         } else {
-            // todo
-            //            bvh_refit_device(m.bvh, m.bounds);
+            bvh_refit_device(m.bvh, m.bounds);
         }
     }
 }

@@ -11,6 +11,7 @@
 #include <cuda_runtime_api.h>
 #include "initializer_array.h"
 #include "constant.h"
+#include "math_utils.h"
 
 namespace wp {
 
@@ -534,22 +535,24 @@ __device__ inline vec_t<Length, Type> lerp(const vec_t<Length, Type> &a, const v
     return a * (Type(1) - t) + b * t;
 }
 
-template<typename T>
-__device__ inline T &operator+=(T &a, const T &b) {
-    a = add(a, b);
-    return a;
+template<unsigned Length, typename Type>
+inline CUDA_CALLABLE void print(vec_t<Length, Type> v) {
+    for (unsigned i = 0; i < Length; ++i) {
+        printf("%g ", float(v[i]));
+    }
+    printf("\n");
 }
 
-template<typename T>
-__device__ inline T &operator-=(T &a, const T &b) {
-    a = sub(a, b);
-    return a;
+inline CUDA_CALLABLE void expect_near(const vec3 &actual, const vec3 &expected, const float &tolerance) {
+    const float diff = max(max(abs(actual[0] - expected[0]), abs(actual[1] - expected[1])), abs(actual[2] - expected[2]));
+    if (diff > tolerance) {
+        printf("Error, expect_near() failed with tolerance ");
+        print(tolerance);
+        printf("\t Expected: ");
+        print(expected);
+        printf("\t Actual: ");
+        print(actual);
+    }
 }
-
-template<typename T>
-__device__ inline T operator+(const T &a, const T &b) { return add(a, b); }
-
-template<typename T>
-__device__ inline T operator-(const T &a, const T &b) { return sub(a, b); }
 
 }// namespace wp

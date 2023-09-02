@@ -16,7 +16,10 @@
 
 namespace wp {
 
-__global__ void bvh_refit_kernel(int n, const int *__restrict__ parents, int *__restrict__ child_count, BVHPackedNodeHalf *__restrict__ lowers, BVHPackedNodeHalf *__restrict__ uppers, const bounds3 *bounds) {
+__global__ void bvh_refit_kernel(int n, const int *__restrict__ parents, int *__restrict__ child_count,
+                                 BVHPackedNodeHalf *__restrict__ lowers,
+                                 BVHPackedNodeHalf *__restrict__ uppers,
+                                 const bounds3 *bounds) {
     int index = blockDim.x * blockIdx.x + threadIdx.x;
 
     if (index < n) {
@@ -109,7 +112,7 @@ __global__ void set_bounds_from_lowers_and_uppers(int n, bounds3 *b, const vec3 
 // refit to data stored in the bvh
 
 void bvh_refit_device(uint64_t id) {
-    wp::BVH bvh;
+    wp::BVH bvh{};
     if (bvh_get_descriptor(id, bvh)) {
         ContextGuard guard(bvh.context);
         wp_launch_device(WP_CURRENT_CONTEXT, wp::set_bounds_from_lowers_and_uppers, bvh.num_bounds, (bvh.num_bounds, bvh.bounds, bvh.lowers, bvh.uppers));

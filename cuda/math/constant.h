@@ -7,8 +7,8 @@
 #pragma once
 
 namespace wp {
-#define gamma 5.828427124 // FOUR_GAMMA_SQUARED = sqrt(8)+3;
-#define cstar 0.923879532 // cos(pi/8)
-#define sstar 0.3826834323// sin(p/8)
-#define EPSILON 1e-6
-}
+constexpr float GAMMA = 5.828427124; // FOUR_GAMMA_SQUARED = sqrt(8)+3;
+constexpr float CSTAR = 0.923879532; // cos(pi/8)
+constexpr float SSTAR = 0.3826834323;// sin(p/8)
+constexpr float EPSILON = 1e-6;
+}// namespace wp

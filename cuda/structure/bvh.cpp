@@ -6,8 +6,9 @@
 
 #include <vector>
 #include <algorithm>
+#include <cassert>
+#include <cstring>
 
-#include "mesh.h"
 #include "bvh.h"
 #include "cuda_context.h"
 #include "cuda_util.h"
@@ -46,7 +47,7 @@ void MedianBVHBuilder::build(BVH &bvh, const bounds3 *items, int n) {
     bvh.node_lowers = new BVHPackedNodeHalf[bvh.max_nodes];
     bvh.node_uppers = new BVHPackedNodeHalf[bvh.max_nodes];
     bvh.node_parents = new int[bvh.max_nodes];
-    bvh.node_counts = NULL;
+    bvh.node_counts = nullptr;
 
     // root is always in first slot for top down builders
     bvh.root = 0;
@@ -360,7 +361,7 @@ int LinearBVHBuilderCPU::build_recursive(BVH &bvh, const KeyIndexPair *keys, con
 
 // create only happens on host currently, use bvh_clone() to transfer BVH To device
 BVH bvh_create(const bounds3 *bounds, int num_bounds) {
-    BVH bvh;
+    BVH bvh{};
     memset(&bvh, 0, sizeof(bvh));
 
     MedianBVHBuilder builder;
@@ -376,8 +377,8 @@ void bvh_destroy_host(BVH &bvh) {
     delete[] bvh.node_parents;
     delete[] bvh.bounds;
 
-    bvh.node_lowers = NULL;
-    bvh.node_uppers = NULL;
+    bvh.node_lowers = nullptr;
+    bvh.node_uppers = nullptr;
     bvh.max_nodes = 0;
     bvh.num_nodes = 0;
     bvh.num_bounds = 0;
@@ -387,15 +388,15 @@ void bvh_destroy_device(BVH &bvh) {
     ContextGuard guard(bvh.context);
 
     free_device(WP_CURRENT_CONTEXT, bvh.node_lowers);
-    bvh.node_lowers = NULL;
+    bvh.node_lowers = nullptr;
     free_device(WP_CURRENT_CONTEXT, bvh.node_uppers);
-    bvh.node_uppers = NULL;
+    bvh.node_uppers = nullptr;
     free_device(WP_CURRENT_CONTEXT, bvh.node_parents);
-    bvh.node_parents = NULL;
+    bvh.node_parents = nullptr;
     free_device(WP_CURRENT_CONTEXT, bvh.node_counts);
-    bvh.node_counts = NULL;
+    bvh.node_counts = nullptr;
     free_device(WP_CURRENT_CONTEXT, bvh.bounds);
-    bvh.bounds = NULL;
+    bvh.bounds = nullptr;
 }
 
 BVH bvh_clone(void *context, const BVH &bvh_host) {
@@ -492,7 +493,7 @@ uint64_t bvh_create_host(vec3 *lowers, vec3 *uppers, int num_bounds) {
     BVH *bvh = new BVH();
     memset(bvh, 0, sizeof(BVH));
 
-    bvh->context = NULL;
+    bvh->context = nullptr;
 
     bvh->lowers = lowers;
     bvh->uppers = uppers;
@@ -517,7 +518,7 @@ uint64_t bvh_create_device(void *context, vec3 *lowers, vec3 *uppers, int num_bo
     // todo: BVH creation only on CPU at the moment so temporarily bring all the data back to host
     vec3 *lowers_host = (vec3 *)alloc_host(sizeof(vec3) * num_bounds);
     vec3 *uppers_host = (vec3 *)alloc_host(sizeof(vec3) * num_bounds);
-    bounds3 *bounds_host = (bounds3 *)alloc_host(sizeof(bounds3) * num_bounds);
+    auto *bounds_host = (bounds3 *)alloc_host(sizeof(bounds3) * num_bounds);
 
     memcpy_d2h(WP_CURRENT_CONTEXT, lowers_host, lowers, sizeof(vec3) * num_bounds);
     memcpy_d2h(WP_CURRENT_CONTEXT, uppers_host, uppers, sizeof(vec3) * num_bounds);
@@ -545,15 +546,13 @@ uint64_t bvh_create_device(void *context, vec3 *lowers, vec3 *uppers, int num_bo
     free_host(lowers_host);
     free_host(uppers_host);
 
-    uint64_t bvh_id = (uint64_t)bvh_device;
+    auto bvh_id = (uint64_t)bvh_device;
     bvh_add_descriptor(bvh_id, bvh_device_clone);
 
     return bvh_id;
 }
 
-void bvh_refit_host(uint64_t id) {
-    BVH *bvh = (BVH *)(id);
-
+void bvh_refit_host(BVH *bvh) {
     for (int i = 0; i < bvh->num_bounds; ++i) {
         bvh->bounds[i] = bounds3();
         bvh->bounds[i].lower = bvh->lowers[i];
@@ -563,16 +562,15 @@ void bvh_refit_host(uint64_t id) {
     bvh_refit_host(*bvh, bvh->bounds);
 }
 
-void bvh_destroy_host(uint64_t id) {
-    BVH *bvh = (BVH *)(id);
+void bvh_destroy_host(BVH *bvh) {
     bvh_destroy_host(*bvh);
     delete bvh;
 }
 
 void bvh_destroy_device(uint64_t id) {
-    BVH bvh;
+    BVH bvh{};
     if (bvh_get_descriptor(id, bvh)) {
         bvh_destroy_device(bvh);
-        mesh_rem_descriptor(id);
+        //        mesh_rem_descriptor(id);
     }
 }

@@ -42,11 +42,10 @@ set(STRUCTURE_FILES
         structure/runlength_encode.cpp
         structure/runlength_encode.cu
         structure/marching.cu
-
-        #        structure/bvh.cpp
-        #        structure/bvh.cu
-        #        structure/mesh.cpp
-        #        structure/mesh.cu
+        structure/bvh.cpp
+        structure/bvh.cu
+        structure/mesh.cpp
+        structure/mesh.cu
 )
 
 set(SOLVER_FILES

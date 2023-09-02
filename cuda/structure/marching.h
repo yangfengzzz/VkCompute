@@ -26,18 +26,18 @@ struct MarchingCubes {
     }
 
     // grid
-    int nx;
-    int ny;
-    int nz;
+    int nx{};
+    int ny{};
+    int nz{};
 
-    int *first_cell_vert;
-    int *first_cell_tri;
-    int *cell_verts;
+    int *first_cell_vert{};
+    int *first_cell_tri{};
+    int *cell_verts{};
 
-    int num_cells;
-    int max_cells;
+    int num_cells{};
+    int max_cells{};
 
-    void *context;
+    void *context{};
 };
 }// namespace wp
 

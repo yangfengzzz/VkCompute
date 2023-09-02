@@ -102,7 +102,7 @@ struct array_t {
     int strides[ARRAY_MAX_DIMS]{};
     int ndim{};
 
-    __device__ inline operator T *() const { return data; }
+    __device__ __host__ inline operator T *() const { return data; }
 };
 
 // TODO:

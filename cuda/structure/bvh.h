@@ -8,6 +8,7 @@
 
 #include "math/bounds.h"
 #include "math/intersect.h"
+#include "math/math_utils.h"
 
 namespace wp {
 
@@ -41,8 +42,6 @@ struct BVH {
     void *context;
 };
 
-#if !defined(__CUDA_ARCH__)
-
 BVH bvh_create(const bounds3 *bounds, int num_bounds);
 
 void bvh_destroy_host(BVH &bvh);
@@ -54,10 +53,8 @@ void bvh_refit_device(BVH &bvh, const bounds3 *bounds);
 // copy host BVH to device
 BVH bvh_clone(void *context, const BVH &bvh_host);
 
-#endif// !__CUDA_ARCH__
-
-CUDA_CALLABLE inline BVHPackedNodeHalf make_node(const vec3 &bound, int child, bool leaf) {
-    BVHPackedNodeHalf n;
+__device__ inline BVHPackedNodeHalf make_node(const vec3 &bound, int child, bool leaf) {
+    BVHPackedNodeHalf n{};
     n.x = bound[0];
     n.y = bound[1];
     n.z = bound[2];
@@ -68,7 +65,7 @@ CUDA_CALLABLE inline BVHPackedNodeHalf make_node(const vec3 &bound, int child, b
 }
 
 // variation of make_node through volatile pointers used in BuildHierarchy
-CUDA_CALLABLE inline void make_node(volatile BVHPackedNodeHalf *n, const vec3 &bound, int child, bool leaf) {
+__device__ inline void make_node(volatile BVHPackedNodeHalf *n, const vec3 &bound, int child, bool leaf) {
     n->x = bound[0];
     n->y = bound[1];
     n->z = bound[2];
@@ -76,7 +73,7 @@ CUDA_CALLABLE inline void make_node(volatile BVHPackedNodeHalf *n, const vec3 &b
     n->b = (unsigned int)(leaf ? 1 : 0);
 }
 
-CUDA_CALLABLE inline int clz(int x) {
+__device__ inline int clz(int x) {
     int n;
     if (x == 0) return 32;
     for (n = 0; ((x & 0x80000000) == 0); n++, x <<= 1)
@@ -84,7 +81,7 @@ CUDA_CALLABLE inline int clz(int x) {
     return n;
 }
 
-CUDA_CALLABLE inline uint32_t part1by2(uint32_t n) {
+__device__ inline uint32_t part1by2(uint32_t n) {
     n = (n ^ (n << 16)) & 0xff0000ff;
     n = (n ^ (n << 8)) & 0x0300f00f;
     n = (n ^ (n << 4)) & 0x030c30c3;
@@ -95,7 +92,7 @@ CUDA_CALLABLE inline uint32_t part1by2(uint32_t n) {
 
 // Takes values in the range [0, 1] and assigns an index based Morton codes of length 3*lwp2(dim) bits
 template<int dim>
-CUDA_CALLABLE inline uint32_t morton3(float x, float y, float z) {
+__device__ inline uint32_t morton3(float x, float y, float z) {
     uint32_t ux = clamp(int(x * dim), 0, dim - 1);
     uint32_t uy = clamp(int(y * dim), 0, dim - 1);
     uint32_t uz = clamp(int(z * dim), 0, dim - 1);
@@ -103,33 +100,31 @@ CUDA_CALLABLE inline uint32_t morton3(float x, float y, float z) {
     return (part1by2(uz) << 2) | (part1by2(uy) << 1) | part1by2(ux);
 }
 
-CUDA_CALLABLE inline int bvh_get_num_bounds(const BVH &bvh) {
+__device__ inline int bvh_get_num_bounds(const BVH &bvh) {
     return bvh.num_bounds;
 }
 
 // stores state required to traverse the BVH nodes that
 // overlap with a query AABB.
 struct bvh_query_t {
-    CUDA_CALLABLE bvh_query_t() {
-    }
-    CUDA_CALLABLE bvh_query_t(int) {
-    }// for backward pass
+    __device__ bvh_query_t() = default;
+    __device__ explicit bvh_query_t(int) {}
 
-    BVH bvh;
+    BVH bvh{};
 
     // BVH traversal stack:
-    int stack[32];
-    int count;
+    int stack[32]{};
+    int count{};
 
     // inputs
-    bool is_ray;
+    bool is_ray{};
     wp::vec3 input_lower;// start for ray
     wp::vec3 input_upper;// dir for ray
 
-    int bounds_nr;
+    int bounds_nr{};
 };
 
-CUDA_CALLABLE inline bvh_query_t bvh_query(const BVH &bvh, bool is_ray, const vec3 &lower, const vec3 &upper) {
+__device__ inline bvh_query_t bvh_query(const BVH &bvh, bool is_ray, const vec3 &lower, const vec3 &upper) {
     // This routine traverses the BVH tree until it finds
     // the first overlapping bound.
 
@@ -196,15 +191,15 @@ CUDA_CALLABLE inline bvh_query_t bvh_query(const BVH &bvh, bool is_ray, const ve
     return query;
 }
 
-CUDA_CALLABLE inline bvh_query_t bvh_query_aabb(const BVH &bvh, const vec3 &lower, const vec3 &upper) {
+__device__ inline bvh_query_t bvh_query_aabb(const BVH &bvh, const vec3 &lower, const vec3 &upper) {
     return bvh_query(bvh, false, lower, upper);
 }
 
-CUDA_CALLABLE inline bvh_query_t bvh_query_ray(const BVH &bvh, const vec3 &start, const vec3 &dir) {
+__device__ inline bvh_query_t bvh_query_ray(const BVH &bvh, const vec3 &start, const vec3 &dir) {
     return bvh_query(bvh, true, start, dir);
 }
 
-CUDA_CALLABLE inline bool bvh_query_next(bvh_query_t &query, int &index) {
+__device__ inline bool bvh_query_next(bvh_query_t &query, int &index) {
     BVH bvh = query.bvh;
 
     wp::bounds3 input_bounds(query.input_lower, query.input_upper);
@@ -247,32 +242,30 @@ CUDA_CALLABLE inline bool bvh_query_next(bvh_query_t &query, int &index) {
     return false;
 }
 
-CUDA_CALLABLE inline int iter_next(bvh_query_t &query) {
+__device__ inline int iter_next(bvh_query_t &query) {
     return query.bounds_nr;
 }
 
-CUDA_CALLABLE inline bool iter_cmp(bvh_query_t &query) {
+__device__ inline bool iter_cmp(bvh_query_t &query) {
     bool finished = bvh_query_next(query, query.bounds_nr);
     return finished;
 }
 
-CUDA_CALLABLE inline bvh_query_t iter_reverse(const bvh_query_t &query) {
+__device__ inline bvh_query_t iter_reverse(const bvh_query_t &query) {
     // can't reverse BVH queries, users should not rely on traversal ordering
     return query;
 }
 
-CUDA_CALLABLE bool bvh_get_descriptor(uint64_t id, BVH &bvh);
-CUDA_CALLABLE void bvh_add_descriptor(uint64_t id, const BVH &bvh);
-CUDA_CALLABLE void bvh_rem_descriptor(uint64_t id);
+__device__ __host__ bool bvh_get_descriptor(uint64_t id, BVH &bvh);
+__device__ void bvh_add_descriptor(uint64_t id, const BVH &bvh);
+__device__ void bvh_rem_descriptor(uint64_t id);
 
 }// namespace wp
 
-extern "C" {
 uint64_t bvh_create_host(wp::vec3 *lowers, wp::vec3 *uppers, int num_bounds);
-void bvh_destroy_host(uint64_t id);
-void bvh_refit_host(uint64_t id);
+void bvh_destroy_host(wp::BVH *bvh);
+void bvh_refit_host(wp::BVH *bvh);
 
 uint64_t bvh_create_device(void *context, wp::vec3 *lowers, wp::vec3 *uppers, int num_bounds);
 void bvh_destroy_device(uint64_t id);
 void bvh_refit_device(uint64_t id);
-}

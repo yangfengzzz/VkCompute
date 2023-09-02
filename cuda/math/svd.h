@@ -123,8 +123,8 @@ inline __device__ void approximateGivensQuaternion(Type a11, Type a12, Type a22,
     sh = a12;
     bool b = gamma * sh * sh < ch * ch;
     Type w = Type(1) / sqrt(ch * ch + sh * sh);
-    ch = b ? w * ch : Type(cstar);
-    sh = b ? w * sh : Type(sstar);
+    ch = b ? w * ch : Type(CSTAR);
+    sh = b ? w * sh : Type(SSTAR);
 }
 
 template<typename Type>

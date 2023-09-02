@@ -197,9 +197,6 @@ inline __device__ transform_t<Type> atomic_add(transform_t<Type> *addr, const tr
 }
 
 template<typename Type>
-__device__ void print(transform_t<Type> t);
-
-template<typename Type>
 __device__ inline transform_t<Type> lerp(const transform_t<Type> &a, const transform_t<Type> &b, Type t) {
     return a * (Type(1) - t) + b * t;
 }
@@ -307,5 +304,10 @@ using spatial_vectord = spatial_vector_t<double>;
 using spatial_matrix = spatial_matrix_t<float>;
 using spatial_matrixf = spatial_matrix_t<float>;
 using spatial_matrixd = spatial_matrix_t<double>;
+
+template<typename Type>
+inline CUDA_CALLABLE void print(transform_t<Type> t) {
+    printf("(%g %g %g) (%g %g %g %g)\n", float(t.p[0]), float(t.p[1]), float(t.p[2]), float(t.q.x), float(t.q.y), float(t.q.z), float(t.q.w));
+}
 
 }// namespace wp

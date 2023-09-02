@@ -21,7 +21,7 @@ public:
 
     ~MonteCarloPiSimulation();
 
-    void step_simulation(float time, CudaStream& stream);
+    void step_simulation(float time, CudaStream &stream);
     static void compute_pi_callback(void *args);
 
     [[nodiscard]] size_t get_num_points() const { return m_numPoints; }
