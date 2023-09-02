@@ -7,10 +7,11 @@
 #pragma once
 
 #include <cuda_runtime_api.h>
+#include <cassert>
 
 namespace wp {
 
-const int ARRAY_MAX_DIMS = 4;// must match constant in types.py
+const int ARRAY_MAX_DIMS = 4;    // must match constant in types.py
 const int ARRAY_TYPE_REGULAR = 0;// must match constant in types.py
 const int ARRAY_TYPE_INDEXED = 1;// must match constant in types.py
 
@@ -41,7 +42,7 @@ inline __device__ void print(shape_t s) {
 
 template<typename T>
 struct array_t {
-    __device__ inline array_t() {}
+    __device__ inline array_t() = default;
     __device__ inline array_t(int) {}// for backward a = 0 initialization syntax
 
     __device__ array_t(T *data, int size, T *grad = nullptr) : data(data), grad(grad) {
@@ -98,8 +99,8 @@ struct array_t {
     T *data{nullptr};
     T *grad{nullptr};
     shape_t shape;
-    int strides[ARRAY_MAX_DIMS];
-    int ndim;
+    int strides[ARRAY_MAX_DIMS]{};
+    int ndim{};
 
     __device__ inline operator T *() const { return data; }
 };
@@ -109,14 +110,14 @@ struct array_t {
 // - templated dimensionality? (also for array_t to save space when passing arrays to kernels)
 template<typename T>
 struct indexedarray_t {
-    __device__ inline indexedarray_t() {}
+    __device__ inline indexedarray_t() = default;
     __device__ inline indexedarray_t(int) {}// for backward a = 0 initialization syntax
 
     __device__ inline bool empty() const { return !arr.data; }
 
     array_t<T> arr;
-    int *indices[ARRAY_MAX_DIMS];// index array per dimension (can be NULL)
-    shape_t shape;               // element count per dimension (num. indices if indexed, array dim if not)
+    int *indices[ARRAY_MAX_DIMS]{};// index array per dimension (can be NULL)
+    shape_t shape;                 // element count per dimension (num. indices if indexed, array dim if not)
 };
 
 // return stride (in bytes) of the given index
@@ -427,8 +428,6 @@ __device__ inline indexedarray_t<T> view(indexedarray_t<T> &src, int i, int j, i
     return a;
 }
 
-// TODO: lower_bound() for indexed arrays?
-
 template<typename T>
 __device__ inline int lower_bound(const array_t<T> &arr, int arr_begin, int arr_end, T value) {
     assert(arr.ndim == 1);
@@ -519,7 +518,6 @@ inline __device__ void store(const A<T> &buf, int i, int j, int k, int l, T valu
 // select operator to check for array being null
 template<typename T1, typename T2>
 __device__ inline T2 select(const array_t<T1> &arr, const T2 &a, const T2 &b) { return arr.data ? b : a; }
-
 
 // stub for the case where we have an nested array inside a struct and
 // atomic add the whole struct onto an array (e.g.: during backwards pass)

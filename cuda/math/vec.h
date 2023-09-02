@@ -7,9 +7,10 @@
 #pragma once
 
 #include <cstdio>
+#include <cstdint>
 #include <cuda_runtime_api.h>
-#include <thrust/limits.h>
 #include "initializer_array.h"
+#include "constant.h"
 
 namespace wp {
 
@@ -358,7 +359,7 @@ inline __device__ Type length(vec_t<3, Type> a) {
 template<unsigned Length, typename Type>
 inline __device__ vec_t<Length, Type> normalize(vec_t<Length, Type> a) {
     Type l = length(a);
-    if (l > Type(thrust::numeric_limits<Type>::epsilon()))
+    if (l > Type(EPSILON))
         return div(a, l);
     else
         return vec_t<Length, Type>();
@@ -367,7 +368,7 @@ inline __device__ vec_t<Length, Type> normalize(vec_t<Length, Type> a) {
 template<typename Type>
 inline __device__ vec_t<2, Type> normalize(vec_t<2, Type> a) {
     Type l = sqrt(a.c[0] * a.c[0] + a.c[1] * a.c[1]);
-    if (l > Type(thrust::numeric_limits<Type>::epsilon()))
+    if (l > Type(EPSILON))
         return vec_t<2, Type>(a.c[0] / l, a.c[1] / l);
     else
         return vec_t<2, Type>();
@@ -376,7 +377,7 @@ inline __device__ vec_t<2, Type> normalize(vec_t<2, Type> a) {
 template<typename Type>
 inline __device__ vec_t<3, Type> normalize(vec_t<3, Type> a) {
     Type l = sqrt(a.c[0] * a.c[0] + a.c[1] * a.c[1] + a.c[2] * a.c[2]);
-    if (l > Type(thrust::numeric_limits<Type>::epsilon()))
+    if (l > Type(EPSILON))
         return vec_t<3, Type>(a.c[0] / l, a.c[1] / l, a.c[2] / l);
     else
         return vec_t<3, Type>();

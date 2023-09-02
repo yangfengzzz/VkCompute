@@ -21,18 +21,18 @@ namespace wp {
 
 // represents a built-in Python range() loop
 struct range_t {
-    __device__ range_t() {}
-    __device__ range_t(int) {}// for backward pass
+    __device__ range_t() = default;
+    __device__ explicit range_t(int) {}// for backward pass
 
-    int start;
-    int end;
-    int step;
+    int start{};
+    int end{};
+    int step{};
 
-    int i;
+    int i{};
 };
 
 __device__ inline range_t range(int end) {
-    range_t r;
+    range_t r{};
     r.start = 0;
     r.end = end;
     r.step = 1;
@@ -43,7 +43,7 @@ __device__ inline range_t range(int end) {
 }
 
 __device__ inline range_t range(int start, int end) {
-    range_t r;
+    range_t r{};
     r.start = start;
     r.end = end;
     r.step = 1;
@@ -54,7 +54,7 @@ __device__ inline range_t range(int start, int end) {
 }
 
 __device__ inline range_t range(int start, int end, int step) {
-    range_t r;
+    range_t r{};
     r.start = start;
     r.end = end;
     r.step = step;
@@ -86,7 +86,7 @@ __device__ inline bool iter_cmp(const range_t &r) {
 
 __device__ inline range_t iter_reverse(const range_t &r) {
     // generates a reverse range, equivalent to reversed(range())
-    range_t rev;
+    range_t rev{};
     rev.start = r.end - 1;
     rev.end = r.start - 1;
     rev.step = -r.step;

@@ -37,7 +37,6 @@
    else no check is done (which is less robust)
 */
 #define USE_EPSILON_TEST TRUE
-#define EPSILON 0.000001
 
 /* some macros */
 #define CROSS(dest, v1, v2)                      \
@@ -122,7 +121,7 @@
     }
 
 __device__ inline int coplanar_tri_tri(float N[3], float V0[3], float V1[3], float V2[3],
-                                          float U0[3], float U1[3], float U2[3]) {
+                                       float U0[3], float U1[3], float U2[3]) {
     float A[3];
     short i0, i1;
     /* first project onto an axis-aligned plane, that maximizes the area */
@@ -204,7 +203,7 @@ __device__ inline int coplanar_tri_tri(float N[3], float V0[3], float V1[3], flo
     }
 
 __device__ inline int NoDivTriTriIsect(float V0[3], float V1[3], float V2[3],
-                                          float U0[3], float U1[3], float U2[3]) {
+                                       float U0[3], float U1[3], float U2[3]) {
     float E1[3], E2[3];
     float N1[3], N2[3], d1, d2;
     float du0, du1, du2, dv0, dv1, dv2;

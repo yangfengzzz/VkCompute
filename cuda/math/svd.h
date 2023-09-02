@@ -10,13 +10,6 @@
 
 namespace wp {
 
-#define _gamma 5.828427124 // FOUR_GAMMA_SQUARED = sqrt(8)+3;
-#define _cstar 0.923879532 // cos(pi/8)
-#define _sstar 0.3826834323// sin(p/8)
-#define _EPSILON 1e-6
-
-// TODO: replace sqrt with rsqrt
-
 template<typename Type>
 inline __device__
     Type
@@ -43,16 +36,16 @@ inline __device__ void condNegSwap(bool c, Type &X, Type &Y) {
 // matrix multiplication M = A * B
 template<typename Type>
 inline __device__ void multAB(Type a11, Type a12, Type a13,
-                                 Type a21, Type a22, Type a23,
-                                 Type a31, Type a32, Type a33,
-                                 //
-                                 Type b11, Type b12, Type b13,
-                                 Type b21, Type b22, Type b23,
-                                 Type b31, Type b32, Type b33,
-                                 //
-                                 Type &m11, Type &m12, Type &m13,
-                                 Type &m21, Type &m22, Type &m23,
-                                 Type &m31, Type &m32, Type &m33) {
+                              Type a21, Type a22, Type a23,
+                              Type a31, Type a32, Type a33,
+                              //
+                              Type b11, Type b12, Type b13,
+                              Type b21, Type b22, Type b23,
+                              Type b31, Type b32, Type b33,
+                              //
+                              Type &m11, Type &m12, Type &m13,
+                              Type &m21, Type &m22, Type &m23,
+                              Type &m31, Type &m32, Type &m33) {
 
     m11 = a11 * b11 + a12 * b21 + a13 * b31;
     m12 = a11 * b12 + a12 * b22 + a13 * b32;
@@ -68,16 +61,16 @@ inline __device__ void multAB(Type a11, Type a12, Type a13,
 // matrix multiplication M = Transpose[A] * B
 template<typename Type>
 inline __device__ void multAtB(Type a11, Type a12, Type a13,
-                                  Type a21, Type a22, Type a23,
-                                  Type a31, Type a32, Type a33,
-                                  //
-                                  Type b11, Type b12, Type b13,
-                                  Type b21, Type b22, Type b23,
-                                  Type b31, Type b32, Type b33,
-                                  //
-                                  Type &m11, Type &m12, Type &m13,
-                                  Type &m21, Type &m22, Type &m23,
-                                  Type &m31, Type &m32, Type &m33) {
+                               Type a21, Type a22, Type a23,
+                               Type a31, Type a32, Type a33,
+                               //
+                               Type b11, Type b12, Type b13,
+                               Type b21, Type b22, Type b23,
+                               Type b31, Type b32, Type b33,
+                               //
+                               Type &m11, Type &m12, Type &m13,
+                               Type &m21, Type &m22, Type &m23,
+                               Type &m31, Type &m32, Type &m33) {
     m11 = a11 * b11 + a21 * b21 + a31 * b31;
     m12 = a11 * b12 + a21 * b22 + a31 * b32;
     m13 = a11 * b13 + a21 * b23 + a31 * b33;
@@ -91,9 +84,9 @@ inline __device__ void multAtB(Type a11, Type a12, Type a13,
 
 template<typename Type>
 inline __device__ void quatToMat3(const Type *qV,
-                                     Type &m11, Type &m12, Type &m13,
-                                     Type &m21, Type &m22, Type &m23,
-                                     Type &m31, Type &m32, Type &m33) {
+                                  Type &m11, Type &m12, Type &m13,
+                                  Type &m21, Type &m22, Type &m23,
+                                  Type &m31, Type &m32, Type &m33) {
     Type w = qV[3];
     Type x = qV[0];
     Type y = qV[1];
@@ -128,18 +121,18 @@ inline __device__ void approximateGivensQuaternion(Type a11, Type a12, Type a22,
      */
     ch = Type(2) * (a11 - a22);
     sh = a12;
-    bool b = _gamma * sh * sh < ch * ch;
+    bool b = gamma * sh * sh < ch * ch;
     Type w = Type(1) / sqrt(ch * ch + sh * sh);
-    ch = b ? w * ch : Type(_cstar);
-    sh = b ? w * sh : Type(_sstar);
+    ch = b ? w * ch : Type(cstar);
+    sh = b ? w * sh : Type(sstar);
 }
 
 template<typename Type>
 inline __device__ void jacobiConjugation(const int x, const int y, const int z,
-                                            Type &s11,
-                                            Type &s21, Type &s22,
-                                            Type &s31, Type &s32, Type &s33,
-                                            Type *qV) {
+                                         Type &s11,
+                                         Type &s21, Type &s22,
+                                         Type &s31, Type &s32, Type &s33,
+                                         Type *qV) {
     Type ch, sh;
     approximateGivensQuaternion(s11, s21, s22, ch, sh);
 
@@ -270,7 +263,7 @@ template<typename Type>
 inline __device__ void QRGivensQuaternion(Type a1, Type a2, Type &ch, Type &sh) {
     // a1 = pivot point on diagonal
     // a2 = lower triangular entry we want to annihilate
-    Type epsilon = _EPSILON;
+    Type epsilon = EPSILON;
     Type rho = accurateSqrt(a1 * a1 + a2 * a2);
 
     sh = rho > epsilon ? a2 : Type(0);

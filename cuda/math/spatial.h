@@ -77,8 +77,8 @@ struct transform_t {
     vec_t<3, Type> p;
     quat_t<Type> q;
 
-    __device__ inline transform_t(vec_t<3, Type> p = vec_t<3, Type>(), quat_t<Type> q = quat_t<Type>()) : p(p), q(q) {}
-    __device__ inline transform_t(Type) {}// helps uniform initialization
+    __device__ inline explicit transform_t(vec_t<3, Type> p = vec_t<3, Type>(), quat_t<Type> q = quat_t<Type>()) : p(p), q(q) {}
+    __device__ inline explicit transform_t(Type) {}// helps uniform initialization
 
     __device__ inline Type operator[](int index) const {
         assert(index < 7);
@@ -93,7 +93,7 @@ struct transform_t {
     }
 };
 
-template<typename Type = float32>
+template<typename Type = float>
 __device__ inline transform_t<Type> transform_identity() {
     return transform_t<Type>(vec_t<3, Type>(), quat_identity<Type>());
 }
@@ -297,17 +297,14 @@ __device__ inline void spatial_mass(const spatial_matrix_t<Type> *I_s, int joint
 }
 
 using transform = transform_t<float>;
-using transformh = transform_t<half>;
 using transformf = transform_t<float>;
 using transformd = transform_t<double>;
 
 using spatial_vector = spatial_vector_t<float>;
-using spatial_vectorh = spatial_vector_t<half>;
 using spatial_vectorf = spatial_vector_t<float>;
 using spatial_vectord = spatial_vector_t<double>;
 
 using spatial_matrix = spatial_matrix_t<float>;
-using spatial_matrixh = spatial_matrix_t<half>;
 using spatial_matrixf = spatial_matrix_t<float>;
 using spatial_matrixd = spatial_matrix_t<double>;
 

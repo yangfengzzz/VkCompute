@@ -21,25 +21,25 @@ public:
     vec3 n_ij_diag;
     vec3 n_ijk_diag;
 
-    float sum_permute_n_xyz;
-    float two_n_xxy_n_yxx;
-    float two_n_xxz_n_zxx;
-    float two_n_yyz_n_zyy;
-    float two_n_yyx_n_xyy;
-    float two_n_zzx_n_xzz;
-    float two_n_zzy_n_yzz;
+    float sum_permute_n_xyz{};
+    float two_n_xxy_n_yxx{};
+    float two_n_xxz_n_zxx{};
+    float two_n_yyz_n_zyy{};
+    float two_n_yyx_n_xyy{};
+    float two_n_zzx_n_xzz{};
+    float two_n_zzy_n_yzz{};
 
-    float n_xy;
-    float n_yx;
-    float n_yz;
-    float n_zy;
-    float n_zx;
-    float n_xz;
+    float n_xy{};
+    float n_yx{};
+    float n_yz{};
+    float n_zy{};
+    float n_zx{};
+    float n_xz{};
 
     bounds3 box;
     vec3 area_P;
-    float area;
-    float max_p_dist_sq;
+    float area{};
+    float max_p_dist_sq{};
 };
 
 __device__ inline void compute_integrals(
@@ -105,7 +105,7 @@ __device__ inline void compute_integrals(
         integral = integral_ik;
         diff = kdiff;
     }
-};
+}
 
 __device__ inline void my_swap(int &a, int &b) {
     int c = a;
@@ -370,7 +370,7 @@ __device__ inline bool evaluate_node_solid_angle(const vec3 &query_point, SolidA
     omega_approx += omega_2;
 
     // Safety check if not finite, need to descend instead
-    if (!isfinite(omega_approx)) {
+    if (!::isfinite(omega_approx)) {
         omega_approx = 0.0f;
         solid_angle = 0.0;
         return true;

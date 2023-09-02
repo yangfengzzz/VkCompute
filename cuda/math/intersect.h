@@ -7,7 +7,7 @@
 #pragma once
 
 #include "vec.h"
-#include <cuda.h>
+#include <cmath>
 
 namespace wp {
 
@@ -50,7 +50,7 @@ __device__ inline vec2 closest_point_to_triangle(const vec3 &a, const vec3 &b, c
         v = 0.0f;
         w = 0.0f;
         u = 1.0f - v - w;
-        return vec2(u, v);
+        return {u, v};
     }
 
     vec3 bp = p - b;
@@ -60,7 +60,7 @@ __device__ inline vec2 closest_point_to_triangle(const vec3 &a, const vec3 &b, c
         v = 1.0f;
         w = 0.0f;
         u = 1.0f - v - w;
-        return vec2(u, v);
+        return {u, v};
     }
 
     float vc = d1 * d4 - d3 * d2;
@@ -68,7 +68,7 @@ __device__ inline vec2 closest_point_to_triangle(const vec3 &a, const vec3 &b, c
         v = d1 / (d1 - d3);
         w = 0.0f;
         u = 1.0f - v - w;
-        return vec2(u, v);
+        return {u, v};
     }
 
     vec3 cp = p - c;
@@ -78,7 +78,7 @@ __device__ inline vec2 closest_point_to_triangle(const vec3 &a, const vec3 &b, c
         v = 0.0f;
         w = 1.0f;
         u = 1.0f - v - w;
-        return vec2(u, v);
+        return {u, v};
     }
 
     float vb = d5 * d2 - d1 * d6;
@@ -86,7 +86,7 @@ __device__ inline vec2 closest_point_to_triangle(const vec3 &a, const vec3 &b, c
         v = 0.0f;
         w = d2 / (d2 - d6);
         u = 1.0f - v - w;
-        return vec2(u, v);
+        return {u, v};
     }
 
     float va = d3 * d6 - d5 * d4;
@@ -94,14 +94,14 @@ __device__ inline vec2 closest_point_to_triangle(const vec3 &a, const vec3 &b, c
         w = (d4 - d3) / ((d4 - d3) + (d5 - d6));
         v = 1.0f - w;
         u = 1.0f - v - w;
-        return vec2(u, v);
+        return {u, v};
     }
 
     float denom = 1.0f / (va + vb + vc);
     v = vb * denom;
     w = vc * denom;
     u = 1.0f - v - w;
-    return vec2(u, v);
+    return {u, v};
 }
 
 __device__ inline bool intersect_ray_aabb(const vec3 &pos, const vec3 &rcp_dir, const vec3 &lower, const vec3 &upper, float &t) {
@@ -109,18 +109,18 @@ __device__ inline bool intersect_ray_aabb(const vec3 &pos, const vec3 &rcp_dir, 
 
     l1 = (lower[0] - pos[0]) * rcp_dir[0];
     l2 = (upper[0] - pos[0]) * rcp_dir[0];
-    lmin = min(l1, l2);
-    lmax = max(l1, l2);
+    lmin = fmin(l1, l2);
+    lmax = fmax(l1, l2);
 
     l1 = (lower[1] - pos[1]) * rcp_dir[1];
     l2 = (upper[1] - pos[1]) * rcp_dir[1];
-    lmin = max(min(l1, l2), lmin);
-    lmax = min(max(l1, l2), lmax);
+    lmin = fmax(fmin(l1, l2), lmin);
+    lmax = fmin(fmax(l1, l2), lmax);
 
     l1 = (lower[2] - pos[2]) * rcp_dir[2];
     l2 = (upper[2] - pos[2]) * rcp_dir[2];
-    lmin = max(min(l1, l2), lmin);
-    lmax = min(max(l1, l2), lmax);
+    lmin = fmax(fmin(l1, l2), lmin);
+    lmax = fmin(fmax(l1, l2), lmax);
 
     bool hit = ((lmax >= 0.f) & (lmax >= lmin));
     if (hit)
@@ -201,19 +201,6 @@ __device__ inline bool intersect_ray_tri_rtcd(const vec3 &p, const vec3 &dir, co
 
     return true;
 }
-
-#ifndef __CUDA_ARCH__
-
-// these are provided as built-ins by CUDA
-inline float __int_as_float(int i) {
-    return *(float *)(&i);
-}
-
-inline int __float_as_int(float f) {
-    return *(int *)(&f);
-}
-
-#endif
 
 __device__ inline float xorf(float x, int y) {
     return __int_as_float(__float_as_int(x) ^ y);
@@ -338,178 +325,4 @@ __device__ inline int intersect_tri_tri(
     return NoDivTriTriIsect(&v0[0], &v1[0], &v2[0], &u0[0], &u1[0], &u2[0]);
 }
 
-static __device__ vec3 closest_point_edge_edge(vec3 var_p1,
-                                                  vec3 var_q1,
-                                                  vec3 var_p2,
-                                                  vec3 var_q2,
-                                                  float32 var_epsilon) {
-    //---------
-    // primal vars
-    vec3 var_0;
-    vec3 var_1;
-    vec3 var_2;
-    float32 var_3;
-    float32 var_4;
-    float32 var_5;
-    const float32 var_6 = 0.0;
-    float32 var_7;
-    float32 var_8;
-    vec3 var_9;
-    float32 var_10;
-    bool var_11;
-    bool var_12;
-    bool var_13;
-    vec3 var_14;
-    bool var_15;
-    float32 var_16;
-    float32 var_17;
-    float32 var_18;
-    float32 var_19;
-    float32 var_20;
-    float32 var_21;
-    bool var_22;
-    float32 var_23;
-    float32 var_24;
-    const float32 var_25 = 1.0;
-    float32 var_26;
-    float32 var_27;
-    float32 var_28;
-    float32 var_29;
-    float32 var_30;
-    float32 var_31;
-    float32 var_32;
-    float32 var_33;
-    bool var_34;
-    float32 var_35;
-    float32 var_36;
-    float32 var_37;
-    float32 var_38;
-    float32 var_39;
-    float32 var_40;
-    float32 var_41;
-    float32 var_42;
-    float32 var_43;
-    float32 var_44;
-    bool var_45;
-    float32 var_46;
-    float32 var_47;
-    float32 var_48;
-    float32 var_49;
-    float32 var_50;
-    bool var_51;
-    float32 var_52;
-    float32 var_53;
-    float32 var_54;
-    float32 var_55;
-    float32 var_56;
-    float32 var_57;
-    float32 var_58;
-    float32 var_59;
-    float32 var_60;
-    float32 var_61;
-    float32 var_62;
-    vec3 var_63;
-    vec3 var_64;
-    vec3 var_65;
-    vec3 var_66;
-    vec3 var_67;
-    vec3 var_68;
-    vec3 var_69;
-    float32 var_70;
-    vec3 var_71;
-    //---------
-    // forward
-    var_0 = wp::sub(var_q1, var_p1);
-    var_1 = wp::sub(var_q2, var_p2);
-    var_2 = wp::sub(var_p1, var_p2);
-    var_3 = wp::dot(var_0, var_0);
-    var_4 = wp::dot(var_1, var_1);
-    var_5 = wp::dot(var_1, var_2);
-    var_7 = wp::cast_float(var_6);
-    var_8 = wp::cast_float(var_6);
-    var_9 = wp::sub(var_p2, var_p1);
-    var_10 = wp::length(var_9);
-    var_11 = (var_3 <= var_epsilon);
-    var_12 = (var_4 <= var_epsilon);
-    var_13 = var_11 && var_12;
-    if (var_13) {
-        var_14 = wp::vec3(var_7, var_8, var_10);
-        return var_14;
-    }
-    var_15 = (var_3 <= var_epsilon);
-    if (var_15) {
-        var_16 = wp::cast_float(var_6);
-        var_17 = wp::div(var_5, var_4);
-        var_18 = wp::cast_float(var_17);
-    }
-    var_19 = wp::select(var_15, var_7, var_16);
-    var_20 = wp::select(var_15, var_8, var_18);
-    if (!var_15) {
-        var_21 = wp::dot(var_0, var_2);
-        var_22 = (var_4 <= var_epsilon);
-        if (var_22) {
-            var_23 = wp::neg(var_21);
-            var_24 = wp::div(var_23, var_3);
-            var_26 = wp::clamp(var_24, var_6, var_25);
-            var_27 = wp::cast_float(var_6);
-        }
-        var_28 = wp::select(var_22, var_19, var_26);
-        var_29 = wp::select(var_22, var_20, var_27);
-        if (!var_22) {
-            var_30 = wp::dot(var_0, var_1);
-            var_31 = wp::mul(var_3, var_4);
-            var_32 = wp::mul(var_30, var_30);
-            var_33 = wp::sub(var_31, var_32);
-            var_34 = (var_33 != var_6);
-            if (var_34) {
-                var_35 = wp::mul(var_30, var_5);
-                var_36 = wp::mul(var_21, var_4);
-                var_37 = wp::sub(var_35, var_36);
-                var_38 = wp::div(var_37, var_33);
-                var_39 = wp::clamp(var_38, var_6, var_25);
-            }
-            var_40 = wp::select(var_34, var_28, var_39);
-            if (!var_34) {
-            }
-            var_41 = wp::select(var_34, var_6, var_40);
-            var_42 = wp::mul(var_30, var_41);
-            var_43 = wp::add(var_42, var_5);
-            var_44 = wp::div(var_43, var_4);
-            var_45 = (var_44 < var_6);
-            if (var_45) {
-                var_46 = wp::neg(var_21);
-                var_47 = wp::div(var_46, var_3);
-                var_48 = wp::clamp(var_47, var_6, var_25);
-            }
-            var_49 = wp::select(var_45, var_41, var_48);
-            var_50 = wp::select(var_45, var_44, var_6);
-            if (!var_45) {
-                var_51 = (var_50 > var_25);
-                if (var_51) {
-                    var_52 = wp::sub(var_30, var_21);
-                    var_53 = wp::div(var_52, var_3);
-                    var_54 = wp::clamp(var_53, var_6, var_25);
-                }
-                var_55 = wp::select(var_51, var_49, var_54);
-                var_56 = wp::select(var_51, var_50, var_25);
-            }
-            var_57 = wp::select(var_45, var_55, var_49);
-            var_58 = wp::select(var_45, var_56, var_50);
-        }
-        var_59 = wp::select(var_22, var_57, var_28);
-        var_60 = wp::select(var_22, var_58, var_29);
-    }
-    var_61 = wp::select(var_15, var_59, var_19);
-    var_62 = wp::select(var_15, var_60, var_20);
-    var_63 = wp::sub(var_q1, var_p1);
-    var_64 = wp::mul(var_63, var_61);
-    var_65 = wp::add(var_p1, var_64);
-    var_66 = wp::sub(var_q2, var_p2);
-    var_67 = wp::mul(var_66, var_62);
-    var_68 = wp::add(var_p2, var_67);
-    var_69 = wp::sub(var_68, var_65);
-    var_70 = wp::length(var_69);
-    var_71 = wp::vec3(var_61, var_62, var_70);
-    return var_71;
-}
 }// namespace wp

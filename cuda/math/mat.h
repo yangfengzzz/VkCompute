@@ -7,6 +7,7 @@
 #pragma once
 
 #include "vec.h"
+#include <cassert>
 
 namespace wp {
 
@@ -19,7 +20,7 @@ template<unsigned Rows, unsigned Cols, typename Type>
 struct mat_t {
     inline mat_t() = default;
 
-    inline __device__ mat_t(Type s) {
+    inline __device__ explicit mat_t(Type s) {
         for (unsigned i = 0; i < Rows; ++i)
             for (unsigned j = 0; j < Cols; ++j)
                 data[i][j] = s;
@@ -129,7 +130,7 @@ struct mat_t {
     // implemented in quat.h
     inline __device__ mat_t(const vec_t<3, Type> &pos, const quat_t<Type> &rot, const vec_t<3, Type> &scale);
 
-    inline __device__ mat_t(const initializer_array<Rows * Cols, Type> &l) {
+    inline __device__ explicit mat_t(const initializer_array<Rows * Cols, Type> &l) {
         for (unsigned i = 0; i < Rows; ++i) {
             for (unsigned j = 0; j < Cols; ++j) {
                 data[i][j] = l[i * Cols + j];
@@ -137,7 +138,7 @@ struct mat_t {
         }
     }
 
-    inline __device__ mat_t(const initializer_array<Cols, vec_t<Rows, Type>> &l) {
+    inline __device__ explicit mat_t(const initializer_array<Cols, vec_t<Rows, Type>> &l) {
         for (unsigned j = 0; j < Cols; ++j) {
             for (unsigned i = 0; i < Rows; ++i) {
                 data[i][j] = l[j][i];
@@ -518,7 +519,7 @@ inline __device__ vec_t<Rows, Type> get_diag(const mat_t<Rows, Rows, Type> &m) {
 template<typename Type>
 inline __device__ mat_t<2, 2, Type> inverse(const mat_t<2, 2, Type> &m) {
     Type det = determinant(m);
-    if (det > Type(kEps) || det < -Type(kEps)) {
+    if (det > Type(EPSILON) || det < -Type(EPSILON)) {
         return mat_t<2, 2, Type>(m.data[1][1], -m.data[0][1],
                                  -m.data[1][0], m.data[0][0]) *
                (Type(1.0f) / det);
@@ -623,7 +624,7 @@ inline __device__ mat_t<4, 4, Type> inverse(const mat_t<4, 4, Type> &m) {
     // compute 4x4 determinant & its reciprocal
     double det = x30 * z30 + x20 * z20 + x10 * z10 + x00 * z00;
 
-    if (fabs(det) > kEps) {
+    if (fabs(det) > EPSILON) {
         mat_t<4, 4, Type> invm;
 
         double rcp = 1.0 / det;
@@ -724,10 +725,6 @@ template<unsigned Rows, unsigned Cols, typename Type>
 __device__ inline mat_t<Rows, Cols, Type> lerp(const mat_t<Rows, Cols, Type> &a, const mat_t<Rows, Cols, Type> &b, Type t) {
     return a * (Type(1) - t) + b * t;
 }
-
-using mat22h = mat_t<2, 2, half>;
-using mat33h = mat_t<3, 3, half>;
-using mat44h = mat_t<4, 4, half>;
 
 using mat22 = mat_t<2, 2, float>;
 using mat33 = mat_t<3, 3, float>;

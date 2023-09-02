@@ -13,7 +13,7 @@ namespace wp {
 template<typename Type>
 struct quat_t {
     // zero constructor for adjoint variable initialization
-    inline __device__ quat_t(Type x = Type(0), Type y = Type(0), Type z = Type(0), Type w = Type(0)) : x(x), y(y), z(z), w(w) {}
+    inline __device__ explicit quat_t(Type x = Type(0), Type y = Type(0), Type z = Type(0), Type w = Type(0)) : x(x), y(y), z(z), w(w) {}
     explicit inline __device__ quat_t(const vec_t<3, Type> &v, Type w = Type(0)) : x(v[0]), y(v[1]), z(v[2]), w(w) {}
 
     // imaginary part
@@ -26,7 +26,6 @@ struct quat_t {
 };
 
 using quat = quat_t<float>;
-using quath = quat_t<half>;
 using quatf = quat_t<float>;
 using quatd = quat_t<double>;
 
@@ -116,7 +115,7 @@ inline __device__ Type length_sq(const quat_t<Type> &q) {
 template<typename Type>
 inline __device__ quat_t<Type> normalize(const quat_t<Type> &q) {
     Type l = length(q);
-    if (l > Type(kEps)) {
+    if (l > Type(EPSILON)) {
         Type inv_l = Type(1) / l;
 
         return quat_t<Type>(q.x * inv_l, q.y * inv_l, q.z * inv_l, q.w * inv_l);
@@ -266,13 +265,6 @@ inline __device__ quat_t<Type> quat_from_matrix(const mat_t<3, 3, Type> &m) {
 
 template<typename Type>
 inline __device__ Type index(const quat_t<Type> &a, int idx) {
-#if FP_CHECK
-    if (idx < 0 || idx > 3) {
-        printf("quat_t index %d out of bounds at %s %d", idx, __FILE__, __LINE__);
-        assert(0);
-    }
-#endif
-
     /*
     * Because quat data is not stored in an array, we index the quaternion by checking all possible idx values.
     * (&a.x)[idx] would be the preferred access strategy, but this results in undefined behavior in the clang compiler
@@ -319,7 +311,7 @@ inline __device__ mat_t<Rows, Cols, Type>::mat_t(const vec_t<3, Type> &pos, cons
     data[3][3] = Type(1);
 }
 
-template<typename Type = float32>
+template<typename Type = float>
 inline __device__ quat_t<Type> quat_identity() {
     return quat_t<Type>(Type(0), Type(0), Type(0), Type(1));
 }

@@ -1130,13 +1130,6 @@ CUDA_CALLABLE inline vec3 mesh_get_point(Mesh &mesh, int index) {
     if (!mesh.points)
         return vec3();
 
-#if FP_CHECK
-    if (index >= mesh.num_tris * 3) {
-        printf("mesh_get_point (%llu, %d) out of bounds at %s:%d\n", id, index, __FILE__, __LINE__);
-        assert(0);
-    }
-#endif
-
     int i = mesh.indices[index];
     return mesh.points[i];
 }
@@ -1144,13 +1137,6 @@ CUDA_CALLABLE inline vec3 mesh_get_point(Mesh &mesh, int index) {
 CUDA_CALLABLE inline vec3 mesh_get_velocity(Mesh &mesh, int index) {
     if (!mesh.velocities)
         return vec3();
-
-#if FP_CHECK
-    if (index >= mesh.num_tris * 3) {
-        printf("mesh_get_velocity (%llu, %d) out of bounds at %s:%d\n", id, index, __FILE__, __LINE__);
-        assert(0);
-    }
-#endif
 
     int i = mesh.indices[index];
     return mesh.velocities[i];

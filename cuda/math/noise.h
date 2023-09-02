@@ -24,7 +24,7 @@ inline __device__ float smootherstep_gradient(float t) {
 }
 
 inline __device__ float smoothstep(float t) {
-    return t * t * (3.0 - t * 2.0);
+    return t * t * (3.0f - t * 2.0f);
 }
 
 inline __device__ float smoothstep_gradient(float t) {
@@ -43,27 +43,27 @@ inline __device__ float interpolate_gradient(float a0, float a1, float t, float 
     // return (d_a1 - d_a0) * t + (a1 - a0) * d_t + d_a0;
 }
 
-inline __device__ float random_gradient_1d(uint32 state, int ix) {
+inline __device__ float random_gradient_1d(uint32_t state, int ix) {
     const uint32_t p1 = 73856093;
-    uint32 idx = ix * p1 + state;
+    uint32_t idx = ix * p1 + state;
     return randf(idx, -1.f, 1.f);
 }
 
-inline __device__ vec2 random_gradient_2d(uint32 state, int ix, int iy) {
+inline __device__ vec2 random_gradient_2d(uint32_t state, int ix, int iy) {
     const uint32_t p1 = 73856093;
     const uint32_t p2 = 19349663;
-    uint32 idx = ix * p1 ^ iy * p2 + state;
+    uint32_t idx = ix * p1 ^ iy * p2 + state;
     float phi = randf(idx, 0.f, 2.f * M_PI);
     float x = cos(phi);
     float y = sin(phi);
-    return vec2(x, y);
+    return {x, y};
 }
 
-inline __device__ vec3 random_gradient_3d(uint32 state, int ix, int iy, int iz) {
-    const uint32 p1 = 73856093;
-    const uint32 p2 = 19349663;
-    const uint32 p3 = 53471161;
-    uint32 idx = ix * p1 ^ iy * p2 ^ iz * p3 + state;
+inline __device__ vec3 random_gradient_3d(uint32_t state, int ix, int iy, int iz) {
+    const uint32_t p1 = 73856093;
+    const uint32_t p2 = 19349663;
+    const uint32_t p3 = 53471161;
+    uint32_t idx = ix * p1 ^ iy * p2 ^ iz * p3 + state;
 
     float x = randn(idx);
     float y = randn(idx);
@@ -72,12 +72,12 @@ inline __device__ vec3 random_gradient_3d(uint32 state, int ix, int iy, int iz) 
     return normalize(vec3(x, y, z));
 }
 
-inline __device__ vec4 random_gradient_4d(uint32 state, int ix, int iy, int iz, int it) {
-    const uint32 p1 = 73856093;
-    const uint32 p2 = 19349663;
-    const uint32 p3 = 53471161;
-    const uint32 p4 = 10000019;
-    uint32 idx = ix * p1 ^ iy * p2 ^ iz * p3 ^ it * p4 + state;
+inline __device__ vec4 random_gradient_4d(uint32_t state, int ix, int iy, int iz, int it) {
+    const uint32_t p1 = 73856093;
+    const uint32_t p2 = 19349663;
+    const uint32_t p3 = 53471161;
+    const uint32_t p4 = 10000019;
+    uint32_t idx = ix * p1 ^ iy * p2 ^ iz * p3 ^ it * p4 + state;
 
     float x = randn(idx);
     float y = randn(idx);
@@ -87,47 +87,47 @@ inline __device__ vec4 random_gradient_4d(uint32 state, int ix, int iy, int iz, 
     return normalize(vec4(x, y, z, t));
 }
 
-inline __device__ float dot_grid_gradient_1d(uint32 state, int ix, float dx) {
+inline __device__ float dot_grid_gradient_1d(uint32_t state, int ix, float dx) {
     float gradient = random_gradient_1d(state, ix);
     return dx * gradient;
 }
 
-inline __device__ float dot_grid_gradient_1d_gradient(uint32 state, int ix, float d_dx) {
+inline __device__ float dot_grid_gradient_1d_gradient(uint32_t state, int ix, float d_dx) {
     float gradient = random_gradient_1d(state, ix);
     return d_dx * gradient;
 }
 
-inline __device__ float dot_grid_gradient_2d(uint32 state, int ix, int iy, float dx, float dy) {
+inline __device__ float dot_grid_gradient_2d(uint32_t state, int ix, int iy, float dx, float dy) {
     vec2 gradient = random_gradient_2d(state, ix, iy);
     return (dx * gradient[0] + dy * gradient[1]);
 }
 
-inline __device__ float dot_grid_gradient_2d_gradient(uint32 state, int ix, int iy, float d_dx, float d_dy) {
+inline __device__ float dot_grid_gradient_2d_gradient(uint32_t state, int ix, int iy, float d_dx, float d_dy) {
     vec2 gradient = random_gradient_2d(state, ix, iy);
     return (d_dx * gradient[0] + d_dy * gradient[1]);
 }
 
-inline __device__ float dot_grid_gradient_3d(uint32 state, int ix, int iy, int iz, float dx, float dy, float dz) {
+inline __device__ float dot_grid_gradient_3d(uint32_t state, int ix, int iy, int iz, float dx, float dy, float dz) {
     vec3 gradient = random_gradient_3d(state, ix, iy, iz);
     return (dx * gradient[0] + dy * gradient[1] + dz * gradient[2]);
 }
 
-inline __device__ float dot_grid_gradient_3d_gradient(uint32 state, int ix, int iy, int iz, float d_dx, float d_dy, float d_dz) {
+inline __device__ float dot_grid_gradient_3d_gradient(uint32_t state, int ix, int iy, int iz, float d_dx, float d_dy, float d_dz) {
     vec3 gradient = random_gradient_3d(state, ix, iy, iz);
     return (d_dx * gradient[0] + d_dy * gradient[1] + d_dz * gradient[2]);
 }
 
-inline __device__ float dot_grid_gradient_4d(uint32 state, int ix, int iy, int iz, int it, float dx, float dy, float dz, float dt) {
+inline __device__ float dot_grid_gradient_4d(uint32_t state, int ix, int iy, int iz, int it, float dx, float dy, float dz, float dt) {
     vec4 gradient = random_gradient_4d(state, ix, iy, iz, it);
     return (dx * gradient[0] + dy * gradient[1] + dz * gradient[2] + dt * gradient[3]);
 }
 
-inline __device__ float dot_grid_gradient_4d_gradient(uint32 state, int ix, int iy, int iz, int it, float d_dx, float d_dy, float d_dz, float d_dt) {
+inline __device__ float dot_grid_gradient_4d_gradient(uint32_t state, int ix, int iy, int iz, int it, float d_dx, float d_dy, float d_dz, float d_dt) {
     vec4 gradient = random_gradient_4d(state, ix, iy, iz, it);
     return (d_dx * gradient[0] + d_dy * gradient[1] + d_dz * gradient[2] + d_dt * gradient[3]);
 }
 
-inline __device__ float noise_1d(uint32 state, int x0, int x1, float dx) {
+inline __device__ float noise_1d(uint32_t state, int x0, int x1, float dx) {
     //vX
     float v0 = dot_grid_gradient_1d(state, x0, dx);
     float v1 = dot_grid_gradient_1d(state, x1, dx - 1.f);
@@ -135,7 +135,7 @@ inline __device__ float noise_1d(uint32 state, int x0, int x1, float dx) {
     return interpolate(v0, v1, dx);
 }
 
-inline __device__ float noise_1d_gradient(uint32 state, int x0, int x1, float dx) {
+inline __device__ float noise_1d_gradient(uint32_t state, int x0, int x1, float dx) {
     float v0 = dot_grid_gradient_1d(state, x0, dx);
     float d_v0_dx = dot_grid_gradient_1d_gradient(state, x0, 1.f);
 
@@ -145,7 +145,7 @@ inline __device__ float noise_1d_gradient(uint32 state, int x0, int x1, float dx
     return interpolate_gradient(v0, v1, dx, d_v0_dx, d_v1_dx, 1.f);
 }
 
-inline __device__ float noise_2d(uint32 state, int x0, int y0, int x1, int y1, float dx, float dy) {
+inline __device__ float noise_2d(uint32_t state, int x0, int y0, int x1, int y1, float dx, float dy) {
     //vXY
     float v00 = dot_grid_gradient_2d(state, x0, y0, dx, dy);
     float v10 = dot_grid_gradient_2d(state, x1, y0, dx - 1.f, dy);
@@ -158,7 +158,7 @@ inline __device__ float noise_2d(uint32 state, int x0, int y0, int x1, int y1, f
     return interpolate(xi0, xi1, dy);
 }
 
-inline __device__ vec2 noise_2d_gradient(uint32 state, int x0, int y0, int x1, int y1, float dx, float dy) {
+inline __device__ vec2 noise_2d_gradient(uint32_t state, int x0, int y0, int x1, int y1, float dx, float dy) {
     float v00 = dot_grid_gradient_2d(state, x0, y0, dx, dy);
     float d_v00_dx = dot_grid_gradient_2d_gradient(state, x0, y0, 1.f, 0.f);
     float d_v00_dy = dot_grid_gradient_2d_gradient(state, x0, y0, 0.0, 1.f);
@@ -186,10 +186,10 @@ inline __device__ vec2 noise_2d_gradient(uint32 state, int x0, int y0, int x1, i
     float gradient_x = interpolate_gradient(xi0, xi1, dy, d_xi0_dx, d_xi1_dx, 0.0);
     float gradient_y = interpolate_gradient(xi0, xi1, dy, d_xi0_dy, d_xi1_dy, 1.f);
 
-    return vec2(gradient_x, gradient_y);
+    return {gradient_x, gradient_y};
 }
 
-inline __device__ float noise_3d(uint32 state, int x0, int y0, int z0, int x1, int y1, int z1, float dx, float dy, float dz) {
+inline __device__ float noise_3d(uint32_t state, int x0, int y0, int z0, int x1, int y1, int z1, float dx, float dy, float dz) {
     //vXYZ
     float v000 = dot_grid_gradient_3d(state, x0, y0, z0, dx, dy, dz);
     float v100 = dot_grid_gradient_3d(state, x1, y0, z0, dx - 1.f, dy, dz);
@@ -214,7 +214,7 @@ inline __device__ float noise_3d(uint32 state, int x0, int y0, int z0, int x1, i
     return interpolate(yi0, yi1, dz);
 }
 
-inline __device__ vec3 noise_3d_gradient(uint32 state, int x0, int y0, int z0, int x1, int y1, int z1, float dx, float dy, float dz) {
+inline __device__ vec3 noise_3d_gradient(uint32_t state, int x0, int y0, int z0, int x1, int y1, int z1, float dx, float dy, float dz) {
     float v000 = dot_grid_gradient_3d(state, x0, y0, z0, dx, dy, dz);
     float d_v000_dx = dot_grid_gradient_3d_gradient(state, x0, y0, z0, 1.f, 0.f, 0.f);
     float d_v000_dy = dot_grid_gradient_3d_gradient(state, x0, y0, z0, 0.f, 1.f, 0.f);
@@ -289,10 +289,10 @@ inline __device__ vec3 noise_3d_gradient(uint32 state, int x0, int y0, int z0, i
     float gradient_y = interpolate_gradient(yi0, yi1, dz, d_yi0_dx, d_yi1_dx, 0.f);
     float gradient_z = interpolate_gradient(yi0, yi1, dz, d_yi0_dz, d_yi1_dz, 1.f);
 
-    return vec3(gradient_x, gradient_y, gradient_z);
+    return {gradient_x, gradient_y, gradient_z};
 }
 
-inline __device__ float noise_4d(uint32 state, int x0, int y0, int z0, int t0, int x1, int y1, int z1, int t1, float dx, float dy, float dz, float dt) {
+inline __device__ float noise_4d(uint32_t state, int x0, int y0, int z0, int t0, int x1, int y1, int z1, int t1, float dx, float dy, float dz, float dt) {
     //vXYZT
     float v0000 = dot_grid_gradient_4d(state, x0, y0, z0, t0, dx, dy, dz, dt);
     float v1000 = dot_grid_gradient_4d(state, x1, y0, z0, t0, dx - 1.f, dy, dz, dt);
@@ -341,7 +341,7 @@ inline __device__ float noise_4d(uint32 state, int x0, int y0, int z0, int t0, i
     return interpolate(zi0, zi1, dt);
 }
 
-inline __device__ vec4 noise_4d_gradient(uint32 state, int x0, int y0, int z0, int t0, int x1, int y1, int z1, int t1, float dx, float dy, float dz, float dt) {
+inline __device__ vec4 noise_4d_gradient(uint32_t state, int x0, int y0, int z0, int t0, int x1, int y1, int z1, int t1, float dx, float dy, float dz, float dt) {
     float v0000 = dot_grid_gradient_4d(state, x0, y0, z0, t0, dx, dy, dz, dt);
     float d_v0000_dx = dot_grid_gradient_4d_gradient(state, x0, y0, z0, t0, 1.f, 0.f, 0.f, 0.f);
     float d_v0000_dy = dot_grid_gradient_4d_gradient(state, x0, y0, z0, t0, 0.f, 1.f, 0.f, 0.f);
@@ -527,12 +527,12 @@ inline __device__ vec4 noise_4d_gradient(uint32 state, int x0, int y0, int z0, i
     float gradient_z = interpolate_gradient(zi0, zi1, dt, d_zi0_dz, d_zi1_dz, 0.f);
     float gradient_t = interpolate_gradient(zi0, zi1, dt, d_zi0_dt, d_zi1_dt, 1.f);
 
-    return vec4(gradient_x, gradient_y, gradient_z, gradient_t);
+    return {gradient_x, gradient_y, gradient_z, gradient_t};
 }
 
 // non-periodic Perlin noise
 
-inline __device__ float noise(uint32 state, float x) {
+inline __device__ float noise(uint32_t state, float x) {
     float dx = x - floor(x);
 
     int x0 = (int)floor(x);
@@ -541,7 +541,7 @@ inline __device__ float noise(uint32 state, float x) {
     return noise_1d(state, x0, x1, dx);
 }
 
-inline __device__ float noise(uint32 state, const vec2 &xy) {
+inline __device__ float noise(uint32_t state, const vec2 &xy) {
     float dx = xy[0] - floor(xy[0]);
     float dy = xy[1] - floor(xy[1]);
 
@@ -554,7 +554,7 @@ inline __device__ float noise(uint32 state, const vec2 &xy) {
     return noise_2d(state, x0, y0, x1, y1, dx, dy);
 }
 
-inline __device__ float noise(uint32 state, const vec3 &xyz) {
+inline __device__ float noise(uint32_t state, const vec3 &xyz) {
     float dx = xyz[0] - floor(xyz[0]);
     float dy = xyz[1] - floor(xyz[1]);
     float dz = xyz[2] - floor(xyz[2]);
@@ -570,7 +570,7 @@ inline __device__ float noise(uint32 state, const vec3 &xyz) {
     return noise_3d(state, x0, y0, z0, x1, y1, z1, dx, dy, dz);
 }
 
-inline __device__ float noise(uint32 state, const vec4 &xyzt) {
+inline __device__ float noise(uint32_t state, const vec4 &xyzt) {
     float dx = xyzt[0] - floor(xyzt[0]);
     float dy = xyzt[1] - floor(xyzt[1]);
     float dz = xyzt[2] - floor(xyzt[2]);
@@ -591,67 +591,66 @@ inline __device__ float noise(uint32 state, const vec4 &xyzt) {
 
 // periodic Perlin noise
 
-inline __device__ float pnoise(uint32 state, float x, int px) {
+inline __device__ float pnoise(uint32_t state, float x, int px) {
     float dx = x - floor(x);
 
-    int x0 = mod(((int)floor(x)), px);
-    int x1 = mod((x0 + 1), px);
+    int x0 = (int)floor(x) % px;
+    int x1 = (x0 + 1) % px;
 
     return noise_1d(state, x0, x1, dx);
 }
 
-
-inline __device__ float pnoise(uint32 state, const vec2 &xy, int px, int py) {
+inline __device__ float pnoise(uint32_t state, const vec2 &xy, int px, int py) {
     float dx = xy[0] - floor(xy[0]);
     float dy = xy[1] - floor(xy[1]);
 
-    int x0 = mod(((int)floor(xy[0])), px);
-    int y0 = mod(((int)floor(xy[1])), py);
+    int x0 = ((int)floor(xy[0])) % px;
+    int y0 = ((int)floor(xy[1])) % py;
 
-    int x1 = mod((x0 + 1), px);
-    int y1 = mod((y0 + 1), py);
+    int x1 = (x0 + 1) % px;
+    int y1 = (y0 + 1) % py;
 
     return noise_2d(state, x0, y0, x1, y1, dx, dy);
 }
 
-inline __device__ float pnoise(uint32 state, const vec3 &xyz, int px, int py, int pz) {
+inline __device__ float pnoise(uint32_t state, const vec3 &xyz, int px, int py, int pz) {
     float dx = xyz[0] - floor(xyz[0]);
     float dy = xyz[1] - floor(xyz[1]);
     float dz = xyz[2] - floor(xyz[2]);
 
-    int x0 = mod(((int)floor(xyz[0])), px);
-    int y0 = mod(((int)floor(xyz[1])), py);
-    int z0 = mod(((int)floor(xyz[2])), pz);
+    int x0 = (int)floor(xyz[0]) % px;
+    int y0 = (int)floor(xyz[1]) % py;
+    int z0 = (int)floor(xyz[2]) % pz;
 
-    int x1 = mod((x0 + 1), px);
-    int y1 = mod((y0 + 1), py);
-    int z1 = mod((z0 + 1), pz);
+    int x1 = (x0 + 1) % px;
+    int y1 = (y0 + 1) % py;
+    int z1 = (z0 + 1) % pz;
 
     return noise_3d(state, x0, y0, z0, x1, y1, z1, dx, dy, dz);
 }
 
-inline __device__ float pnoise(uint32 state, const vec4 &xyzt, int px, int py, int pz, int pt) {
+inline __device__ float pnoise(uint32_t state, const vec4 &xyzt, int px, int py, int pz, int pt) {
     float dx = xyzt[0] - floor(xyzt[0]);
     float dy = xyzt[1] - floor(xyzt[1]);
     float dz = xyzt[2] - floor(xyzt[2]);
     float dt = xyzt[3] - floor(xyzt[3]);
 
-    int x0 = mod(((int)floor(xyzt[0])), px);
-    int y0 = mod(((int)floor(xyzt[1])), py);
-    int z0 = mod(((int)floor(xyzt[2])), pz);
-    int t0 = mod(((int)floor(xyzt[3])), pt);
+    int x0 = (int)floor(xyzt[0]) % px;
+    int y0 = (int)floor(xyzt[1]) % py;
+    int z0 = (int)floor(xyzt[2]) % pz;
+    int t0 = (int)floor(xyzt[3]) % pt;
 
-    int x1 = mod((x0 + 1), px);
-    int y1 = mod((y0 + 1), py);
-    int z1 = mod((z0 + 1), pz);
-    int t1 = mod((t0 + 1), pt);
+    int x1 = (x0 + 1) % px;
+    int y1 = (y0 + 1) % py;
+    int z1 = (z0 + 1) % pz;
+    int t1 = (t0 + 1) % pt;
 
     return noise_4d(state, x0, y0, z0, t0, x1, y1, z1, t1, dx, dy, dz, dt);
 }
 
 // curl noise
 
-inline __device__ vec2 curlnoise(uint32 state, const vec2 &xy) {
+inline __device__ vec2 curlnoise(uint32_t state, const vec2 &xy) {
     float dx = xy[0] - floor(xy[0]);
     float dy = xy[1] - floor(xy[1]);
 
@@ -662,10 +661,10 @@ inline __device__ vec2 curlnoise(uint32 state, const vec2 &xy) {
     int y1 = y0 + 1;
 
     vec2 grad_field = noise_2d_gradient(state, x0, y0, x1, y1, dx, dy);
-    return vec2(-grad_field[1], grad_field[0]);
+    return {-grad_field[1], grad_field[0]};
 }
 
-inline __device__ vec3 curlnoise(uint32 state, const vec3 &xyz) {
+inline __device__ vec3 curlnoise(uint32_t state, const vec3 &xyz) {
     float dx = xyz[0] - floor(xyz[0]);
     float dy = xyz[1] - floor(xyz[1]);
     float dz = xyz[2] - floor(xyz[2]);
@@ -684,13 +683,13 @@ inline __device__ vec3 curlnoise(uint32 state, const vec3 &xyz) {
     state = rand_init(state, 13112221);
     vec3 grad_field_3 = noise_3d_gradient(state, x0, y0, z0, x1, y1, z1, dx, dy, dz);
 
-    return vec3(
+    return {
         grad_field_3[1] - grad_field_2[2],
         grad_field_1[2] - grad_field_3[0],
-        grad_field_2[0] - grad_field_1[1]);
+        grad_field_2[0] - grad_field_1[1]};
 }
 
-inline __device__ vec3 curlnoise(uint32 state, const vec4 &xyzt) {
+inline __device__ vec3 curlnoise(uint32_t state, const vec4 &xyzt) {
     float dx = xyzt[0] - floor(xyzt[0]);
     float dy = xyzt[1] - floor(xyzt[1]);
     float dz = xyzt[2] - floor(xyzt[2]);
@@ -712,10 +711,10 @@ inline __device__ vec3 curlnoise(uint32 state, const vec4 &xyzt) {
     state = rand_init(state, 13112221);
     vec4 grad_field_3 = noise_4d_gradient(state, x0, y0, z0, t0, x1, y1, z1, t1, dx, dy, dz, dt);
 
-    return vec3(
+    return {
         grad_field_3[1] - grad_field_2[2],
         grad_field_1[2] - grad_field_3[0],
-        grad_field_2[0] - grad_field_1[1]);
+        grad_field_2[0] - grad_field_1[1]};
 }
 
 }// namespace wp
