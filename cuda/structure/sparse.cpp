@@ -241,9 +241,9 @@ void bsr_transpose_host(int rows_per_block, int cols_per_block, int row_count, i
     std::partial_sum(transposed_bsr_offsets, transposed_bsr_offsets + col_count + 1, transposed_bsr_offsets);
 }
 
-WP_API int bsr_matrix_from_triplets_float_host(int rows_per_block, int cols_per_block, int row_count, int nnz,
-                                               uint64_t tpl_rows, uint64_t tpl_columns, uint64_t tpl_values,
-                                               uint64_t bsr_offsets, uint64_t bsr_columns, uint64_t bsr_values) {
+int bsr_matrix_from_triplets_float_host(int rows_per_block, int cols_per_block, int row_count, int nnz,
+                                        uint64_t tpl_rows, uint64_t tpl_columns, uint64_t tpl_values,
+                                        uint64_t bsr_offsets, uint64_t bsr_columns, uint64_t bsr_values) {
     return bsr_matrix_from_triplets_host(
         rows_per_block, cols_per_block, row_count, nnz, reinterpret_cast<const int *>(tpl_rows),
         reinterpret_cast<const int *>(tpl_columns), reinterpret_cast<const float *>(tpl_values),
@@ -251,9 +251,9 @@ WP_API int bsr_matrix_from_triplets_float_host(int rows_per_block, int cols_per_
         reinterpret_cast<float *>(bsr_values));
 }
 
-WP_API int bsr_matrix_from_triplets_double_host(int rows_per_block, int cols_per_block, int row_count, int nnz,
-                                                uint64_t tpl_rows, uint64_t tpl_columns, uint64_t tpl_values,
-                                                uint64_t bsr_offsets, uint64_t bsr_columns, uint64_t bsr_values) {
+int bsr_matrix_from_triplets_double_host(int rows_per_block, int cols_per_block, int row_count, int nnz,
+                                         uint64_t tpl_rows, uint64_t tpl_columns, uint64_t tpl_values,
+                                         uint64_t bsr_offsets, uint64_t bsr_columns, uint64_t bsr_values) {
     return bsr_matrix_from_triplets_host(
         rows_per_block, cols_per_block, row_count, nnz, reinterpret_cast<const int *>(tpl_rows),
         reinterpret_cast<const int *>(tpl_columns), reinterpret_cast<const double *>(tpl_values),
@@ -261,10 +261,10 @@ WP_API int bsr_matrix_from_triplets_double_host(int rows_per_block, int cols_per
         reinterpret_cast<double *>(bsr_values));
 }
 
-WP_API void bsr_transpose_float_host(int rows_per_block, int cols_per_block, int row_count, int col_count, int nnz,
-                                     uint64_t bsr_offsets, uint64_t bsr_columns, uint64_t bsr_values,
-                                     uint64_t transposed_bsr_offsets, uint64_t transposed_bsr_columns,
-                                     uint64_t transposed_bsr_values) {
+void bsr_transpose_float_host(int rows_per_block, int cols_per_block, int row_count, int col_count, int nnz,
+                              uint64_t bsr_offsets, uint64_t bsr_columns, uint64_t bsr_values,
+                              uint64_t transposed_bsr_offsets, uint64_t transposed_bsr_columns,
+                              uint64_t transposed_bsr_values) {
     bsr_transpose_host(rows_per_block, cols_per_block, row_count, col_count, nnz,
                        reinterpret_cast<const int *>(bsr_offsets), reinterpret_cast<const int *>(bsr_columns),
                        reinterpret_cast<const float *>(bsr_values), reinterpret_cast<int *>(transposed_bsr_offsets),
@@ -272,10 +272,10 @@ WP_API void bsr_transpose_float_host(int rows_per_block, int cols_per_block, int
                        reinterpret_cast<float *>(transposed_bsr_values));
 }
 
-WP_API void bsr_transpose_double_host(int rows_per_block, int cols_per_block, int row_count, int col_count, int nnz,
-                                      uint64_t bsr_offsets, uint64_t bsr_columns, uint64_t bsr_values,
-                                      uint64_t transposed_bsr_offsets, uint64_t transposed_bsr_columns,
-                                      uint64_t transposed_bsr_values) {
+void bsr_transpose_double_host(int rows_per_block, int cols_per_block, int row_count, int col_count, int nnz,
+                               uint64_t bsr_offsets, uint64_t bsr_columns, uint64_t bsr_values,
+                               uint64_t transposed_bsr_offsets, uint64_t transposed_bsr_columns,
+                               uint64_t transposed_bsr_values) {
     bsr_transpose_host(rows_per_block, cols_per_block, row_count, col_count, nnz,
                        reinterpret_cast<const int *>(bsr_offsets), reinterpret_cast<const int *>(bsr_columns),
                        reinterpret_cast<const double *>(bsr_values), reinterpret_cast<int *>(transposed_bsr_offsets),

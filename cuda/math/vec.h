@@ -20,45 +20,45 @@ struct vec_t {
 
     inline vec_t() = default;
 
-    inline __device__ vec_t(Type s) {
+    inline __device__ __host__ vec_t(Type s) {
         for (unsigned i = 0; i < Length; ++i) {
             c[i] = s;
         }
     }
 
     template<typename OtherType>
-    inline explicit __device__ vec_t(const vec_t<Length, OtherType> &other) {
+    inline explicit __device__ __host__ vec_t(const vec_t<Length, OtherType> &other) {
         for (unsigned i = 0; i < Length; ++i) {
             c[i] = other[i];
         }
     }
 
-    inline __device__ vec_t(Type x, Type y) {
+    inline __device__ __host__ vec_t(Type x, Type y) {
         c[0] = x;
         c[1] = y;
     }
 
-    inline __device__ vec_t(Type x, Type y, Type z) {
+    inline __device__ __host__ vec_t(Type x, Type y, Type z) {
         c[0] = x;
         c[1] = y;
         c[2] = z;
     }
 
-    inline __device__ vec_t(Type x, Type y, Type z, Type w) {
+    inline __device__ __host__ vec_t(Type x, Type y, Type z, Type w) {
         c[0] = x;
         c[1] = y;
         c[2] = z;
         c[3] = w;
     }
 
-    inline __device__ vec_t(const initializer_array<Length, Type> &l) {
+    inline __device__ __host__ vec_t(const initializer_array<Length, Type> &l) {
         for (unsigned i = 0; i < Length; ++i) {
             c[i] = l[i];
         }
     }
 
     // special screw vector constructor for spatial_vectors:
-    inline __device__ vec_t(vec_t<3, Type> w, vec_t<3, Type> v) {
+    inline __device__ __host__ vec_t(vec_t<3, Type> w, vec_t<3, Type> v) {
         c[0] = w[0];
         c[1] = w[1];
         c[2] = w[2];
@@ -67,11 +67,11 @@ struct vec_t {
         c[5] = v[2];
     }
 
-    inline __device__ Type operator[](int index) const {
+    inline __device__ __host__ Type operator[](int index) const {
         return c[index];
     }
 
-    inline __device__ Type &operator[](int index) {
+    inline __device__ __host__ Type &operator[](int index) {
         return c[index];
     }
 };

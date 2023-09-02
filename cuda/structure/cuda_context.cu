@@ -74,9 +74,9 @@ struct DeviceInfo {
 };
 
 struct ContextInfo {
-    DeviceInfo *device_info = NULL;
+    DeviceInfo *device_info = nullptr;
 
-    CUstream stream = NULL;// created when needed
+    CUstream stream = nullptr;// created when needed
 };
 
 // cached info for all devices, indexed by ordinal
@@ -97,25 +97,22 @@ int cuda_get_context_restore_policy() {
 }
 
 int cuda_init() {
-    if (!init_cuda_driver())
-        return -1;
-
     int deviceCount = 0;
-    if (check_cu(cuDeviceGetCount_f(&deviceCount))) {
+    if (check_cu(cuDeviceGetCount(&deviceCount))) {
         g_devices.resize(deviceCount);
 
         for (int i = 0; i < deviceCount; i++) {
             CUdevice device;
-            if (check_cu(cuDeviceGet_f(&device, i))) {
+            if (check_cu(cuDeviceGet(&device, i))) {
                 // query device info
                 g_devices[i].device = device;
                 g_devices[i].ordinal = i;
-                check_cu(cuDeviceGetName_f(g_devices[i].name, DeviceInfo::kNameLen, device));
-                check_cu(cuDeviceGetAttribute_f(&g_devices[i].is_uva, CU_DEVICE_ATTRIBUTE_UNIFIED_ADDRESSING, device));
+                check_cu(cuDeviceGetName(g_devices[i].name, DeviceInfo::kNameLen, device));
+                check_cu(cuDeviceGetAttribute(&g_devices[i].is_uva, CU_DEVICE_ATTRIBUTE_UNIFIED_ADDRESSING, device));
                 int major = 0;
                 int minor = 0;
-                check_cu(cuDeviceGetAttribute_f(&major, CU_DEVICE_ATTRIBUTE_COMPUTE_CAPABILITY_MAJOR, device));
-                check_cu(cuDeviceGetAttribute_f(&minor, CU_DEVICE_ATTRIBUTE_COMPUTE_CAPABILITY_MINOR, device));
+                check_cu(cuDeviceGetAttribute(&major, CU_DEVICE_ATTRIBUTE_COMPUTE_CAPABILITY_MAJOR, device));
+                check_cu(cuDeviceGetAttribute(&minor, CU_DEVICE_ATTRIBUTE_COMPUTE_CAPABILITY_MINOR, device));
                 g_devices[i].arch = 10 * major + minor;
 
                 g_device_map[device] = &g_devices[i];
@@ -132,21 +129,21 @@ int cuda_init() {
 
 static inline CUcontext get_current_context() {
     CUcontext ctx;
-    if (check_cu(cuCtxGetCurrent_f(&ctx)))
+    if (check_cu(cuCtxGetCurrent(&ctx)))
         return ctx;
     else
-        return NULL;
+        return nullptr;
 }
 
 static inline CUstream get_current_stream() {
-    return static_cast<CUstream>(cuda_context_get_stream(NULL));
+    return static_cast<CUstream>(cuda_context_get_stream(nullptr));
 }
 
 static ContextInfo *get_context_info(CUcontext ctx) {
     if (!ctx) {
         ctx = get_current_context();
         if (!ctx)
-            return NULL;
+            return nullptr;
     }
 
     auto it = g_contexts.find(ctx);
@@ -157,14 +154,14 @@ static ContextInfo *get_context_info(CUcontext ctx) {
         ContextGuard guard(ctx, true);
         ContextInfo context_info;
         CUdevice device;
-        if (check_cu(cuCtxGetDevice_f(&device))) {
+        if (check_cu(cuCtxGetDevice(&device))) {
             context_info.device_info = g_device_map[device];
             auto result = g_contexts.insert(std::make_pair(ctx, context_info));
             return &result.first->second;
         }
     }
 
-    return NULL;
+    return nullptr;
 }
 
 void *alloc_pinned(size_t s) {
@@ -217,7 +214,7 @@ void memcpy_peer(void *context, void *dest, void *src, size_t n) {
 }
 
 __global__ void memset_kernel(int *dest, int value, size_t n) {
-    const size_t tid = wp::grid_index();
+    const size_t tid = grid_index();
 
     if (tid < n) {
         dest[tid] = value;
@@ -233,13 +230,13 @@ void memset_device(void *context, void *dest, int value, size_t n) {
     } else {
         // custom kernel to support 4-byte values (and slightly lower host overhead)
         const size_t num_words = n / 4;
-        wp_launch_device(WP_CURRENT_CONTEXT, memset_kernel, num_words, ((int *)dest, value, num_words));
+        wp_launch_device(WP_CURRENT_CONTEXT, memset_kernel, num_words, ((int *)dest, value, num_words))
     }
 }
 
 // fill memory buffer with a value: generic memtile kernel using memcpy for each element
 __global__ void memtile_kernel(void *dst, const void *src, size_t srcsize, size_t n) {
-    size_t tid = wp::grid_index();
+    size_t tid = grid_index();
     if (tid < n) {
         memcpy((int8_t *)dst + srcsize * tid, src, srcsize);
     }
@@ -248,7 +245,7 @@ __global__ void memtile_kernel(void *dst, const void *src, size_t srcsize, size_
 // this should be faster than memtile_kernel, but requires proper alignment of dst
 template<typename T>
 __global__ void memtile_value_kernel(T *dst, T value, size_t n) {
-    size_t tid = wp::grid_index();
+    size_t tid = grid_index();
     if (tid < n) {
         dst[tid] = value;
     }
@@ -257,22 +254,22 @@ __global__ void memtile_value_kernel(T *dst, T value, size_t n) {
 void memtile_device(void *context, void *dst, const void *src, size_t srcsize, size_t n) {
     ContextGuard guard(context);
 
-    size_t dst_addr = reinterpret_cast<size_t>(dst);
-    size_t src_addr = reinterpret_cast<size_t>(src);
+    auto dst_addr = reinterpret_cast<size_t>(dst);
+    auto src_addr = reinterpret_cast<size_t>(src);
 
     // try memtile_value first because it should be faster, but we need to ensure proper alignment
     if (srcsize == 8 && (dst_addr & 7) == 0 && (src_addr & 7) == 0) {
-        int64_t *p = reinterpret_cast<int64_t *>(dst);
+        auto *p = reinterpret_cast<int64_t *>(dst);
         int64_t value = *reinterpret_cast<const int64_t *>(src);
-        wp_launch_device(WP_CURRENT_CONTEXT, memtile_value_kernel, n, (p, value, n));
+        wp_launch_device(WP_CURRENT_CONTEXT, memtile_value_kernel, n, (p, value, n))
     } else if (srcsize == 4 && (dst_addr & 3) == 0 && (src_addr & 3) == 0) {
-        int32_t *p = reinterpret_cast<int32_t *>(dst);
+        auto *p = reinterpret_cast<int32_t *>(dst);
         int32_t value = *reinterpret_cast<const int32_t *>(src);
-        wp_launch_device(WP_CURRENT_CONTEXT, memtile_value_kernel, n, (p, value, n));
+        wp_launch_device(WP_CURRENT_CONTEXT, memtile_value_kernel, n, (p, value, n))
     } else if (srcsize == 2 && (dst_addr & 1) == 0 && (src_addr & 1) == 0) {
-        int16_t *p = reinterpret_cast<int16_t *>(dst);
+        auto *p = reinterpret_cast<int16_t *>(dst);
         int16_t value = *reinterpret_cast<const int16_t *>(src);
-        wp_launch_device(WP_CURRENT_CONTEXT, memtile_value_kernel, n, (p, value, n));
+        wp_launch_device(WP_CURRENT_CONTEXT, memtile_value_kernel, n, (p, value, n))
     } else if (srcsize == 1) {
         check_cuda(cudaMemset(dst, *reinterpret_cast<const int8_t *>(src), n));
     } else {
@@ -283,9 +280,9 @@ void memtile_device(void *context, void *dst, const void *src, size_t srcsize, s
         check_cuda(cudaMalloc(&src_device, srcsize));
         check_cuda(cudaMemcpyAsync(src_device, src, srcsize, cudaMemcpyHostToDevice, get_current_stream()));
 
-        wp_launch_device(WP_CURRENT_CONTEXT, memtile_kernel, n, (dst, src_device, srcsize, n));
+        wp_launch_device(WP_CURRENT_CONTEXT, memtile_kernel, n, (dst, src_device, srcsize, n))
 
-        check_cuda(cudaFree(src_device));
+            check_cuda(cudaFree(src_device));
     }
 }
 
@@ -372,24 +369,24 @@ static __global__ void array_copy_4d_kernel(void *dst, const void *src,
     }
 }
 
-WP_API size_t array_copy_device(void *context, void *dst, void *src, int dst_type, int src_type, int elem_size) {
+size_t array_copy_device(void *context, void *dst, void *src, int dst_type, int src_type, int elem_size) {
     if (!src || !dst)
         return 0;
 
-    const void *src_data = NULL;
-    const void *src_grad = NULL;
-    void *dst_data = NULL;
-    void *dst_grad = NULL;
+    const void *src_data = nullptr;
+    const void *src_grad = nullptr;
+    void *dst_data = nullptr;
+    void *dst_grad = nullptr;
     int src_ndim = 0;
     int dst_ndim = 0;
-    const int *src_shape = NULL;
-    const int *dst_shape = NULL;
-    const int *src_strides = NULL;
-    const int *dst_strides = NULL;
-    const int *const *src_indices = NULL;
-    const int *const *dst_indices = NULL;
+    const int *src_shape = nullptr;
+    const int *dst_shape = nullptr;
+    const int *src_strides = nullptr;
+    const int *dst_strides = nullptr;
+    const int *const *src_indices = nullptr;
+    const int *const *dst_indices = nullptr;
 
-    const int *null_indices[wp::ARRAY_MAX_DIMS] = {NULL};
+    const int *null_indices[wp::ARRAY_MAX_DIMS] = {nullptr};
 
     if (src_type == wp::ARRAY_TYPE_REGULAR) {
         const wp::array_t<void> &src_arr = *static_cast<const wp::array_t<void> *>(src);
@@ -451,9 +448,8 @@ WP_API size_t array_copy_device(void *context, void *dst, void *src, int dst_typ
 
     switch (src_ndim) {
         case 1: {
-            wp_launch_device(WP_CURRENT_CONTEXT, array_copy_1d_kernel, n, (dst_data, src_data, dst_strides[0], src_strides[0], dst_indices[0], src_indices[0], src_shape[0], elem_size));
-            if (has_grad) {
-                wp_launch_device(WP_CURRENT_CONTEXT, array_copy_1d_kernel, n, (dst_grad, src_grad, dst_strides[0], src_strides[0], dst_indices[0], src_indices[0], src_shape[0], elem_size));
+            wp_launch_device(WP_CURRENT_CONTEXT, array_copy_1d_kernel, n, (dst_data, src_data, dst_strides[0], src_strides[0], dst_indices[0], src_indices[0], src_shape[0], elem_size)) if (has_grad) {
+                wp_launch_device(WP_CURRENT_CONTEXT, array_copy_1d_kernel, n, (dst_grad, src_grad, dst_strides[0], src_strides[0], dst_indices[0], src_indices[0], src_shape[0], elem_size))
             }
             break;
         }
@@ -464,9 +460,8 @@ WP_API size_t array_copy_device(void *context, void *dst, void *src, int dst_typ
             wp::vec_t<2, const int *> src_indices_v(src_indices[0], src_indices[1]);
             wp::vec_t<2, const int *> dst_indices_v(dst_indices[0], dst_indices[1]);
 
-            wp_launch_device(WP_CURRENT_CONTEXT, array_copy_2d_kernel, n, (dst_data, src_data, dst_strides_v, src_strides_v, dst_indices_v, src_indices_v, shape_v, elem_size));
-            if (has_grad) {
-                wp_launch_device(WP_CURRENT_CONTEXT, array_copy_2d_kernel, n, (dst_grad, src_grad, dst_strides_v, src_strides_v, dst_indices_v, src_indices_v, shape_v, elem_size));
+            wp_launch_device(WP_CURRENT_CONTEXT, array_copy_2d_kernel, n, (dst_data, src_data, dst_strides_v, src_strides_v, dst_indices_v, src_indices_v, shape_v, elem_size)) if (has_grad) {
+                wp_launch_device(WP_CURRENT_CONTEXT, array_copy_2d_kernel, n, (dst_grad, src_grad, dst_strides_v, src_strides_v, dst_indices_v, src_indices_v, shape_v, elem_size))
             }
             break;
         }
@@ -477,9 +472,8 @@ WP_API size_t array_copy_device(void *context, void *dst, void *src, int dst_typ
             wp::vec_t<3, const int *> src_indices_v(src_indices[0], src_indices[1], src_indices[2]);
             wp::vec_t<3, const int *> dst_indices_v(dst_indices[0], dst_indices[1], dst_indices[2]);
 
-            wp_launch_device(WP_CURRENT_CONTEXT, array_copy_3d_kernel, n, (dst_data, src_data, dst_strides_v, src_strides_v, dst_indices_v, src_indices_v, shape_v, elem_size));
-            if (has_grad) {
-                wp_launch_device(WP_CURRENT_CONTEXT, array_copy_3d_kernel, n, (dst_grad, src_grad, dst_strides_v, src_strides_v, dst_indices_v, src_indices_v, shape_v, elem_size));
+            wp_launch_device(WP_CURRENT_CONTEXT, array_copy_3d_kernel, n, (dst_data, src_data, dst_strides_v, src_strides_v, dst_indices_v, src_indices_v, shape_v, elem_size)) if (has_grad) {
+                wp_launch_device(WP_CURRENT_CONTEXT, array_copy_3d_kernel, n, (dst_grad, src_grad, dst_strides_v, src_strides_v, dst_indices_v, src_indices_v, shape_v, elem_size))
             }
             break;
         }
@@ -490,9 +484,8 @@ WP_API size_t array_copy_device(void *context, void *dst, void *src, int dst_typ
             wp::vec_t<4, const int *> src_indices_v(src_indices[0], src_indices[1], src_indices[2], src_indices[3]);
             wp::vec_t<4, const int *> dst_indices_v(dst_indices[0], dst_indices[1], dst_indices[2], dst_indices[3]);
 
-            wp_launch_device(WP_CURRENT_CONTEXT, array_copy_4d_kernel, n, (dst_data, src_data, dst_strides_v, src_strides_v, dst_indices_v, src_indices_v, shape_v, elem_size));
-            if (has_grad) {
-                wp_launch_device(WP_CURRENT_CONTEXT, array_copy_4d_kernel, n, (dst_grad, src_grad, dst_strides_v, src_strides_v, dst_indices_v, src_indices_v, shape_v, elem_size));
+            wp_launch_device(WP_CURRENT_CONTEXT, array_copy_4d_kernel, n, (dst_data, src_data, dst_strides_v, src_strides_v, dst_indices_v, src_indices_v, shape_v, elem_size)) if (has_grad) {
+                wp_launch_device(WP_CURRENT_CONTEXT, array_copy_4d_kernel, n, (dst_grad, src_grad, dst_strides_v, src_strides_v, dst_indices_v, src_indices_v, shape_v, elem_size))
             }
             break;
         }
@@ -584,17 +577,17 @@ static __global__ void array_fill_4d_kernel(void *data,
     }
 }
 
-WP_API void array_fill_device(void *context, void *arr_ptr, int arr_type, const void *value_ptr, int value_size) {
+void array_fill_device(void *context, void *arr_ptr, int arr_type, const void *value_ptr, int value_size) {
     if (!arr_ptr || !value_ptr)
         return;
 
-    void *data = NULL;
+    void *data = nullptr;
     int ndim = 0;
-    const int *shape = NULL;
-    const int *strides = NULL;
-    const int *const *indices = NULL;
+    const int *shape = nullptr;
+    const int *strides = nullptr;
+    const int *const *indices = nullptr;
 
-    const int *null_indices[wp::ARRAY_MAX_DIMS] = {NULL};
+    const int *null_indices[wp::ARRAY_MAX_DIMS] = {nullptr};
 
     if (arr_type == wp::ARRAY_TYPE_REGULAR) {
         wp::array_t<void> &arr = *static_cast<wp::array_t<void> *>(arr_ptr);
@@ -629,32 +622,28 @@ WP_API void array_fill_device(void *context, void *arr_ptr, int arr_type, const 
     switch (ndim) {
         case 1: {
             wp_launch_device(WP_CURRENT_CONTEXT, array_fill_1d_kernel, n,
-                             (data, shape[0], strides[0], indices[0], value_devptr, value_size));
-            break;
+                             (data, shape[0], strides[0], indices[0], value_devptr, value_size)) break;
         }
         case 2: {
             wp::vec_t<2, int> shape_v(shape[0], shape[1]);
             wp::vec_t<2, int> strides_v(strides[0], strides[1]);
             wp::vec_t<2, const int *> indices_v(indices[0], indices[1]);
             wp_launch_device(WP_CURRENT_CONTEXT, array_fill_2d_kernel, n,
-                             (data, shape_v, strides_v, indices_v, value_devptr, value_size));
-            break;
+                             (data, shape_v, strides_v, indices_v, value_devptr, value_size)) break;
         }
         case 3: {
             wp::vec_t<3, int> shape_v(shape[0], shape[1], shape[2]);
             wp::vec_t<3, int> strides_v(strides[0], strides[1], strides[2]);
             wp::vec_t<3, const int *> indices_v(indices[0], indices[1], indices[2]);
             wp_launch_device(WP_CURRENT_CONTEXT, array_fill_3d_kernel, n,
-                             (data, shape_v, strides_v, indices_v, value_devptr, value_size));
-            break;
+                             (data, shape_v, strides_v, indices_v, value_devptr, value_size)) break;
         }
         case 4: {
             wp::vec_t<4, int> shape_v(shape[0], shape[1], shape[2], shape[3]);
             wp::vec_t<4, int> strides_v(strides[0], strides[1], strides[2], strides[3]);
             wp::vec_t<4, const int *> indices_v(indices[0], indices[1], indices[2], indices[3]);
             wp_launch_device(WP_CURRENT_CONTEXT, array_fill_4d_kernel, n,
-                             (data, shape_v, strides_v, indices_v, value_devptr, value_size));
-            break;
+                             (data, shape_v, strides_v, indices_v, value_devptr, value_size)) break;
         }
         default:
             fprintf(stderr, "Warp error: invalid array dimensionality (%d)\n", ndim);
@@ -672,7 +661,7 @@ void array_scan_float_device(uint64_t in, uint64_t out, int len, bool inclusive)
 
 int cuda_driver_version() {
     int version;
-    if (check_cu(cuDriverGetVersion_f(&version)))
+    if (check_cu(cuDriverGetVersion(&version)))
         return version;
     else
         return 0;
@@ -698,28 +687,28 @@ void nvrtc_supported_archs(int *archs) {
 
 int cuda_device_get_count() {
     int count = 0;
-    check_cu(cuDeviceGetCount_f(&count));
+    check_cu(cuDeviceGetCount(&count));
     return count;
 }
 
 void *cuda_device_primary_context_retain(int ordinal) {
-    CUcontext context = NULL;
+    CUcontext context = nullptr;
     CUdevice device;
-    if (check_cu(cuDeviceGet_f(&device, ordinal)))
-        check_cu(cuDevicePrimaryCtxRetain_f(&context, device));
+    if (check_cu(cuDeviceGet(&device, ordinal)))
+        check_cu(cuDevicePrimaryCtxRetain(&context, device));
     return context;
 }
 
 void cuda_device_primary_context_release(int ordinal) {
     CUdevice device;
-    if (check_cu(cuDeviceGet_f(&device, ordinal)))
-        check_cu(cuDevicePrimaryCtxRelease_f(device));
+    if (check_cu(cuDeviceGet(&device, ordinal)))
+        check_cu(cuDevicePrimaryCtxRelease(device));
 }
 
 const char *cuda_device_get_name(int ordinal) {
     if (ordinal >= 0 && ordinal < int(g_devices.size()))
         return g_devices[ordinal].name;
-    return NULL;
+    return nullptr;
 }
 
 int cuda_device_get_arch(int ordinal) {
@@ -739,56 +728,56 @@ void *cuda_context_get_current() {
 }
 
 void cuda_context_set_current(void *context) {
-    CUcontext ctx = static_cast<CUcontext>(context);
-    CUcontext prev_ctx = NULL;
-    check_cu(cuCtxGetCurrent_f(&prev_ctx));
+    auto ctx = static_cast<CUcontext>(context);
+    CUcontext prev_ctx = nullptr;
+    check_cu(cuCtxGetCurrent(&prev_ctx));
     if (ctx != prev_ctx) {
-        check_cu(cuCtxSetCurrent_f(ctx));
+        check_cu(cuCtxSetCurrent(ctx));
     }
 }
 
 void cuda_context_push_current(void *context) {
-    check_cu(cuCtxPushCurrent_f(static_cast<CUcontext>(context)));
+    check_cu(cuCtxPushCurrent(static_cast<CUcontext>(context)));
 }
 
 void cuda_context_pop_current() {
     CUcontext context;
-    check_cu(cuCtxPopCurrent_f(&context));
+    check_cu(cuCtxPopCurrent(&context));
 }
 
 void *cuda_context_create(int device_ordinal) {
-    CUcontext ctx = NULL;
+    CUcontext ctx = nullptr;
     CUdevice device;
-    if (check_cu(cuDeviceGet_f(&device, device_ordinal)))
-        check_cu(cuCtxCreate_f(&ctx, 0, device));
+    if (check_cu(cuDeviceGet(&device, device_ordinal)))
+        check_cu(cuCtxCreate(&ctx, 0, device));
     return ctx;
 }
 
 void cuda_context_destroy(void *context) {
     if (context) {
-        CUcontext ctx = static_cast<CUcontext>(context);
+        auto ctx = static_cast<CUcontext>(context);
 
         // ensure this is not the current context
         if (ctx == cuda_context_get_current())
-            cuda_context_set_current(NULL);
+            cuda_context_set_current(nullptr);
 
         // release the cached info about this context
         ContextInfo *info = get_context_info(ctx);
         if (info) {
             if (info->stream)
-                check_cu(cuStreamDestroy_f(info->stream));
+                check_cu(cuStreamDestroy(info->stream));
 
             g_contexts.erase(ctx);
         }
 
-        check_cu(cuCtxDestroy_f(ctx));
+        check_cu(cuCtxDestroy(ctx));
     }
 }
 
 void cuda_context_synchronize(void *context) {
     ContextGuard guard(context);
 
-    check_cu(cuCtxSynchronize_f());
+    check_cu(cuCtxSynchronize());
 }
 
 uint64_t cuda_context_check(void *context) {
@@ -829,7 +818,7 @@ void *cuda_context_get_stream(void *context) {
     if (info) {
         return info->stream;
     }
-    return NULL;
+    return nullptr;
 }
 
 void cuda_context_set_stream(void *context, void *stream) {
@@ -848,8 +837,8 @@ int cuda_context_enable_peer_access(void *context, void *peer_context) {
     if (context == peer_context)
         return 1;// ok
 
-    CUcontext ctx = static_cast<CUcontext>(context);
-    CUcontext peer_ctx = static_cast<CUcontext>(peer_context);
+    auto ctx = static_cast<CUcontext>(context);
+    auto peer_ctx = static_cast<CUcontext>(peer_context);
 
     ContextInfo *info = get_context_info(ctx);
     ContextInfo *peer_info = get_context_info(peer_ctx);
@@ -869,7 +858,7 @@ int cuda_context_enable_peer_access(void *context, void *peer_context) {
     } else {
         // different devices, try to enable
         ContextGuard guard(ctx, true);
-        CUresult result = cuCtxEnablePeerAccess_f(peer_ctx, 0);
+        CUresult result = cuCtxEnablePeerAccess(peer_ctx, 0);
         if (result == CUDA_SUCCESS || result == CUDA_ERROR_PEER_ACCESS_ALREADY_ENABLED) {
             return 1;// ok
         } else {
@@ -886,8 +875,8 @@ int cuda_context_can_access_peer(void *context, void *peer_context) {
     if (context == peer_context)
         return 1;
 
-    CUcontext ctx = static_cast<CUcontext>(context);
-    CUcontext peer_ctx = static_cast<CUcontext>(peer_context);
+    auto ctx = static_cast<CUcontext>(context);
+    auto peer_ctx = static_cast<CUcontext>(peer_context);
 
     ContextInfo *info = get_context_info(ctx);
     ContextInfo *peer_info = get_context_info(peer_ctx);
@@ -904,7 +893,7 @@ int cuda_context_can_access_peer(void *context, void *peer_context) {
         // different devices, try to enable
         // TODO: is there a better way to check?
         ContextGuard guard(ctx, true);
-        CUresult result = cuCtxEnablePeerAccess_f(peer_ctx, 0);
+        CUresult result = cuCtxEnablePeerAccess(peer_ctx, 0);
         if (result == CUDA_SUCCESS || result == CUDA_ERROR_PEER_ACCESS_ALREADY_ENABLED)
             return 1;
         else
@@ -915,15 +904,15 @@ int cuda_context_can_access_peer(void *context, void *peer_context) {
 void *cuda_stream_create(void *context) {
     CUcontext ctx = context ? static_cast<CUcontext>(context) : get_current_context();
     if (!ctx)
-        return NULL;
+        return nullptr;
 
     ContextGuard guard(context, true);
 
     CUstream stream;
-    if (check_cu(cuStreamCreate_f(&stream, CU_STREAM_DEFAULT)))
+    if (check_cu(cuStreamCreate(&stream, CU_STREAM_DEFAULT)))
         return stream;
     else
-        return NULL;
+        return nullptr;
 }
 
 void cuda_stream_destroy(void *context, void *stream) {
@@ -936,13 +925,13 @@ void cuda_stream_destroy(void *context, void *stream) {
 
     ContextGuard guard(context, true);
 
-    check_cu(cuStreamDestroy_f(static_cast<CUstream>(stream)));
+    check_cu(cuStreamDestroy(static_cast<CUstream>(stream)));
 }
 
 void cuda_stream_synchronize(void *context, void *stream) {
     ContextGuard guard(context);
 
-    check_cu(cuStreamSynchronize_f(static_cast<CUstream>(stream)));
+    check_cu(cuStreamSynchronize(static_cast<CUstream>(stream)));
 }
 
 void *cuda_stream_get_current() {
@@ -952,36 +941,36 @@ void *cuda_stream_get_current() {
 void cuda_stream_wait_event(void *context, void *stream, void *event) {
     ContextGuard guard(context);
 
-    check_cu(cuStreamWaitEvent_f(static_cast<CUstream>(stream), static_cast<CUevent>(event), 0));
+    check_cu(cuStreamWaitEvent(static_cast<CUstream>(stream), static_cast<CUevent>(event), 0));
 }
 
 void cuda_stream_wait_stream(void *context, void *stream, void *other_stream, void *event) {
     ContextGuard guard(context);
 
-    check_cu(cuEventRecord_f(static_cast<CUevent>(event), static_cast<CUstream>(other_stream)));
-    check_cu(cuStreamWaitEvent_f(static_cast<CUstream>(stream), static_cast<CUevent>(event), 0));
+    check_cu(cuEventRecord(static_cast<CUevent>(event), static_cast<CUstream>(other_stream)));
+    check_cu(cuStreamWaitEvent(static_cast<CUstream>(stream), static_cast<CUevent>(event), 0));
 }
 
 void *cuda_event_create(void *context, unsigned flags) {
     ContextGuard guard(context);
 
     CUevent event;
-    if (check_cu(cuEventCreate_f(&event, flags)))
+    if (check_cu(cuEventCreate(&event, flags)))
         return event;
     else
-        return NULL;
+        return nullptr;
 }
 
 void cuda_event_destroy(void *context, void *event) {
     ContextGuard guard(context, true);
 
-    check_cu(cuEventDestroy_f(static_cast<CUevent>(event)));
+    check_cu(cuEventDestroy(static_cast<CUevent>(event)));
 }
 
 void cuda_event_record(void *context, void *event, void *stream) {
     ContextGuard guard(context);
 
-    check_cu(cuEventRecord_f(static_cast<CUevent>(event), static_cast<CUstream>(stream)));
+    check_cu(cuEventRecord(static_cast<CUevent>(event), static_cast<CUstream>(stream)));
 }
 
 void cuda_graph_begin_capture(void *context) {
@@ -993,15 +982,15 @@ void cuda_graph_begin_capture(void *context) {
 void *cuda_graph_end_capture(void *context) {
     ContextGuard guard(context);
 
-    cudaGraph_t graph = NULL;
+    cudaGraph_t graph = nullptr;
     check_cuda(cudaStreamEndCapture(get_current_stream(), &graph));
 
     if (graph) {
         // enable to create debug GraphVis visualization of graph
         //cudaGraphDebugDotPrint(graph, "graph.dot", cudaGraphDebugDotFlagsVerbose);
 
-        cudaGraphExec_t graph_exec = NULL;
-        check_cuda(cudaGraphInstantiate(&graph_exec, graph, NULL, NULL, 0));
+        cudaGraphExec_t graph_exec = nullptr;
+        check_cuda(cudaGraphInstantiate(&graph_exec, graph, nullptr, nullptr, 0));
 
         // can use after CUDA 11.4 to permit graphs to capture cudaMallocAsync() operations
         //check_cuda(cudaGraphInstantiateWithFlags(&graph_exec, graph, cudaGraphInstantiateFlagAutoFreeOnLaunch));
@@ -1011,7 +1000,7 @@ void *cuda_graph_end_capture(void *context) {
 
         return graph_exec;
     } else {
-        return NULL;
+        return nullptr;
     }
 }
 
@@ -1078,10 +1067,10 @@ size_t cuda_compile_program(const char *cuda_src, int arch, const char *include_
     res = nvrtcCreateProgram(
         &prog,   // prog
         cuda_src,// buffer
-        NULL,    // name
+        nullptr, // name
         0,       // numHeaders
-        NULL,    // headers
-        NULL);   // includeNames
+        nullptr, // headers
+        nullptr);// includeNames
 
     if (!check_nvrtc(res))
         return size_t(res);
@@ -1166,21 +1155,21 @@ void *cuda_load_module(void *context, const char *path) {
         if (fread(input.data(), 1, length, file) != length) {
             fprintf(stderr, "Warp error: Failed to read input file '%s'\n", path);
             fclose(file);
-            return NULL;
+            return nullptr;
         }
         fclose(file);
 
         input[length] = '\0';
     } else {
         fprintf(stderr, "Warp error: Failed to open input file '%s'\n", path);
-        return NULL;
+        return nullptr;
     }
 
     int driver_cuda_version = 0;
-    CUmodule module = NULL;
+    CUmodule module = nullptr;
 
     if (load_ptx) {
-        if (check_cu(cuDriverGetVersion_f(&driver_cuda_version)) && driver_cuda_version >= CUDA_VERSION) {
+        if (check_cu(cuDriverGetVersion(&driver_cuda_version)) && driver_cuda_version >= CUDA_VERSION) {
             // let the driver compile the PTX
 
             CUjit_option options[2];
@@ -1195,12 +1184,12 @@ void *cuda_load_module(void *context, const char *path) {
             options[1] = CU_JIT_ERROR_LOG_BUFFER_SIZE_BYTES;
             option_vals[1] = (void *)(size_t)log_size;
 
-            if (!check_cu(cuModuleLoadDataEx_f(&module, input.data(), 2, options, option_vals))) {
+            if (!check_cu(cuModuleLoadDataEx(&module, input.data(), 2, options, option_vals))) {
                 fprintf(stderr, "Warp error: Loading PTX module failed\n");
                 // print error log if not empty
                 if (*error_log)
                     fprintf(stderr, "PTX loader error:\n%s\n", error_log);
-                return NULL;
+                return nullptr;
             }
         } else {
             // manually compile the PTX and load as CUBIN
@@ -1208,7 +1197,7 @@ void *cuda_load_module(void *context, const char *path) {
             ContextInfo *context_info = get_context_info(static_cast<CUcontext>(context));
             if (!context_info || !context_info->device_info) {
                 fprintf(stderr, "Warp error: Failed to determine target architecture\n");
-                return NULL;
+                return nullptr;
             }
 
             int arch = context_info->device_info->arch;
@@ -1218,33 +1207,33 @@ void *cuda_load_module(void *context, const char *path) {
 
             const char *compiler_options[] = {arch_opt};
 
-            nvPTXCompilerHandle compiler = NULL;
+            nvPTXCompilerHandle compiler = nullptr;
             if (!check_nvptx(nvPTXCompilerCreate(&compiler, input.size(), input.data())))
-                return NULL;
+                return nullptr;
 
             if (!check_nvptx(nvPTXCompilerCompile(compiler, sizeof(compiler_options) / sizeof(*compiler_options), compiler_options)))
-                return NULL;
+                return nullptr;
 
             size_t cubin_size = 0;
             if (!check_nvptx(nvPTXCompilerGetCompiledProgramSize(compiler, &cubin_size)))
-                return NULL;
+                return nullptr;
 
             std::vector<char> cubin(cubin_size);
             if (!check_nvptx(nvPTXCompilerGetCompiledProgram(compiler, cubin.data())))
-                return NULL;
+                return nullptr;
 
             check_nvptx(nvPTXCompilerDestroy(&compiler));
 
-            if (!check_cu(cuModuleLoadDataEx_f(&module, cubin.data(), 0, NULL, NULL))) {
+            if (!check_cu(cuModuleLoadDataEx(&module, cubin.data(), 0, nullptr, nullptr))) {
                 fprintf(stderr, "Warp CUDA error: Loading module failed\n");
-                return NULL;
+                return nullptr;
             }
         }
     } else {
         // load CUBIN
-        if (!check_cu(cuModuleLoadDataEx_f(&module, input.data(), 0, NULL, NULL))) {
+        if (!check_cu(cuModuleLoadDataEx(&module, input.data(), 0, nullptr, nullptr))) {
             fprintf(stderr, "Warp CUDA error: Loading module failed\n");
-            return NULL;
+            return nullptr;
         }
     }
 
@@ -1254,14 +1243,14 @@ void *cuda_load_module(void *context, const char *path) {
 void cuda_unload_module(void *context, void *module) {
     ContextGuard guard(context);
 
-    check_cu(cuModuleUnload_f((CUmodule)module));
+    check_cu(cuModuleUnload((CUmodule)module));
 }
 
 void *cuda_get_kernel(void *context, void *module, const char *name) {
     ContextGuard guard(context);
 
-    CUfunction kernel = NULL;
-    if (!check_cu(cuModuleGetFunction_f(&kernel, (CUmodule)module, name)))
+    CUfunction kernel = nullptr;
+    if (!check_cu(cuModuleGetFunction(&kernel, (CUmodule)module, name)))
         fprintf(stderr, "Warp CUDA error: Failed to lookup kernel function %s in module\n", name);
 
     return kernel;
@@ -1275,13 +1264,13 @@ size_t cuda_launch_kernel(void *context, void *kernel, size_t dim, void **args) 
     // grid_dim is fine as an int for the near future
     const int grid_dim = (dim + block_dim - 1) / block_dim;
 
-    CUresult res = cuLaunchKernel_f(
+    CUresult res = cuLaunchKernel(
         (CUfunction)kernel,
         grid_dim, 1, 1,
         block_dim, 1, 1,
         0, get_current_stream(),
         args,
-        0);
+        nullptr);
 
     check_cu(res);
 
@@ -1291,13 +1280,13 @@ size_t cuda_launch_kernel(void *context, void *kernel, size_t dim, void **args) 
 void cuda_graphics_map(void *context, void *resource) {
     ContextGuard guard(context);
 
-    check_cu(cuGraphicsMapResources_f(1, (CUgraphicsResource *)resource, get_current_stream()));
+    check_cu(cuGraphicsMapResources(1, (CUgraphicsResource *)resource, get_current_stream()));
 }
 
 void cuda_graphics_unmap(void *context, void *resource) {
     ContextGuard guard(context);
 
-    check_cu(cuGraphicsUnmapResources_f(1, (CUgraphicsResource *)resource, get_current_stream()));
+    check_cu(cuGraphicsUnmapResources(1, (CUgraphicsResource *)resource, get_current_stream()));
 }
 
 void cuda_graphics_device_ptr_and_size(void *context, void *resource, uint64_t *ptr, size_t *size) {
@@ -1305,39 +1294,16 @@ void cuda_graphics_device_ptr_and_size(void *context, void *resource, uint64_t *
 
     CUdeviceptr device_ptr;
     size_t bytes;
-    check_cu(cuGraphicsResourceGetMappedPointer_f(&device_ptr, &bytes, *(CUgraphicsResource *)resource));
+    check_cu(cuGraphicsResourceGetMappedPointer(&device_ptr, &bytes, *(CUgraphicsResource *)resource));
 
     *ptr = device_ptr;
     *size = bytes;
 }
 
-void *cuda_graphics_register_gl_buffer(void *context, uint32_t gl_buffer, unsigned int flags) {
-    ContextGuard guard(context);
-
-    CUgraphicsResource *resource = new CUgraphicsResource;
-    check_cu(cuGraphicsGLRegisterBuffer_f(resource, gl_buffer, flags));
-
-    return resource;
-}
-
 void cuda_graphics_unregister_resource(void *context, void *resource) {
     ContextGuard guard(context);
 
-    CUgraphicsResource *res = (CUgraphicsResource *)resource;
-    check_cu(cuGraphicsUnregisterResource_f(*res));
+    auto *res = (CUgraphicsResource *)resource;
+    check_cu(cuGraphicsUnregisterResource(*res));
     delete res;
 }
-
-// impl. files
-#include "bvh.cu"
-#include "mesh.cu"
-#include "sort.cu"
-#include "hashgrid.cu"
-#include "reduce.cu"
-#include "runlength_encode.cu"
-#include "scan.cu"
-#include "marching.cu"
-#include "sparse.cu"
-#if WP_ENABLE_CUTLASS
-#include "cutlass_gemm.cu"
-#endif

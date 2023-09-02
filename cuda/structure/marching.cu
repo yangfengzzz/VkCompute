@@ -387,7 +387,7 @@ void marching_cubes_destroy_device(wp::MarchingCubes *mc) {
     delete mc;
 }
 
-WP_API int marching_cubes_surface_device(
+int marching_cubes_surface_device(
     wp::MarchingCubes &mc,
     const float *field,
     int nx,

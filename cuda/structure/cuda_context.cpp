@@ -5,54 +5,11 @@
 //  property of any third parties.
 
 #include "cuda_context.h"
-#include "math/math_core.h"
 #include "scan.h"
 #include "math/array.h"
 
-#include "stdlib.h"
-#include "string.h"
-
-int cuda_init();
-
-uint16_t float_to_half_bits(float x) {
-    return wp::half(x).u;
-}
-
-float half_bits_to_float(uint16_t u) {
-    wp::half h;
-    h.u = u;
-    return half_to_float(h);
-}
-
-int init() {
-    // note: it's safe to proceed even if CUDA initialization failed
-    cuda_init();
-
-    return 0;
-}
-
-void shutdown() {
-}
-
-int is_cuda_enabled() {
-    // WP_ENABLE_CUDA
-    return true;
-}
-
-int is_cuda_compatibility_enabled() {
-    // WP_ENABLE_CUDA_COMPATIBILITY
-    return true;
-}
-
-int is_cutlass_enabled() {
-    //todo WP_ENABLE_CUTLASS
-    return true;
-}
-
-int is_debug_enabled() {
-    //todo WP_ENABLE_DEBUG
-    return true;
-}
+#include <cstdlib>
+#include <cstring>
 
 void *alloc_host(size_t s) {
     return malloc(s);
@@ -85,8 +42,8 @@ void memtile_value_host(T *dst, T value, size_t n) {
 }
 
 void memtile_host(void *dst, const void *src, size_t srcsize, size_t n) {
-    size_t dst_addr = reinterpret_cast<size_t>(dst);
-    size_t src_addr = reinterpret_cast<size_t>(src);
+    auto dst_addr = reinterpret_cast<size_t>(dst);
+    auto src_addr = reinterpret_cast<size_t>(src);
 
     // try memtile_value first because it should be faster, but we need to ensure proper alignment
     if (srcsize == 8 && (dst_addr & 7) == 0 && (src_addr & 7) == 0)
@@ -139,24 +96,24 @@ static void array_copy_nd(void *dst, const void *src,
     }
 }
 
-WP_API size_t array_copy_host(void *dst, void *src, int dst_type, int src_type, int elem_size) {
+size_t array_copy_host(void *dst, void *src, int dst_type, int src_type, int elem_size) {
     if (!src || !dst)
         return 0;
 
-    const void *src_data = NULL;
-    const void *src_grad = NULL;
-    void *dst_data = NULL;
-    void *dst_grad = NULL;
-    int src_ndim = 0;
-    int dst_ndim = 0;
-    const int *src_shape = NULL;
-    const int *dst_shape = NULL;
-    const int *src_strides = NULL;
-    const int *dst_strides = NULL;
-    const int *const *src_indices = NULL;
-    const int *const *dst_indices = NULL;
+    const void *src_data;
+    const void *src_grad = nullptr;
+    void *dst_data;
+    void *dst_grad = nullptr;
+    int src_ndim;
+    int dst_ndim;
+    const int *src_shape;
+    const int *dst_shape;
+    const int *src_strides;
+    const int *dst_strides;
+    const int *const *src_indices;
+    const int *const *dst_indices;
 
-    const int *null_indices[wp::ARRAY_MAX_DIMS] = {NULL};
+    const int *null_indices[wp::ARRAY_MAX_DIMS] = {nullptr};
 
     if (src_type == wp::ARRAY_TYPE_REGULAR) {
         const wp::array_t<void> &src_arr = *static_cast<const wp::array_t<void> *>(src);
@@ -262,7 +219,7 @@ static void array_fill_indexed(void *data, const int *shape, const int *strides,
     }
 }
 
-WP_API void array_fill_host(void *arr_ptr, int arr_type, const void *value_ptr, int value_size) {
+void array_fill_host(void *arr_ptr, int arr_type, const void *value_ptr, int value_size) {
     if (!arr_ptr || !value_ptr)
         return;
 
@@ -276,8 +233,3 @@ WP_API void array_fill_host(void *arr_ptr, int arr_type, const void *value_ptr, 
         fprintf(stderr, "Warp error: Invalid array type id %d\n", arr_type);
     }
 }
-
-// impl. files
-// TODO: compile as separate translation units
-#include "bvh.cpp"
-#include "scan.cpp"

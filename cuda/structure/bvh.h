@@ -268,11 +268,11 @@ CUDA_CALLABLE void bvh_rem_descriptor(uint64_t id);
 }// namespace wp
 
 extern "C" {
-WP_API uint64_t bvh_create_host(wp::vec3 *lowers, wp::vec3 *uppers, int num_bounds);
-WP_API void bvh_destroy_host(uint64_t id);
-WP_API void bvh_refit_host(uint64_t id);
+uint64_t bvh_create_host(wp::vec3 *lowers, wp::vec3 *uppers, int num_bounds);
+void bvh_destroy_host(uint64_t id);
+void bvh_refit_host(uint64_t id);
 
-WP_API uint64_t bvh_create_device(void *context, wp::vec3 *lowers, wp::vec3 *uppers, int num_bounds);
-WP_API void bvh_destroy_device(uint64_t id);
-WP_API void bvh_refit_device(uint64_t id);
+uint64_t bvh_create_device(void *context, wp::vec3 *lowers, wp::vec3 *uppers, int num_bounds);
+void bvh_destroy_device(uint64_t id);
+void bvh_refit_device(uint64_t id);
 }
