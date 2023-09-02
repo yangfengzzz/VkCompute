@@ -143,10 +143,10 @@ uint64_t hash_grid_create_device(void *context, int dim_x, int dim_y, int dim_z)
     grid.cell_ends = (int *)alloc_device(WP_CURRENT_CONTEXT, num_cells * sizeof(int));
 
     // upload to device
-    HashGrid *grid_device = (HashGrid *)(alloc_device(WP_CURRENT_CONTEXT, sizeof(HashGrid)));
+    auto *grid_device = (HashGrid *)(alloc_device(WP_CURRENT_CONTEXT, sizeof(HashGrid)));
     memcpy_h2d(WP_CURRENT_CONTEXT, grid_device, &grid, sizeof(HashGrid));
 
-    uint64_t grid_id = (uint64_t)(grid_device);
+    auto grid_id = (uint64_t)(grid_device);
     hash_grid_add_descriptor(grid_id, grid);
 
     return grid_id;

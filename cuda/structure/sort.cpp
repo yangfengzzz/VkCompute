@@ -5,7 +5,7 @@
 //  property of any third parties.
 
 #include "sort.h"
-#include "string.h"
+#include <cstring>
 
 #include <cstdint>
 

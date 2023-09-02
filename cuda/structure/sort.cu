@@ -16,7 +16,7 @@
 
 // temporary buffer for radix sort
 struct RadixSortTemp {
-    void *mem = NULL;
+    void *mem = nullptr;
     size_t size = 0;
 };
 
@@ -32,7 +32,7 @@ void radix_sort_reserve(void *context, int n, void **mem_out, size_t *size_out) 
     // compute temporary memory required
     size_t sort_temp_size;
     check_cuda(cub::DeviceRadixSort::SortPairs(
-        NULL,
+        nullptr,
         sort_temp_size,
         d_keys,
         d_values,

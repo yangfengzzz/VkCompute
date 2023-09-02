@@ -13,7 +13,7 @@
 
 // temporary buffer, useful for cub algorithms
 struct TemporaryBuffer {
-    void *buffer = NULL;
+    void *buffer = nullptr;
     size_t buffer_size = 0;
 
     void ensure_fits(size_t size) {
@@ -28,7 +28,7 @@ struct TemporaryBuffer {
 };
 
 struct PinnedTemporaryBuffer {
-    void *buffer = NULL;
+    void *buffer = nullptr;
     size_t buffer_size = 0;
 
     void ensure_fits(size_t size) {

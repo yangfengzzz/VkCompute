@@ -20,7 +20,7 @@ struct vec_t {
 
     inline vec_t() = default;
 
-    inline __device__ __host__ vec_t(Type s) {
+    inline __device__ __host__ explicit vec_t(Type s) {
         for (unsigned i = 0; i < Length; ++i) {
             c[i] = s;
         }

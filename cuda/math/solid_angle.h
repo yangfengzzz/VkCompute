@@ -133,7 +133,7 @@ __device__ inline void precompute_triangle_solid_angle_props(const vec3 &a, cons
 
     // NOTE: Due to P being at the centroid, triangles have Nij = 0
     //       contributions to Nij.
-    my_data.n_ij_diag = 0.0f;
+    my_data.n_ij_diag = vec3(0.0f);
     my_data.n_xy = 0.0f;
     my_data.n_yx = 0.0f;
     my_data.n_yz = 0.0f;
@@ -143,7 +143,7 @@ __device__ inline void precompute_triangle_solid_angle_props(const vec3 &a, cons
 
     // If it's zero-length, the results are zero, so we can skip.
     if (area == 0) {
-        my_data.n_ijk_diag = 0.0f;
+        my_data.n_ijk_diag = vec3(0.0f);
         my_data.sum_permute_n_xyz = 0.0f;
         my_data.two_n_xxy_n_yxx = 0.0f;
         my_data.two_n_xxz_n_zxx = 0.0f;

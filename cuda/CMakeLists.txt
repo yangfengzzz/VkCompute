@@ -29,11 +29,15 @@ set(STRUCTURE_FILES
         structure/cuda_util.cpp
         structure/cuda_context.cpp
         structure/cuda_context.cu
+        structure/sort.cpp
+        structure/sort.cu
+        structure/scan.cu
+        structure/scan.cpp
+        structure/hashgrid.cpp
+        structure/hashgrid.cu
 
         #        structure/bvh.cpp
         #        structure/bvh.cu
-        #        structure/hashgrid.cpp
-        #        structure/hashgrid.cu
         #        structure/marching.cu
         #        structure/mesh.cpp
         #        structure/mesh.cu
@@ -41,10 +45,6 @@ set(STRUCTURE_FILES
         #        structure/reduce.cu
         #        structure/runlength_encode.cpp
         #        structure/runlength_encode.cu
-        #        structure/scan.cpp
-        #        structure/scan.cu
-        #        structure/sort.cpp
-        #        structure/sort.cu
         #        structure/sparse.cpp
         #        structure/sparse.cu
 

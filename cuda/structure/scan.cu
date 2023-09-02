@@ -20,23 +20,23 @@ void scan_device(const T *values_in, T *values_out, int n, bool inclusive) {
 
     ContextGuard guard(context);
 
-    cudaStream_t stream = static_cast<cudaStream_t>(cuda_stream_get_current());
-
     // compute temporary memory required
     size_t scan_temp_size;
     if (inclusive) {
-        cub::DeviceScan::InclusiveSum(NULL, scan_temp_size, values_in, values_out, n);
+        cub::DeviceScan::InclusiveSum(nullptr, scan_temp_size, values_in, values_out, n);
     } else {
-        cub::DeviceScan::ExclusiveSum(NULL, scan_temp_size, values_in, values_out, n);
+        cub::DeviceScan::ExclusiveSum(nullptr, scan_temp_size, values_in, values_out, n);
     }
 
     cub_temp.ensure_fits(scan_temp_size);
 
     // scan
     if (inclusive) {
-        cub::DeviceScan::InclusiveSum(cub_temp.buffer, scan_temp_size, values_in, values_out, n, (cudaStream_t)cuda_stream_get_current());
+        cub::DeviceScan::InclusiveSum(cub_temp.buffer, scan_temp_size, values_in, values_out, n,
+                                      (cudaStream_t)cuda_stream_get_current());
     } else {
-        cub::DeviceScan::ExclusiveSum(cub_temp.buffer, scan_temp_size, values_in, values_out, n, (cudaStream_t)cuda_stream_get_current());
+        cub::DeviceScan::ExclusiveSum(cub_temp.buffer, scan_temp_size, values_in, values_out, n,
+                                      (cudaStream_t)cuda_stream_get_current());
     }
 }
 
