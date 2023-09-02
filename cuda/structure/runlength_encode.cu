@@ -4,7 +4,7 @@
 //  personal capacity and am not conveying any rights to any intellectual
 //  property of any third parties.
 
-#include "cuda_context.h"
+#include "runlength_encode.h"
 #include "cuda_util.h"
 
 #include "temp_buffer.h"
@@ -23,7 +23,7 @@ void runlength_encode_device(int n,
     TemporaryBuffer &cub_temp = g_temp_buffer_map[context];
 
     ContextGuard guard(context);
-    cudaStream_t stream = static_cast<cudaStream_t>(cuda_stream_get_current());
+    auto stream = static_cast<cudaStream_t>(cuda_stream_get_current());
 
     size_t buff_size = 0;
     check_cuda(cub::DeviceRunLengthEncode::Encode(

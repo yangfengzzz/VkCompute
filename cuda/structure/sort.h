@@ -6,8 +6,11 @@
 
 #pragma once
 
-#include <cstddef>
+#include "math/vec.h"
 
 void radix_sort_reserve(void *context, int n, void **mem_out = nullptr, size_t *size_out = nullptr);
 void radix_sort_pairs_host(int *keys, int *values, int n);
 void radix_sort_pairs_device(void *context, int *keys, int *values, int n);
+
+void radix_sort_pairs_int_host(uint64_t keys, uint64_t values, int n);
+void radix_sort_pairs_int_device(uint64_t keys, uint64_t values, int n);

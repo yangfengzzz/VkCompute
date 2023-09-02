@@ -4,9 +4,8 @@
 //  personal capacity and am not conveying any rights to any intellectual
 //  property of any third parties.
 
+#include "sparse.h"
 #include "cuda_util.h"
-#include "cuda_context.h"
-
 #include "temp_buffer.h"
 
 #define THRUST_IGNORE_CUB_VERSION_CHECK
@@ -21,15 +20,15 @@ namespace {
 // Combined row+column value that can be radix-sorted with CUB
 using BsrRowCol = uint64_t;
 
-CUDA_CALLABLE BsrRowCol bsr_combine_row_col(uint32_t row, uint32_t col) {
+__device__ BsrRowCol bsr_combine_row_col(uint32_t row, uint32_t col) {
     return (static_cast<uint64_t>(row) << 32) | col;
 }
 
-CUDA_CALLABLE uint32_t bsr_get_row(const BsrRowCol &row_col) {
+__device__ uint32_t bsr_get_row(const BsrRowCol &row_col) {
     return row_col >> 32;
 }
 
-CUDA_CALLABLE uint32_t bsr_get_col(const BsrRowCol &row_col) {
+__device__ uint32_t bsr_get_col(const BsrRowCol &row_col) {
     return row_col & INT_MAX;
 }
 
@@ -37,11 +36,11 @@ CUDA_CALLABLE uint32_t bsr_get_col(const BsrRowCol &row_col) {
 struct BsrFromTripletsTemp {
     // Temp work buffers
     int nnz = 0;
-    int *block_indices = NULL;
+    int *block_indices = nullptr;
 
-    BsrRowCol *combined_row_col = NULL;
+    BsrRowCol *combined_row_col = nullptr;
 
-    cudaEvent_t host_sync_event = NULL;
+    cudaEvent_t host_sync_event = nullptr;
 
     void ensure_fits(size_t size) {
 
@@ -60,7 +59,7 @@ struct BsrFromTripletsTemp {
             nnz = size;
         }
 
-        if (host_sync_event == NULL) {
+        if (host_sync_event == nullptr) {
             cudaEventCreateWithFlags(&host_sync_event, cudaEventDisableTiming);
         }
     }
@@ -75,7 +74,7 @@ struct BsrBlockIsNotZero {
     int block_size;
     const T *values;
 
-    CUDA_CALLABLE_DEVICE bool operator()(int i) const {
+    __device__ bool operator()(int i) const {
         const T *val = values + i * block_size;
         for (int i = 0; i < block_size; ++i, ++val) {
             if (*val != T(0))
@@ -178,7 +177,6 @@ int bsr_matrix_from_triplets_device(const int rows_per_block,
                      (nnz, d_keys.Current()));
 
     if (tpl_values) {
-
         // Remove zero blocks
         size_t buff_size = 0;
         BsrBlockIsNotZero<T> isNotZero{block_size, tpl_values};
@@ -206,9 +204,9 @@ int bsr_matrix_from_triplets_device(const int rows_per_block,
     // Combine rows and columns so we can sort on them both
     wp_launch_device(WP_CURRENT_CONTEXT, bsr_fill_row_col, nnz,
                      (d_nz_triplet_count, d_keys.Current(), tpl_rows, tpl_columns,
-                      d_values.Current()));
+                      d_values.Current()))
 
-    if (tpl_values) {
+        if (tpl_values) {
         // Make sure count is available on host
         cudaEventSynchronize(bsr_temp.host_sync_event);
     }
@@ -263,11 +261,11 @@ int bsr_matrix_from_triplets_device(const int rows_per_block,
     wp_launch_device(WP_CURRENT_CONTEXT, bsr_merge_blocks, compressed_nnz,
                      (compressed_nnz, block_size, d_keys.Alternate(),
                       d_keys.Current(), d_values.Alternate(), tpl_values,
-                      bsr_offsets, bsr_columns, bsr_values));
+                      bsr_offsets, bsr_columns, bsr_values))
 
-    // Last, prefix sum the row block counts
-    check_cuda(cub::DeviceScan::InclusiveSum(nullptr, buff_size, bsr_offsets,
-                                             bsr_offsets, row_count + 1, stream));
+        // Last, prefix sum the row block counts
+        check_cuda(cub::DeviceScan::InclusiveSum(nullptr, buff_size, bsr_offsets,
+                                                 bsr_offsets, row_count + 1, stream));
     cub_temp.ensure_fits(buff_size);
     check_cuda(cub::DeviceScan::InclusiveSum(cub_temp.buffer, buff_size,
                                              bsr_offsets, bsr_offsets,
@@ -312,7 +310,7 @@ __global__ void bsr_transpose_fill_row_col(const int nnz, const int row_count,
 
 template<int Rows, int Cols, typename T>
 struct BsrBlockTransposer {
-    void CUDA_CALLABLE_DEVICE operator()(const T *src, T *dest) const {
+    void __device__ operator()(const T *src, T *dest) const {
         for (int r = 0; r < Rows; ++r) {
             for (int c = 0; c < Cols; ++c) {
                 dest[c * Rows + r] = src[r * Cols + c];
@@ -327,7 +325,7 @@ struct BsrBlockTransposer<-1, -1, T> {
     int row_count;
     int col_count;
 
-    void CUDA_CALLABLE_DEVICE operator()(const T *src, T *dest) const {
+    void __device__ operator()(const T *src, T *dest) const {
         for (int r = 0; r < row_count; ++r) {
             for (int c = 0; c < col_count; ++c) {
                 dest[c * row_count + r] = src[r * col_count + c];
@@ -373,7 +371,7 @@ void bsr_transpose_device(int rows_per_block, int cols_per_block, int row_count,
 
     ContextGuard guard(context);
 
-    cudaStream_t stream = static_cast<cudaStream_t>(cuda_stream_get_current());
+    auto stream = static_cast<cudaStream_t>(cuda_stream_get_current());
     bsr_temp.ensure_fits(nnz);
 
     // Zero the transposed offsets
@@ -387,10 +385,10 @@ void bsr_transpose_device(int rows_per_block, int cols_per_block, int row_count,
 
     wp_launch_device(WP_CURRENT_CONTEXT, bsr_transpose_fill_row_col, nnz,
                      (nnz, row_count, bsr_offsets, bsr_columns, d_keys.Current(),
-                      d_values.Current(), transposed_bsr_offsets));
+                      d_values.Current(), transposed_bsr_offsets))
 
-    // Sort blocks
-    size_t buff_size = 0;
+        // Sort blocks
+        size_t buff_size = 0;
     check_cuda(cub::DeviceRadixSort::SortPairs(nullptr, buff_size, d_values,
                                                d_keys, nnz, 0, 64, stream));
     cub_temp.ensure_fits(buff_size);
@@ -414,20 +412,17 @@ void bsr_transpose_device(int rows_per_block, int cols_per_block, int row_count,
                     wp_launch_device(WP_CURRENT_CONTEXT, bsr_transpose_blocks, nnz,
                                      (nnz, block_size, BsrBlockTransposer<1, 1, T>{},
                                       d_keys.Current(), d_values.Current(), bsr_values,
-                                      transposed_bsr_columns, transposed_bsr_values));
-                    return;
+                                      transposed_bsr_columns, transposed_bsr_values)) return;
                 case 2:
                     wp_launch_device(WP_CURRENT_CONTEXT, bsr_transpose_blocks, nnz,
                                      (nnz, block_size, BsrBlockTransposer<1, 2, T>{},
                                       d_keys.Current(), d_values.Current(), bsr_values,
-                                      transposed_bsr_columns, transposed_bsr_values));
-                    return;
+                                      transposed_bsr_columns, transposed_bsr_values)) return;
                 case 3:
                     wp_launch_device(WP_CURRENT_CONTEXT, bsr_transpose_blocks, nnz,
                                      (nnz, block_size, BsrBlockTransposer<1, 3, T>{},
                                       d_keys.Current(), d_values.Current(), bsr_values,
-                                      transposed_bsr_columns, transposed_bsr_values));
-                    return;
+                                      transposed_bsr_columns, transposed_bsr_values)) return;
             }
         case 2:
             switch (col_count) {
@@ -435,20 +430,17 @@ void bsr_transpose_device(int rows_per_block, int cols_per_block, int row_count,
                     wp_launch_device(WP_CURRENT_CONTEXT, bsr_transpose_blocks, nnz,
                                      (nnz, block_size, BsrBlockTransposer<2, 1, T>{},
                                       d_keys.Current(), d_values.Current(), bsr_values,
-                                      transposed_bsr_columns, transposed_bsr_values));
-                    return;
+                                      transposed_bsr_columns, transposed_bsr_values)) return;
                 case 2:
                     wp_launch_device(WP_CURRENT_CONTEXT, bsr_transpose_blocks, nnz,
                                      (nnz, block_size, BsrBlockTransposer<2, 2, T>{},
                                       d_keys.Current(), d_values.Current(), bsr_values,
-                                      transposed_bsr_columns, transposed_bsr_values));
-                    return;
+                                      transposed_bsr_columns, transposed_bsr_values)) return;
                 case 3:
                     wp_launch_device(WP_CURRENT_CONTEXT, bsr_transpose_blocks, nnz,
                                      (nnz, block_size, BsrBlockTransposer<2, 3, T>{},
                                       d_keys.Current(), d_values.Current(), bsr_values,
-                                      transposed_bsr_columns, transposed_bsr_values));
-                    return;
+                                      transposed_bsr_columns, transposed_bsr_values)) return;
             }
         case 3:
             switch (col_count) {
@@ -456,20 +448,17 @@ void bsr_transpose_device(int rows_per_block, int cols_per_block, int row_count,
                     wp_launch_device(WP_CURRENT_CONTEXT, bsr_transpose_blocks, nnz,
                                      (nnz, block_size, BsrBlockTransposer<3, 1, T>{},
                                       d_keys.Current(), d_values.Current(), bsr_values,
-                                      transposed_bsr_columns, transposed_bsr_values));
-                    return;
+                                      transposed_bsr_columns, transposed_bsr_values)) return;
                 case 2:
                     wp_launch_device(WP_CURRENT_CONTEXT, bsr_transpose_blocks, nnz,
                                      (nnz, block_size, BsrBlockTransposer<3, 2, T>{},
                                       d_keys.Current(), d_values.Current(), bsr_values,
-                                      transposed_bsr_columns, transposed_bsr_values));
-                    return;
+                                      transposed_bsr_columns, transposed_bsr_values)) return;
                 case 3:
                     wp_launch_device(WP_CURRENT_CONTEXT, bsr_transpose_blocks, nnz,
                                      (nnz, block_size, BsrBlockTransposer<3, 3, T>{},
                                       d_keys.Current(), d_values.Current(), bsr_values,
-                                      transposed_bsr_columns, transposed_bsr_values));
-                    return;
+                                      transposed_bsr_columns, transposed_bsr_values)) return;
             }
     }
 
@@ -478,7 +467,7 @@ void bsr_transpose_device(int rows_per_block, int cols_per_block, int row_count,
         (nnz, block_size,
          BsrBlockTransposer<-1, -1, T>{rows_per_block, cols_per_block},
          d_keys.Current(), d_values.Current(), bsr_values, transposed_bsr_columns,
-         transposed_bsr_values));
+         transposed_bsr_values))
 }
 
 }// namespace

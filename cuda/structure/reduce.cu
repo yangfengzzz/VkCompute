@@ -6,7 +6,7 @@
 
 #include "cuda_util.h"
 #include "cuda_context.h"
-#include "math/vec.h"
+#include "reduce.h"
 #include "temp_buffer.h"
 
 #define THRUST_IGNORE_CUB_VERSION_CHECK
@@ -37,11 +37,11 @@ struct cub_strided_iterator {
     T *ptr = nullptr;
     int stride = 1;
 
-    CUDA_CALLABLE self_type operator++(int) {
+    __device__ self_type operator++(int) {
         return ++(self_type(*this));
     }
 
-    CUDA_CALLABLE self_type &operator++() {
+    __device__ self_type &operator++() {
         ptr += stride;
         return *this;
     }
@@ -50,41 +50,41 @@ struct cub_strided_iterator {
         return *ptr;
     }
 
-    CUDA_CALLABLE self_type operator+(difference_type n) const {
+    __device__ self_type operator+(difference_type n) const {
         return self_type(*this) += n;
     }
 
-    CUDA_CALLABLE self_type &operator+=(difference_type n) {
+    __device__ self_type &operator+=(difference_type n) {
         ptr += n * stride;
         return *this;
     }
 
-    CUDA_CALLABLE self_type operator-(difference_type n) const {
+    __device__ self_type operator-(difference_type n) const {
         return self_type(*this) -= n;
     }
 
-    CUDA_CALLABLE self_type &operator-=(difference_type n) {
+    __device__ self_type &operator-=(difference_type n) {
         ptr -= n * stride;
         return *this;
     }
 
-    CUDA_CALLABLE difference_type operator-(const self_type &other) const {
+    __device__ difference_type operator-(const self_type &other) const {
         return (ptr - other.ptr) / stride;
     }
 
-    CUDA_CALLABLE reference operator[](difference_type n) const {
+    __device__ reference operator[](difference_type n) const {
         return *(ptr + n * stride);
     }
 
-    CUDA_CALLABLE pointer operator->() const {
+    __device__ pointer operator->() const {
         return ptr;
     }
 
-    CUDA_CALLABLE bool operator==(const self_type &rhs) const {
+    __device__ bool operator==(const self_type &rhs) const {
         return (ptr == rhs.ptr);
     }
 
-    CUDA_CALLABLE bool operator!=(const self_type &rhs) const {
+    __device__ bool operator!=(const self_type &rhs) const {
         return (ptr != rhs.ptr);
     }
 };
@@ -98,7 +98,7 @@ void array_sum_device(const T *ptr_a, T *ptr_out, int count, int byte_stride, in
     TemporaryBuffer &cub_temp = g_temp_buffer_map[context];
 
     ContextGuard guard(context);
-    cudaStream_t stream = static_cast<cudaStream_t>(cuda_stream_get_current());
+    auto stream = static_cast<cudaStream_t>(cuda_stream_get_current());
 
     cub_strided_iterator<const T> ptr_strided{ptr_a, stride};
 
@@ -139,12 +139,12 @@ void array_sum_device_dispatch(const T *ptr_a, T *ptr_out, int count, int byte_s
 }
 
 template<typename T>
-CUDA_CALLABLE T element_inner_product(const T &a, const T &b) {
+__device__ T element_inner_product(const T &a, const T &b) {
     return a * b;
 }
 
 template<unsigned Length, typename T>
-CUDA_CALLABLE T element_inner_product(const wp::vec_t<Length, T> &a, const wp::vec_t<Length, T> &b) {
+__device__ T element_inner_product(const wp::vec_t<Length, T> &a, const wp::vec_t<Length, T> &b) {
     return wp::dot(a, b);
 }
 
@@ -166,11 +166,11 @@ struct cub_inner_product_iterator {
     int stride_b = 1;
     int type_length = 1;
 
-    CUDA_CALLABLE self_type operator++(int) {
+    __device__ self_type operator++(int) {
         return ++(self_type(*this));
     }
 
-    CUDA_CALLABLE self_type &operator++() {
+    __device__ self_type &operator++() {
         ptr_a += stride_a;
         ptr_b += stride_b;
         return *this;
@@ -180,44 +180,44 @@ struct cub_inner_product_iterator {
         return compute_value(0);
     }
 
-    CUDA_CALLABLE self_type operator+(difference_type n) const {
+    __device__ self_type operator+(difference_type n) const {
         return self_type(*this) += n;
     }
 
-    CUDA_CALLABLE self_type &operator+=(difference_type n) {
+    __device__ self_type &operator+=(difference_type n) {
         ptr_a += n * stride_a;
         ptr_b += n * stride_b;
         return *this;
     }
 
-    CUDA_CALLABLE self_type operator-(difference_type n) const {
+    __device__ self_type operator-(difference_type n) const {
         return self_type(*this) -= n;
     }
 
-    CUDA_CALLABLE self_type &operator-=(difference_type n) {
+    __device__ self_type &operator-=(difference_type n) {
         ptr_a -= n * stride_a;
         ptr_b -= n * stride_b;
         return *this;
     }
 
-    CUDA_CALLABLE difference_type operator-(const self_type &other) const {
+    __device__ difference_type operator-(const self_type &other) const {
         return (ptr_a - other.ptr_a) / stride_a;
     }
 
-    CUDA_CALLABLE reference operator[](difference_type n) const {
+    __device__ reference operator[](difference_type n) const {
         return compute_value(n);
     }
 
-    CUDA_CALLABLE bool operator==(const self_type &rhs) const {
+    __device__ bool operator==(const self_type &rhs) const {
         return (ptr_a == rhs.ptr_a);
     }
 
-    CUDA_CALLABLE bool operator!=(const self_type &rhs) const {
+    __device__ bool operator!=(const self_type &rhs) const {
         return (ptr_a != rhs.ptr_a);
     }
 
 private:
-    CUDA_CALLABLE ScalarT compute_value(difference_type n) const {
+    __device__ ScalarT compute_value(difference_type n) const {
         ScalarT val(0);
         const ElemT *a = ptr_a + n * stride_a;
         const ElemT *b = ptr_b + n * stride_b;
@@ -240,7 +240,7 @@ void array_inner_device(const ElemT *ptr_a, const ElemT *ptr_b, ScalarT *ptr_out
     TemporaryBuffer &cub_temp = g_temp_buffer_map[context];
 
     ContextGuard guard(context);
-    cudaStream_t stream = static_cast<cudaStream_t>(cuda_stream_get_current());
+    auto stream = static_cast<cudaStream_t>(cuda_stream_get_current());
 
     cub_inner_product_iterator<ElemT, ScalarT> inner_iterator{ptr_a, ptr_b, stride_a, stride_b, type_length};
 
@@ -284,30 +284,30 @@ void array_inner_float_device(uint64_t a, uint64_t b, uint64_t out, int count, i
                               int type_len) {
     void *context = cuda_context_get_current();
 
-    const float *ptr_a = (const float *)(a);
-    const float *ptr_b = (const float *)(b);
-    float *ptr_out = (float *)(out);
+    const auto *ptr_a = (const float *)(a);
+    const auto *ptr_b = (const float *)(b);
+    auto *ptr_out = (float *)(out);
 
     array_inner_device_dispatch(ptr_a, ptr_b, ptr_out, count, byte_stride_a, byte_stride_b, type_len);
 }
 
 void array_inner_double_device(uint64_t a, uint64_t b, uint64_t out, int count, int byte_stride_a, int byte_stride_b,
                                int type_len) {
-    const double *ptr_a = (const double *)(a);
-    const double *ptr_b = (const double *)(b);
-    double *ptr_out = (double *)(out);
+    const auto *ptr_a = (const double *)(a);
+    const auto *ptr_b = (const double *)(b);
+    auto *ptr_out = (double *)(out);
 
     array_inner_device_dispatch(ptr_a, ptr_b, ptr_out, count, byte_stride_a, byte_stride_b, type_len);
 }
 
 void array_sum_float_device(uint64_t a, uint64_t out, int count, int byte_stride, int type_length) {
-    const float *ptr_a = (const float *)(a);
-    float *ptr_out = (float *)(out);
+    const auto *ptr_a = (const float *)(a);
+    auto *ptr_out = (float *)(out);
     array_sum_device_dispatch(ptr_a, ptr_out, count, byte_stride, type_length);
 }
 
 void array_sum_double_device(uint64_t a, uint64_t out, int count, int byte_stride, int type_length) {
-    const double *ptr_a = (const double *)(a);
-    double *ptr_out = (double *)(out);
+    const auto *ptr_a = (const double *)(a);
+    auto *ptr_out = (double *)(out);
     array_sum_device_dispatch(ptr_a, ptr_out, count, byte_stride, type_length);
 }

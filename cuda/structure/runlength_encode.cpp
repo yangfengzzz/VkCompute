@@ -4,7 +4,7 @@
 //  personal capacity and am not conveying any rights to any intellectual
 //  property of any third parties.
 
-#include "cuda_context.h"
+#include "runlength_encode.h"
 
 #include <cstdint>
 

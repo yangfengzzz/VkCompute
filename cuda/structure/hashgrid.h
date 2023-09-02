@@ -126,3 +126,13 @@ __device__ inline int hash_grid_point_id(const HashGrid *grid, int &index) {
 }
 
 }// namespace wp
+
+ uint64_t hash_grid_create_host(int dim_x, int dim_y, int dim_z);
+ void hash_grid_reserve_host(wp::HashGrid *grid, int num_points);
+ void hash_grid_destroy_host(wp::HashGrid *grid);
+ void hash_grid_update_host(wp::HashGrid *grid, float cell_width, const wp::vec3 *positions, int num_points);
+
+ uint64_t hash_grid_create_device(void *context, int dim_x, int dim_y, int dim_z);
+ void hash_grid_reserve_device(uint64_t id, int num_points);
+ void hash_grid_destroy_device(uint64_t id);
+ void hash_grid_update_device(uint64_t id, float cell_width, const wp::vec3 *positions, int num_points);

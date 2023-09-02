@@ -4,7 +4,8 @@
 //  personal capacity and am not conveying any rights to any intellectual
 //  property of any third parties.
 
-#include "cuda_context.h"
+#include "reduce.h"
+#include <cassert>
 
 namespace {
 
@@ -101,30 +102,30 @@ void array_sum_host(const T *ptr_a, T *ptr_out, int count, int byte_stride, int 
 
 void array_inner_float_host(uint64_t a, uint64_t b, uint64_t out, int count, int byte_stride_a, int byte_stride_b,
                             int type_length) {
-    const float *ptr_a = (const float *)(a);
-    const float *ptr_b = (const float *)(b);
-    float *ptr_out = (float *)(out);
+    const auto *ptr_a = (const float *)(a);
+    const auto *ptr_b = (const float *)(b);
+    auto *ptr_out = (float *)(out);
 
     array_inner_host(ptr_a, ptr_b, ptr_out, count, byte_stride_a, byte_stride_b, type_length);
 }
 
 void array_inner_double_host(uint64_t a, uint64_t b, uint64_t out, int count, int byte_stride_a, int byte_stride_b,
                              int type_length) {
-    const double *ptr_a = (const double *)(a);
-    const double *ptr_b = (const double *)(b);
-    double *ptr_out = (double *)(out);
+    const auto *ptr_a = (const double *)(a);
+    const auto *ptr_b = (const double *)(b);
+    auto *ptr_out = (double *)(out);
 
     array_inner_host(ptr_a, ptr_b, ptr_out, count, byte_stride_a, byte_stride_b, type_length);
 }
 
 void array_sum_float_host(uint64_t a, uint64_t out, int count, int byte_stride_a, int type_length) {
-    const float *ptr_a = (const float *)(a);
-    float *ptr_out = (float *)(out);
+    const auto *ptr_a = (const float *)(a);
+    auto *ptr_out = (float *)(out);
     array_sum_host(ptr_a, ptr_out, count, byte_stride_a, type_length);
 }
 
 void array_sum_double_host(uint64_t a, uint64_t out, int count, int byte_stride_a, int type_length) {
-    const double *ptr_a = (const double *)(a);
-    double *ptr_out = (double *)(out);
+    const auto *ptr_a = (const double *)(a);
+    auto *ptr_out = (double *)(out);
     array_sum_host(ptr_a, ptr_out, count, byte_stride_a, type_length);
 }

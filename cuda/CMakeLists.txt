@@ -35,19 +35,18 @@ set(STRUCTURE_FILES
         structure/scan.cpp
         structure/hashgrid.cpp
         structure/hashgrid.cu
+        structure/reduce.cpp
+        structure/reduce.cu
+        structure/sparse.cpp
+        structure/sparse.cu
+        structure/runlength_encode.cpp
+        structure/runlength_encode.cu
+        structure/marching.cu
 
         #        structure/bvh.cpp
         #        structure/bvh.cu
-        #        structure/marching.cu
         #        structure/mesh.cpp
         #        structure/mesh.cu
-        #        structure/reduce.cpp
-        #        structure/reduce.cu
-        #        structure/runlength_encode.cpp
-        #        structure/runlength_encode.cu
-        #        structure/sparse.cpp
-        #        structure/sparse.cu
-
 )
 
 set(SOLVER_FILES

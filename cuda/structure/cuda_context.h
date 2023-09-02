@@ -94,3 +94,11 @@ void cuda_graphics_map(void *context, void *resource);
 void cuda_graphics_unmap(void *context, void *resource);
 void cuda_graphics_device_ptr_and_size(void *context, void *resource, uint64_t *ptr, size_t *size);
 void cuda_graphics_unregister_resource(void *context, void *resource);
+
+// generic copy supporting non-contiguous arrays
+size_t array_copy_host(void *dst, void *src, int dst_type, int src_type, int elem_size);
+size_t array_copy_device(void *context, void *dst, void *src, int dst_type, int src_type, int elem_size);
+
+// generic fill for non-contiguous arrays
+void array_fill_host(void *arr, int arr_type, const void *value, int value_size);
+void array_fill_device(void *context, void *arr, int arr_type, const void *value, int value_size);

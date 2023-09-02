@@ -6,7 +6,8 @@
 
 #include "cuda_context.h"
 #include "cuda_util.h"
-#include "math/vec.h"
+#include "marching.h"
+#include "math/math_utils.h"
 
 #include "thrust/device_ptr.h"
 #include "thrust/sort.h"
@@ -164,37 +165,6 @@ __constant__ int marchingCubesEdgeLocations[12][4] = {
     {1, 0, 0, 2},
     {1, 1, 0, 2},
     {0, 1, 0, 2}};
-
-// ---------------------------------------------------------------------------------------
-struct MarchingCubes {
-    MarchingCubes() {
-        memset(this, 0, sizeof(MarchingCubes));
-    }
-
-    __device__ __host__ int cell_index(int xi, int yi, int zi) const {
-        return (xi * ny + yi) * nz + zi;
-    }
-    __device__ __host__ void cell_coord(int cell_index, int &xi, int &yi, int &zi) const {
-        zi = cell_index % nz;
-        cell_index /= nz;
-        yi = cell_index % ny;
-        xi = cell_index / ny;
-    }
-
-    // grid
-    int nx;
-    int ny;
-    int nz;
-
-    int *first_cell_vert;
-    int *first_cell_tri;
-    int *cell_verts;
-
-    int num_cells;
-    int max_cells;
-
-    void *context;
-};
 
 // -----------------------------------------------------------------------------------
 __global__ void count_cell_verts(MarchingCubes mc, const float *density, float threshold) {
@@ -437,10 +407,10 @@ int marching_cubes_surface_device(
     }
 
     // create vertices
-    wp_launch_device(WP_CURRENT_CONTEXT, wp::create_cell_verts, mc.num_cells, (mc, verts, NULL, field, threshold));
+    wp_launch_device(WP_CURRENT_CONTEXT, wp::create_cell_verts, mc.num_cells, (mc, verts, nullptr, field, threshold))
 
-    // create triangles
-    wp_launch_device(WP_CURRENT_CONTEXT, wp::count_cell_tris, mc.num_cells, (mc, field, threshold));
+        // create triangles
+        wp_launch_device(WP_CURRENT_CONTEXT, wp::count_cell_tris, mc.num_cells, (mc, field, threshold));
 
     memcpy_d2h(WP_CURRENT_CONTEXT, &num_last, &mc.first_cell_tri[mc.num_cells - 1], sizeof(int));
 

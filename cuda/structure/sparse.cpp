@@ -4,8 +4,7 @@
 //  personal capacity and am not conveying any rights to any intellectual
 //  property of any third parties.
 
-#include "cuda_context.h"
-
+#include "sparse.h"
 #include <algorithm>
 #include <numeric>
 #include <vector>
@@ -127,8 +126,7 @@ int bsr_matrix_from_triplets_host(const int rows_per_block, const int cols_per_b
         bsr_values -= block_size;
     }
 
-    for (int i = 0; i < block_indices.size(); ++i) {
-        int idx = block_indices[i];
+    for (int idx : block_indices) {
         int row = tpl_rows[idx];
         int col = tpl_columns[idx];
         const T *val = tpl_values + idx * block_size;
