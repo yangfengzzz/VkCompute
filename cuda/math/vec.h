@@ -6,7 +6,9 @@
 
 #pragma once
 
-#include "math_core.h"
+#include <cstdio>
+#include <cuda_runtime_api.h>
+#include <thrust/limits.h>
 #include "initializer_array.h"
 
 namespace wp {
@@ -17,48 +19,45 @@ struct vec_t {
 
     inline vec_t() = default;
 
-    inline CUDA_CALLABLE vec_t(Type s) {
+    inline __device__ vec_t(Type s) {
         for (unsigned i = 0; i < Length; ++i) {
             c[i] = s;
         }
     }
 
     template<typename OtherType>
-    inline explicit CUDA_CALLABLE vec_t(const vec_t<Length, OtherType> &other) {
+    inline explicit __device__ vec_t(const vec_t<Length, OtherType> &other) {
         for (unsigned i = 0; i < Length; ++i) {
             c[i] = other[i];
         }
     }
 
-    inline CUDA_CALLABLE vec_t(Type x, Type y) {
-        assert(Length == 2);
+    inline __device__ vec_t(Type x, Type y) {
         c[0] = x;
         c[1] = y;
     }
 
-    inline CUDA_CALLABLE vec_t(Type x, Type y, Type z) {
-        assert(Length == 3);
+    inline __device__ vec_t(Type x, Type y, Type z) {
         c[0] = x;
         c[1] = y;
         c[2] = z;
     }
 
-    inline CUDA_CALLABLE vec_t(Type x, Type y, Type z, Type w) {
-        assert(Length == 4);
+    inline __device__ vec_t(Type x, Type y, Type z, Type w) {
         c[0] = x;
         c[1] = y;
         c[2] = z;
         c[3] = w;
     }
 
-    inline CUDA_CALLABLE vec_t(const initializer_array<Length, Type> &l) {
+    inline __device__ vec_t(const initializer_array<Length, Type> &l) {
         for (unsigned i = 0; i < Length; ++i) {
             c[i] = l[i];
         }
     }
 
     // special screw vector constructor for spatial_vectors:
-    inline CUDA_CALLABLE vec_t(vec_t<3, Type> w, vec_t<3, Type> v) {
+    inline __device__ vec_t(vec_t<3, Type> w, vec_t<3, Type> v) {
         c[0] = w[0];
         c[1] = w[1];
         c[2] = w[2];
@@ -67,48 +66,42 @@ struct vec_t {
         c[5] = v[2];
     }
 
-    inline CUDA_CALLABLE Type operator[](int index) const {
-        assert(index < Length);
+    inline __device__ Type operator[](int index) const {
         return c[index];
     }
 
-    inline CUDA_CALLABLE Type &operator[](int index) {
-        assert(index < Length);
+    inline __device__ Type &operator[](int index) {
         return c[index];
     }
 };
 
-using vec2b = vec_t<2, int8>;
-using vec3b = vec_t<3, int8>;
-using vec4b = vec_t<4, int8>;
-using vec2ub = vec_t<2, uint8>;
-using vec3ub = vec_t<3, uint8>;
-using vec4ub = vec_t<4, uint8>;
+using vec2b = vec_t<2, int8_t>;
+using vec3b = vec_t<3, int8_t>;
+using vec4b = vec_t<4, int8_t>;
+using vec2ub = vec_t<2, uint8_t>;
+using vec3ub = vec_t<3, uint8_t>;
+using vec4ub = vec_t<4, uint8_t>;
 
-using vec2s = vec_t<2, int16>;
-using vec3s = vec_t<3, int16>;
-using vec4s = vec_t<4, int16>;
-using vec2us = vec_t<2, uint16>;
-using vec3us = vec_t<3, uint16>;
-using vec4us = vec_t<4, uint16>;
+using vec2s = vec_t<2, int16_t>;
+using vec3s = vec_t<3, int16_t>;
+using vec4s = vec_t<4, int16_t>;
+using vec2us = vec_t<2, uint16_t>;
+using vec3us = vec_t<3, uint16_t>;
+using vec4us = vec_t<4, uint16_t>;
 
-using vec2i = vec_t<2, int32>;
-using vec3i = vec_t<3, int32>;
-using vec4i = vec_t<4, int32>;
-using vec2ui = vec_t<2, uint32>;
-using vec3ui = vec_t<3, uint32>;
-using vec4ui = vec_t<4, uint32>;
+using vec2i = vec_t<2, int32_t>;
+using vec3i = vec_t<3, int32_t>;
+using vec4i = vec_t<4, int32_t>;
+using vec2ui = vec_t<2, uint32_t>;
+using vec3ui = vec_t<3, uint32_t>;
+using vec4ui = vec_t<4, uint32_t>;
 
-using vec2l = vec_t<2, int64>;
-using vec3l = vec_t<3, int64>;
-using vec4l = vec_t<4, int64>;
-using vec2ul = vec_t<2, uint64>;
-using vec3ul = vec_t<3, uint64>;
-using vec4ul = vec_t<4, uint64>;
-
-using vec2h = vec_t<2, half>;
-using vec3h = vec_t<3, half>;
-using vec4h = vec_t<4, half>;
+using vec2l = vec_t<2, int64_t>;
+using vec3l = vec_t<3, int64_t>;
+using vec4l = vec_t<4, int64_t>;
+using vec2ul = vec_t<2, uint64_t>;
+using vec3ul = vec_t<3, uint64_t>;
+using vec4ul = vec_t<4, uint64_t>;
 
 using vec2 = vec_t<2, float>;
 using vec3 = vec_t<3, float>;
@@ -131,7 +124,7 @@ using vec4d = vec_t<4, double>;
 
 // negation:
 template<unsigned Length, typename Type>
-inline CUDA_CALLABLE vec_t<Length, Type> operator-(vec_t<Length, Type> a) {
+inline __device__ vec_t<Length, Type> operator-(vec_t<Length, Type> a) {
     // NB: this constructor will initialize all ret's components to 0, which is
     // unnecessary...
     vec_t<Length, Type> ret;
@@ -144,28 +137,28 @@ inline CUDA_CALLABLE vec_t<Length, Type> operator-(vec_t<Length, Type> a) {
 }
 
 template<unsigned Length, typename Type>
-CUDA_CALLABLE inline vec_t<Length, Type> pos(const vec_t<Length, Type> &x) {
+__device__ inline vec_t<Length, Type> pos(const vec_t<Length, Type> &x) {
     return x;
 }
 
 template<unsigned Length, typename Type>
-CUDA_CALLABLE inline vec_t<Length, Type> neg(const vec_t<Length, Type> &x) {
+__device__ inline vec_t<Length, Type> neg(const vec_t<Length, Type> &x) {
     return -x;
 }
 
 template<typename Type>
-CUDA_CALLABLE inline vec_t<3, Type> neg(const vec_t<3, Type> &x) {
+__device__ inline vec_t<3, Type> neg(const vec_t<3, Type> &x) {
     return vec_t<3, Type>(-x.c[0], -x.c[1], -x.c[2]);
 }
 
 template<typename Type>
-CUDA_CALLABLE inline vec_t<2, Type> neg(const vec_t<2, Type> &x) {
+__device__ inline vec_t<2, Type> neg(const vec_t<2, Type> &x) {
     return vec_t<2, Type>(-x.c[0], -x.c[1]);
 }
 
 // equality:
 template<unsigned Length, typename Type>
-inline CUDA_CALLABLE bool operator==(const vec_t<Length, Type> &a, const vec_t<Length, Type> &b) {
+inline __device__ bool operator==(const vec_t<Length, Type> &a, const vec_t<Length, Type> &b) {
     for (unsigned i = 0; i < Length; ++i) {
         if (a[i] != b[i]) {
             return false;
@@ -176,7 +169,7 @@ inline CUDA_CALLABLE bool operator==(const vec_t<Length, Type> &a, const vec_t<L
 
 // scalar multiplication:
 template<unsigned Length, typename Type>
-inline CUDA_CALLABLE vec_t<Length, Type> mul(vec_t<Length, Type> a, Type s) {
+inline __device__ vec_t<Length, Type> mul(vec_t<Length, Type> a, Type s) {
     vec_t<Length, Type> ret;
     for (unsigned i = 0; i < Length; ++i) {
         ret[i] = a[i] * s;
@@ -185,33 +178,33 @@ inline CUDA_CALLABLE vec_t<Length, Type> mul(vec_t<Length, Type> a, Type s) {
 }
 
 template<typename Type>
-inline CUDA_CALLABLE vec_t<3, Type> mul(vec_t<3, Type> a, Type s) {
+inline __device__ vec_t<3, Type> mul(vec_t<3, Type> a, Type s) {
     return vec_t<3, Type>(a.c[0] * s, a.c[1] * s, a.c[2] * s);
 }
 
 template<typename Type>
-inline CUDA_CALLABLE vec_t<2, Type> mul(vec_t<2, Type> a, Type s) {
+inline __device__ vec_t<2, Type> mul(vec_t<2, Type> a, Type s) {
     return vec_t<2, Type>(a.c[0] * s, a.c[1] * s);
 }
 
 template<unsigned Length, typename Type>
-inline CUDA_CALLABLE vec_t<Length, Type> mul(Type s, vec_t<Length, Type> a) {
+inline __device__ vec_t<Length, Type> mul(Type s, vec_t<Length, Type> a) {
     return mul(a, s);
 }
 
 template<unsigned Length, typename Type>
-inline CUDA_CALLABLE vec_t<Length, Type> operator*(Type s, vec_t<Length, Type> a) {
+inline __device__ vec_t<Length, Type> operator*(Type s, vec_t<Length, Type> a) {
     return mul(a, s);
 }
 
 template<unsigned Length, typename Type>
-inline CUDA_CALLABLE vec_t<Length, Type> operator*(vec_t<Length, Type> a, Type s) {
+inline __device__ vec_t<Length, Type> operator*(vec_t<Length, Type> a, Type s) {
     return mul(a, s);
 }
 
 // component wise multiplication:
 template<unsigned Length, typename Type>
-inline CUDA_CALLABLE vec_t<Length, Type> cw_mul(vec_t<Length, Type> a, vec_t<Length, Type> b) {
+inline __device__ vec_t<Length, Type> cw_mul(vec_t<Length, Type> a, vec_t<Length, Type> b) {
     vec_t<Length, Type> ret;
     for (unsigned i = 0; i < Length; ++i) {
         ret[i] = a[i] * b[i];
@@ -221,7 +214,7 @@ inline CUDA_CALLABLE vec_t<Length, Type> cw_mul(vec_t<Length, Type> a, vec_t<Len
 
 // division
 template<unsigned Length, typename Type>
-inline CUDA_CALLABLE vec_t<Length, Type> div(vec_t<Length, Type> a, Type s) {
+inline __device__ vec_t<Length, Type> div(vec_t<Length, Type> a, Type s) {
     vec_t<Length, Type> ret;
     for (unsigned i = 0; i < Length; ++i) {
         ret[i] = a[i] / s;
@@ -230,23 +223,23 @@ inline CUDA_CALLABLE vec_t<Length, Type> div(vec_t<Length, Type> a, Type s) {
 }
 
 template<typename Type>
-inline CUDA_CALLABLE vec_t<3, Type> div(vec_t<3, Type> a, Type s) {
+inline __device__ vec_t<3, Type> div(vec_t<3, Type> a, Type s) {
     return vec_t<3, Type>(a.c[0] / s, a.c[1] / s, a.c[2] / s);
 }
 
 template<typename Type>
-inline CUDA_CALLABLE vec_t<2, Type> div(vec_t<2, Type> a, Type s) {
+inline __device__ vec_t<2, Type> div(vec_t<2, Type> a, Type s) {
     return vec_t<2, Type>(a.c[0] / s, a.c[1] / s);
 }
 
 template<unsigned Length, typename Type>
-inline CUDA_CALLABLE vec_t<Length, Type> operator/(vec_t<Length, Type> a, Type s) {
+inline __device__ vec_t<Length, Type> operator/(vec_t<Length, Type> a, Type s) {
     return div(a, s);
 }
 
 // component wise division
 template<unsigned Length, typename Type>
-inline CUDA_CALLABLE vec_t<Length, Type> cw_div(vec_t<Length, Type> a, vec_t<Length, Type> b) {
+inline __device__ vec_t<Length, Type> cw_div(vec_t<Length, Type> a, vec_t<Length, Type> b) {
     vec_t<Length, Type> ret;
     for (unsigned i = 0; i < Length; ++i) {
         ret[i] = a[i] / b[i];
@@ -256,7 +249,7 @@ inline CUDA_CALLABLE vec_t<Length, Type> cw_div(vec_t<Length, Type> a, vec_t<Len
 
 // addition
 template<unsigned Length, typename Type>
-inline CUDA_CALLABLE vec_t<Length, Type> add(vec_t<Length, Type> a, vec_t<Length, Type> b) {
+inline __device__ vec_t<Length, Type> add(vec_t<Length, Type> a, vec_t<Length, Type> b) {
     vec_t<Length, Type> ret;
     for (unsigned i = 0; i < Length; ++i) {
         ret[i] = a[i] + b[i];
@@ -265,18 +258,18 @@ inline CUDA_CALLABLE vec_t<Length, Type> add(vec_t<Length, Type> a, vec_t<Length
 }
 
 template<typename Type>
-inline CUDA_CALLABLE vec_t<2, Type> add(vec_t<2, Type> a, vec_t<2, Type> b) {
+inline __device__ vec_t<2, Type> add(vec_t<2, Type> a, vec_t<2, Type> b) {
     return vec_t<2, Type>(a.c[0] + b.c[0], a.c[1] + b.c[1]);
 }
 
 template<typename Type>
-inline CUDA_CALLABLE vec_t<3, Type> add(vec_t<3, Type> a, vec_t<3, Type> b) {
+inline __device__ vec_t<3, Type> add(vec_t<3, Type> a, vec_t<3, Type> b) {
     return vec_t<3, Type>(a.c[0] + b.c[0], a.c[1] + b.c[1], a.c[2] + b.c[2]);
 }
 
 // subtraction
 template<unsigned Length, typename Type>
-inline CUDA_CALLABLE vec_t<Length, Type> sub(vec_t<Length, Type> a, vec_t<Length, Type> b) {
+inline __device__ vec_t<Length, Type> sub(vec_t<Length, Type> a, vec_t<Length, Type> b) {
     vec_t<Length, Type> ret;
     for (unsigned i = 0; i < Length; ++i) {
         ret[i] = Type(a[i] - b[i]);
@@ -285,18 +278,18 @@ inline CUDA_CALLABLE vec_t<Length, Type> sub(vec_t<Length, Type> a, vec_t<Length
 }
 
 template<typename Type>
-inline CUDA_CALLABLE vec_t<2, Type> sub(vec_t<2, Type> a, vec_t<2, Type> b) {
+inline __device__ vec_t<2, Type> sub(vec_t<2, Type> a, vec_t<2, Type> b) {
     return vec_t<2, Type>(a.c[0] - b.c[0], a.c[1] - b.c[1]);
 }
 
 template<typename Type>
-inline CUDA_CALLABLE vec_t<3, Type> sub(vec_t<3, Type> a, vec_t<3, Type> b) {
+inline __device__ vec_t<3, Type> sub(vec_t<3, Type> a, vec_t<3, Type> b) {
     return vec_t<3, Type>(a.c[0] - b.c[0], a.c[1] - b.c[1], a.c[2] - b.c[2]);
 }
 
 // dot product:
 template<unsigned Length, typename Type>
-inline CUDA_CALLABLE Type dot(vec_t<Length, Type> a, vec_t<Length, Type> b) {
+inline __device__ Type dot(vec_t<Length, Type> a, vec_t<Length, Type> b) {
     Type ret(0);
     for (unsigned i = 0; i < Length; ++i) {
         ret += a[i] * b[i];
@@ -305,27 +298,26 @@ inline CUDA_CALLABLE Type dot(vec_t<Length, Type> a, vec_t<Length, Type> b) {
 }
 
 template<typename Type>
-inline CUDA_CALLABLE Type dot(vec_t<2, Type> a, vec_t<2, Type> b) {
+inline __device__ Type dot(vec_t<2, Type> a, vec_t<2, Type> b) {
     return a.c[0] * b.c[0] + a.c[1] * b.c[1];
 }
 
 template<typename Type>
-inline CUDA_CALLABLE Type dot(vec_t<3, Type> a, vec_t<3, Type> b) {
+inline __device__ Type dot(vec_t<3, Type> a, vec_t<3, Type> b) {
     return a.c[0] * b.c[0] + a.c[1] * b.c[1] + a.c[2] * b.c[2];
 }
 
 template<unsigned Length, typename Type>
-inline CUDA_CALLABLE Type tensordot(vec_t<Length, Type> a, vec_t<Length, Type> b) {
+inline __device__ Type tensordot(vec_t<Length, Type> a, vec_t<Length, Type> b) {
     // corresponds to `np.tensordot()` with all axes being contracted
     return dot(a, b);
 }
 
 template<unsigned Length, typename Type>
-inline CUDA_CALLABLE Type index(const vec_t<Length, Type> &a, int idx) {
+inline __device__ Type index(const vec_t<Length, Type> &a, int idx) {
 #ifndef NDEBUG
     if (idx < 0 || idx >= Length) {
         printf("vec index %d out of bounds at %s %d\n", idx, __FILE__, __LINE__);
-        assert(0);
     }
 #endif
 
@@ -333,11 +325,10 @@ inline CUDA_CALLABLE Type index(const vec_t<Length, Type> &a, int idx) {
 }
 
 template<unsigned Length, typename Type>
-inline CUDA_CALLABLE void indexset(vec_t<Length, Type> &v, int idx, Type value) {
+inline __device__ void indexset(vec_t<Length, Type> &v, int idx, Type value) {
 #ifndef NDEBUG
     if (idx < 0 || idx >= Length) {
         printf("vec store %d out of bounds at %s %d\n", idx, __FILE__, __LINE__);
-        assert(0);
     }
 #endif
 
@@ -345,54 +336,54 @@ inline CUDA_CALLABLE void indexset(vec_t<Length, Type> &v, int idx, Type value) 
 }
 
 template<unsigned Length, typename Type>
-inline CUDA_CALLABLE Type length(vec_t<Length, Type> a) {
+inline __device__ Type length(vec_t<Length, Type> a) {
     return sqrt(dot(a, a));
 }
 
 template<unsigned Length, typename Type>
-inline CUDA_CALLABLE Type length_sq(vec_t<Length, Type> a) {
+inline __device__ Type length_sq(vec_t<Length, Type> a) {
     return dot(a, a);
 }
 
 template<typename Type>
-inline CUDA_CALLABLE Type length(vec_t<2, Type> a) {
+inline __device__ Type length(vec_t<2, Type> a) {
     return sqrt(a.c[0] * a.c[0] + a.c[1] * a.c[1]);
 }
 
 template<typename Type>
-inline CUDA_CALLABLE Type length(vec_t<3, Type> a) {
+inline __device__ Type length(vec_t<3, Type> a) {
     return sqrt(a.c[0] * a.c[0] + a.c[1] * a.c[1] + a.c[2] * a.c[2]);
 }
 
 template<unsigned Length, typename Type>
-inline CUDA_CALLABLE vec_t<Length, Type> normalize(vec_t<Length, Type> a) {
+inline __device__ vec_t<Length, Type> normalize(vec_t<Length, Type> a) {
     Type l = length(a);
-    if (l > Type(kEps))
+    if (l > Type(thrust::numeric_limits<Type>::epsilon()))
         return div(a, l);
     else
         return vec_t<Length, Type>();
 }
 
 template<typename Type>
-inline CUDA_CALLABLE vec_t<2, Type> normalize(vec_t<2, Type> a) {
+inline __device__ vec_t<2, Type> normalize(vec_t<2, Type> a) {
     Type l = sqrt(a.c[0] * a.c[0] + a.c[1] * a.c[1]);
-    if (l > Type(kEps))
+    if (l > Type(thrust::numeric_limits<Type>::epsilon()))
         return vec_t<2, Type>(a.c[0] / l, a.c[1] / l);
     else
         return vec_t<2, Type>();
 }
 
 template<typename Type>
-inline CUDA_CALLABLE vec_t<3, Type> normalize(vec_t<3, Type> a) {
+inline __device__ vec_t<3, Type> normalize(vec_t<3, Type> a) {
     Type l = sqrt(a.c[0] * a.c[0] + a.c[1] * a.c[1] + a.c[2] * a.c[2]);
-    if (l > Type(kEps))
+    if (l > Type(thrust::numeric_limits<Type>::epsilon()))
         return vec_t<3, Type>(a.c[0] / l, a.c[1] / l, a.c[2] / l);
     else
         return vec_t<3, Type>();
 }
 
 template<typename Type>
-inline CUDA_CALLABLE vec_t<3, Type> cross(vec_t<3, Type> a, vec_t<3, Type> b) {
+inline __device__ vec_t<3, Type> cross(vec_t<3, Type> a, vec_t<3, Type> b) {
     return {
         Type(a[1] * b[2] - a[2] * b[1]),
         Type(a[2] * b[0] - a[0] * b[2]),
@@ -400,7 +391,7 @@ inline CUDA_CALLABLE vec_t<3, Type> cross(vec_t<3, Type> a, vec_t<3, Type> b) {
 }
 
 template<unsigned Length, typename Type>
-inline bool CUDA_CALLABLE isfinite(vec_t<Length, Type> x) {
+inline bool __device__ isfinite(vec_t<Length, Type> x) {
     for (unsigned i = 0; i < Length; ++i) {
         if (!isfinite(x[i])) {
             return false;
@@ -411,7 +402,7 @@ inline bool CUDA_CALLABLE isfinite(vec_t<Length, Type> x) {
 
 // These two functions seem to compile very slowly
 template<unsigned Length, typename Type>
-inline CUDA_CALLABLE vec_t<Length, Type> min(vec_t<Length, Type> a, vec_t<Length, Type> b) {
+inline __device__ vec_t<Length, Type> min(vec_t<Length, Type> a, vec_t<Length, Type> b) {
     vec_t<Length, Type> ret;
     for (unsigned i = 0; i < Length; ++i) {
         ret[i] = a[i] < b[i] ? a[i] : b[i];
@@ -420,7 +411,7 @@ inline CUDA_CALLABLE vec_t<Length, Type> min(vec_t<Length, Type> a, vec_t<Length
 }
 
 template<unsigned Length, typename Type>
-inline CUDA_CALLABLE vec_t<Length, Type> max(vec_t<Length, Type> a, vec_t<Length, Type> b) {
+inline __device__ vec_t<Length, Type> max(vec_t<Length, Type> a, vec_t<Length, Type> b) {
     vec_t<Length, Type> ret;
     for (unsigned i = 0; i < Length; ++i) {
         ret[i] = a[i] > b[i] ? a[i] : b[i];
@@ -429,7 +420,7 @@ inline CUDA_CALLABLE vec_t<Length, Type> max(vec_t<Length, Type> a, vec_t<Length
 }
 
 template<unsigned Length, typename Type>
-inline CUDA_CALLABLE Type min(vec_t<Length, Type> v) {
+inline __device__ Type min(vec_t<Length, Type> v) {
     Type ret = v[0];
     for (unsigned i = 1; i < Length; ++i) {
         if (v[i] < ret)
@@ -439,7 +430,7 @@ inline CUDA_CALLABLE Type min(vec_t<Length, Type> v) {
 }
 
 template<unsigned Length, typename Type>
-inline CUDA_CALLABLE Type max(vec_t<Length, Type> v) {
+inline __device__ Type max(vec_t<Length, Type> v) {
     Type ret = v[0];
     for (unsigned i = 1; i < Length; ++i) {
         if (v[i] > ret)
@@ -449,7 +440,7 @@ inline CUDA_CALLABLE Type max(vec_t<Length, Type> v) {
 }
 
 template<unsigned Length, typename Type>
-inline CUDA_CALLABLE unsigned argmin(vec_t<Length, Type> v) {
+inline __device__ unsigned argmin(vec_t<Length, Type> v) {
     unsigned ret = 0;
     for (unsigned i = 1; i < Length; ++i) {
         if (v[i] < v[ret])
@@ -459,7 +450,7 @@ inline CUDA_CALLABLE unsigned argmin(vec_t<Length, Type> v) {
 }
 
 template<unsigned Length, typename Type>
-inline CUDA_CALLABLE unsigned argmax(vec_t<Length, Type> v) {
+inline __device__ unsigned argmax(vec_t<Length, Type> v) {
     unsigned ret = 0;
     for (unsigned i = 1; i < Length; ++i) {
         if (v[i] > v[ret])
@@ -469,7 +460,7 @@ inline CUDA_CALLABLE unsigned argmax(vec_t<Length, Type> v) {
 }
 
 template<unsigned Length, typename Type>
-inline CUDA_CALLABLE void expect_near(const vec_t<Length, Type> &actual, const vec_t<Length, Type> &expected, const Type &tolerance) {
+inline __device__ void expect_near(const vec_t<Length, Type> &actual, const vec_t<Length, Type> &expected, const Type &tolerance) {
     const Type diff(0);
     for (size_t i = 0; i < Length; ++i) {
         diff = max(diff, abs(actual[i] - expected[i]));
@@ -486,7 +477,7 @@ inline CUDA_CALLABLE void expect_near(const vec_t<Length, Type> &actual, const v
 
 // Do I need to specialize these for different lengths?
 template<unsigned Length, typename Type>
-inline CUDA_CALLABLE vec_t<Length, Type> atomic_add(vec_t<Length, Type> *addr, vec_t<Length, Type> value) {
+inline __device__ vec_t<Length, Type> atomic_add(vec_t<Length, Type> *addr, vec_t<Length, Type> value) {
 
     vec_t<Length, Type> ret;
     for (unsigned i = 0; i < Length; ++i) {
@@ -497,7 +488,7 @@ inline CUDA_CALLABLE vec_t<Length, Type> atomic_add(vec_t<Length, Type> *addr, v
 }
 
 template<unsigned Length, typename Type>
-inline CUDA_CALLABLE vec_t<Length, Type> atomic_min(vec_t<Length, Type> *addr, vec_t<Length, Type> value) {
+inline __device__ vec_t<Length, Type> atomic_min(vec_t<Length, Type> *addr, vec_t<Length, Type> value) {
 
     vec_t<Length, Type> ret;
     for (unsigned i = 0; i < Length; ++i) {
@@ -508,7 +499,7 @@ inline CUDA_CALLABLE vec_t<Length, Type> atomic_min(vec_t<Length, Type> *addr, v
 }
 
 template<unsigned Length, typename Type>
-inline CUDA_CALLABLE vec_t<Length, Type> atomic_max(vec_t<Length, Type> *addr, vec_t<Length, Type> value) {
+inline __device__ vec_t<Length, Type> atomic_max(vec_t<Length, Type> *addr, vec_t<Length, Type> value) {
 
     vec_t<Length, Type> ret;
     for (unsigned i = 0; i < Length; ++i) {
@@ -524,7 +515,7 @@ inline CUDA_CALLABLE vec_t<Length, Type> atomic_max(vec_t<Length, Type> *addr, v
 // but you often use it for ray tracing where it does. Not sure if the
 // fabs() incurs a performance hit...
 template<unsigned Length, typename Type>
-CUDA_CALLABLE inline int longest_axis(const vec_t<Length, Type> &v) {
+__device__ inline int longest_axis(const vec_t<Length, Type> &v) {
     Type lmax = abs(v[0]);
     int ret(0);
     for (unsigned i = 1; i < Length; ++i) {
@@ -538,8 +529,26 @@ CUDA_CALLABLE inline int longest_axis(const vec_t<Length, Type> &v) {
 }
 
 template<unsigned Length, typename Type>
-CUDA_CALLABLE inline vec_t<Length, Type> lerp(const vec_t<Length, Type> &a, const vec_t<Length, Type> &b, Type t) {
+__device__ inline vec_t<Length, Type> lerp(const vec_t<Length, Type> &a, const vec_t<Length, Type> &b, Type t) {
     return a * (Type(1) - t) + b * t;
 }
+
+template<typename T>
+__device__ inline T &operator+=(T &a, const T &b) {
+    a = add(a, b);
+    return a;
+}
+
+template<typename T>
+__device__ inline T &operator-=(T &a, const T &b) {
+    a = sub(a, b);
+    return a;
+}
+
+template<typename T>
+__device__ inline T operator+(const T &a, const T &b) { return add(a, b); }
+
+template<typename T>
+__device__ inline T operator-(const T &a, const T &b) { return sub(a, b); }
 
 }// namespace wp

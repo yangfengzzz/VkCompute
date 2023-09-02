@@ -19,20 +19,20 @@ template<unsigned Rows, unsigned Cols, typename Type>
 struct mat_t {
     inline mat_t() = default;
 
-    inline CUDA_CALLABLE mat_t(Type s) {
+    inline __device__ mat_t(Type s) {
         for (unsigned i = 0; i < Rows; ++i)
             for (unsigned j = 0; j < Cols; ++j)
                 data[i][j] = s;
     }
 
     template<typename OtherType>
-    inline explicit CUDA_CALLABLE mat_t(const mat_t<Rows, Cols, OtherType> &other) {
+    inline explicit __device__ mat_t(const mat_t<Rows, Cols, OtherType> &other) {
         for (unsigned i = 0; i < Rows; ++i)
             for (unsigned j = 0; j < Cols; ++j)
                 data[i][j] = other.data[i][j];
     }
 
-    inline CUDA_CALLABLE mat_t(vec_t<2, Type> c0, vec_t<2, Type> c1) {
+    inline __device__ mat_t(vec_t<2, Type> c0, vec_t<2, Type> c1) {
         data[0][0] = c0[0];
         data[1][0] = c0[1];
 
@@ -40,7 +40,7 @@ struct mat_t {
         data[1][1] = c1[1];
     }
 
-    inline CUDA_CALLABLE mat_t(vec_t<3, Type> c0, vec_t<3, Type> c1, vec_t<3, Type> c2) {
+    inline __device__ mat_t(vec_t<3, Type> c0, vec_t<3, Type> c1, vec_t<3, Type> c2) {
         data[0][0] = c0[0];
         data[1][0] = c0[1];
         data[2][0] = c0[2];
@@ -54,7 +54,7 @@ struct mat_t {
         data[2][2] = c2[2];
     }
 
-    inline CUDA_CALLABLE mat_t(vec_t<4, Type> c0, vec_t<4, Type> c1, vec_t<4, Type> c2, vec_t<4, Type> c3) {
+    inline __device__ mat_t(vec_t<4, Type> c0, vec_t<4, Type> c1, vec_t<4, Type> c2, vec_t<4, Type> c3) {
         data[0][0] = c0[0];
         data[1][0] = c0[1];
         data[2][0] = c0[2];
@@ -76,14 +76,14 @@ struct mat_t {
         data[3][3] = c3[3];
     }
 
-    inline CUDA_CALLABLE mat_t(Type m00, Type m01, Type m10, Type m11) {
+    inline __device__ mat_t(Type m00, Type m01, Type m10, Type m11) {
         data[0][0] = m00;
         data[1][0] = m10;
         data[0][1] = m01;
         data[1][1] = m11;
     }
 
-    inline CUDA_CALLABLE mat_t(
+    inline __device__ mat_t(
         Type m00, Type m01, Type m02,
         Type m10, Type m11, Type m12,
         Type m20, Type m21, Type m22) {
@@ -100,7 +100,7 @@ struct mat_t {
         data[2][2] = m22;
     }
 
-    inline CUDA_CALLABLE mat_t(
+    inline __device__ mat_t(
         Type m00, Type m01, Type m02, Type m03,
         Type m10, Type m11, Type m12, Type m13,
         Type m20, Type m21, Type m22, Type m23,
@@ -127,9 +127,9 @@ struct mat_t {
     }
 
     // implemented in quat.h
-    inline CUDA_CALLABLE mat_t(const vec_t<3, Type> &pos, const quat_t<Type> &rot, const vec_t<3, Type> &scale);
+    inline __device__ mat_t(const vec_t<3, Type> &pos, const quat_t<Type> &rot, const vec_t<3, Type> &scale);
 
-    inline CUDA_CALLABLE mat_t(const initializer_array<Rows * Cols, Type> &l) {
+    inline __device__ mat_t(const initializer_array<Rows * Cols, Type> &l) {
         for (unsigned i = 0; i < Rows; ++i) {
             for (unsigned j = 0; j < Cols; ++j) {
                 data[i][j] = l[i * Cols + j];
@@ -137,7 +137,7 @@ struct mat_t {
         }
     }
 
-    inline CUDA_CALLABLE mat_t(const initializer_array<Cols, vec_t<Rows, Type>> &l) {
+    inline __device__ mat_t(const initializer_array<Cols, vec_t<Rows, Type>> &l) {
         for (unsigned j = 0; j < Cols; ++j) {
             for (unsigned i = 0; i < Rows; ++i) {
                 data[i][j] = l[j][i];
@@ -145,15 +145,15 @@ struct mat_t {
         }
     }
 
-    CUDA_CALLABLE vec_t<Cols, Type> get_row(int index) const {
+    __device__ vec_t<Cols, Type> get_row(int index) const {
         return (vec_t<Cols, Type> &)data[index];
     }
 
-    CUDA_CALLABLE void set_row(int index, const vec_t<Cols, Type> &v) {
+    __device__ void set_row(int index, const vec_t<Cols, Type> &v) {
         (vec_t<Cols, Type> &)data[index] = v;
     }
 
-    CUDA_CALLABLE vec_t<Rows, Type> get_col(int index) const {
+    __device__ vec_t<Rows, Type> get_col(int index) const {
         vec_t<Rows, Type> ret;
         for (unsigned i = 0; i < Rows; ++i) {
             ret[i] = data[i][index];
@@ -161,7 +161,7 @@ struct mat_t {
         return ret;
     }
 
-    CUDA_CALLABLE void set_col(int index, const vec_t<Rows, Type> &v) {
+    __device__ void set_col(int index, const vec_t<Rows, Type> &v) {
         for (unsigned i = 0; i < Rows; ++i) {
             data[i][index] = v[i];
         }
@@ -172,7 +172,7 @@ struct mat_t {
 };
 
 template<unsigned Rows, typename Type>
-inline CUDA_CALLABLE mat_t<Rows, Rows, Type> identity() {
+inline __device__ mat_t<Rows, Rows, Type> identity() {
     mat_t<Rows, Rows, Type> m;
     for (unsigned i = 0; i < Rows; ++i) {
         m.data[i][i] = Type(1);
@@ -181,7 +181,7 @@ inline CUDA_CALLABLE mat_t<Rows, Rows, Type> identity() {
 }
 
 template<unsigned Rows, unsigned Cols, typename Type>
-inline CUDA_CALLABLE bool operator==(const mat_t<Rows, Cols, Type> &a, const mat_t<Rows, Cols, Type> &b) {
+inline __device__ bool operator==(const mat_t<Rows, Cols, Type> &a, const mat_t<Rows, Cols, Type> &b) {
     for (unsigned i = 0; i < Rows; ++i)
         for (unsigned j = 0; j < Cols; ++j)
             if (a.data[i][j] != b.data[i][j])
@@ -192,7 +192,7 @@ inline CUDA_CALLABLE bool operator==(const mat_t<Rows, Cols, Type> &a, const mat
 
 // negation:
 template<unsigned Rows, unsigned Cols, typename Type>
-inline CUDA_CALLABLE mat_t<Rows, Cols, Type> operator-(mat_t<Rows, Cols, Type> a) {
+inline __device__ mat_t<Rows, Cols, Type> operator-(mat_t<Rows, Cols, Type> a) {
     // NB: this constructor will initialize all ret's components to 0, which is
     // unnecessary...
     mat_t<Rows, Cols, Type> ret;
@@ -205,17 +205,17 @@ inline CUDA_CALLABLE mat_t<Rows, Cols, Type> operator-(mat_t<Rows, Cols, Type> a
 }
 
 template<unsigned Rows, unsigned Cols, typename Type>
-CUDA_CALLABLE inline mat_t<Rows, Cols, Type> pos(const mat_t<Rows, Cols, Type> &x) {
+__device__ inline mat_t<Rows, Cols, Type> pos(const mat_t<Rows, Cols, Type> &x) {
     return x;
 }
 
 template<unsigned Rows, unsigned Cols, typename Type>
-CUDA_CALLABLE inline mat_t<Rows, Cols, Type> neg(const mat_t<Rows, Cols, Type> &x) {
+__device__ inline mat_t<Rows, Cols, Type> neg(const mat_t<Rows, Cols, Type> &x) {
     return -x;
 }
 
 template<unsigned Rows, unsigned Cols, typename Type>
-inline CUDA_CALLABLE mat_t<Rows, Cols, Type> atomic_add(mat_t<Rows, Cols, Type> *addr, mat_t<Rows, Cols, Type> value) {
+inline __device__ mat_t<Rows, Cols, Type> atomic_add(mat_t<Rows, Cols, Type> *addr, mat_t<Rows, Cols, Type> value) {
     mat_t<Rows, Cols, Type> m;
 
     for (unsigned i = 0; i < Rows; ++i)
@@ -226,7 +226,7 @@ inline CUDA_CALLABLE mat_t<Rows, Cols, Type> atomic_add(mat_t<Rows, Cols, Type> 
 }
 
 template<unsigned Rows, unsigned Cols, typename Type>
-inline CUDA_CALLABLE mat_t<Rows, Cols, Type> atomic_min(mat_t<Rows, Cols, Type> *addr, mat_t<Rows, Cols, Type> value) {
+inline __device__ mat_t<Rows, Cols, Type> atomic_min(mat_t<Rows, Cols, Type> *addr, mat_t<Rows, Cols, Type> value) {
     mat_t<Rows, Cols, Type> m;
 
     for (unsigned i = 0; i < Rows; ++i)
@@ -237,7 +237,7 @@ inline CUDA_CALLABLE mat_t<Rows, Cols, Type> atomic_min(mat_t<Rows, Cols, Type> 
 }
 
 template<unsigned Rows, unsigned Cols, typename Type>
-inline CUDA_CALLABLE mat_t<Rows, Cols, Type> atomic_max(mat_t<Rows, Cols, Type> *addr, mat_t<Rows, Cols, Type> value) {
+inline __device__ mat_t<Rows, Cols, Type> atomic_max(mat_t<Rows, Cols, Type> *addr, mat_t<Rows, Cols, Type> value) {
     mat_t<Rows, Cols, Type> m;
 
     for (unsigned i = 0; i < Rows; ++i)
@@ -248,7 +248,7 @@ inline CUDA_CALLABLE mat_t<Rows, Cols, Type> atomic_max(mat_t<Rows, Cols, Type> 
 }
 
 template<unsigned Rows, unsigned Cols, typename Type>
-inline CUDA_CALLABLE vec_t<Cols, Type> index(const mat_t<Rows, Cols, Type> &m, int row) {
+inline __device__ vec_t<Cols, Type> index(const mat_t<Rows, Cols, Type> &m, int row) {
     vec_t<Cols, Type> ret;
     for (unsigned i = 0; i < Cols; ++i) {
         ret.c[i] = m.data[row][i];
@@ -257,7 +257,7 @@ inline CUDA_CALLABLE vec_t<Cols, Type> index(const mat_t<Rows, Cols, Type> &m, i
 }
 
 template<unsigned Rows, unsigned Cols, typename Type>
-inline CUDA_CALLABLE Type index(const mat_t<Rows, Cols, Type> &m, int row, int col) {
+inline __device__ Type index(const mat_t<Rows, Cols, Type> &m, int row, int col) {
 #ifndef NDEBUG
     if (row < 0 || row >= Rows) {
         printf("mat row index %d out of bounds at %s %d\n", row, __FILE__, __LINE__);
@@ -272,7 +272,7 @@ inline CUDA_CALLABLE Type index(const mat_t<Rows, Cols, Type> &m, int row, int c
 }
 
 template<unsigned Rows, unsigned Cols, typename Type>
-inline CUDA_CALLABLE void indexset(mat_t<Rows, Cols, Type> &m, int row, vec_t<Cols, Type> value) {
+inline __device__ void indexset(mat_t<Rows, Cols, Type> &m, int row, vec_t<Cols, Type> value) {
 #ifndef NDEBUG
     if (row < 0 || row >= Rows) {
         printf("mat row index %d out of bounds at %s %d\n", row, __FILE__, __LINE__);
@@ -285,7 +285,7 @@ inline CUDA_CALLABLE void indexset(mat_t<Rows, Cols, Type> &m, int row, vec_t<Co
 }
 
 template<unsigned Rows, unsigned Cols, typename Type>
-inline CUDA_CALLABLE void indexset(mat_t<Rows, Cols, Type> &m, int row, int col, Type value) {
+inline __device__ void indexset(mat_t<Rows, Cols, Type> &m, int row, int col, Type value) {
 #ifndef NDEBUG
     if (row < 0 || row >= Rows) {
         printf("mat row index %d out of bounds at %s %d\n", row, __FILE__, __LINE__);
@@ -300,7 +300,7 @@ inline CUDA_CALLABLE void indexset(mat_t<Rows, Cols, Type> &m, int row, int col,
 }
 
 template<unsigned Rows, unsigned Cols, typename Type>
-inline bool CUDA_CALLABLE isfinite(const mat_t<Rows, Cols, Type> &m) {
+inline bool __device__ isfinite(const mat_t<Rows, Cols, Type> &m) {
     for (unsigned i = 0; i < Rows; ++i)
         for (unsigned j = 0; j < Cols; ++j)
             if (!isfinite(m.data[i][j]))
@@ -309,7 +309,7 @@ inline bool CUDA_CALLABLE isfinite(const mat_t<Rows, Cols, Type> &m) {
 }
 
 template<unsigned Rows, unsigned Cols, typename Type>
-inline CUDA_CALLABLE mat_t<Rows, Cols, Type> add(const mat_t<Rows, Cols, Type> &a, const mat_t<Rows, Cols, Type> &b) {
+inline __device__ mat_t<Rows, Cols, Type> add(const mat_t<Rows, Cols, Type> &a, const mat_t<Rows, Cols, Type> &b) {
     mat_t<Rows, Cols, Type> t;
     for (unsigned i = 0; i < Rows; ++i) {
         for (unsigned j = 0; j < Cols; ++j) {
@@ -321,7 +321,7 @@ inline CUDA_CALLABLE mat_t<Rows, Cols, Type> add(const mat_t<Rows, Cols, Type> &
 }
 
 template<unsigned Rows, unsigned Cols, typename Type>
-inline CUDA_CALLABLE mat_t<Rows, Cols, Type> sub(const mat_t<Rows, Cols, Type> &a, const mat_t<Rows, Cols, Type> &b) {
+inline __device__ mat_t<Rows, Cols, Type> sub(const mat_t<Rows, Cols, Type> &a, const mat_t<Rows, Cols, Type> &b) {
     mat_t<Rows, Cols, Type> t;
     for (unsigned i = 0; i < Rows; ++i) {
         for (unsigned j = 0; j < Cols; ++j) {
@@ -333,7 +333,7 @@ inline CUDA_CALLABLE mat_t<Rows, Cols, Type> sub(const mat_t<Rows, Cols, Type> &
 }
 
 template<unsigned Rows, unsigned Cols, typename Type>
-inline CUDA_CALLABLE mat_t<Rows, Cols, Type> div(const mat_t<Rows, Cols, Type> &a, Type b) {
+inline __device__ mat_t<Rows, Cols, Type> div(const mat_t<Rows, Cols, Type> &a, Type b) {
     mat_t<Rows, Cols, Type> t;
     for (unsigned i = 0; i < Rows; ++i) {
         for (unsigned j = 0; j < Cols; ++j) {
@@ -345,7 +345,7 @@ inline CUDA_CALLABLE mat_t<Rows, Cols, Type> div(const mat_t<Rows, Cols, Type> &
 }
 
 template<unsigned Rows, unsigned Cols, typename Type>
-inline CUDA_CALLABLE mat_t<Rows, Cols, Type> mul(const mat_t<Rows, Cols, Type> &a, Type b) {
+inline __device__ mat_t<Rows, Cols, Type> mul(const mat_t<Rows, Cols, Type> &a, Type b) {
     mat_t<Rows, Cols, Type> t;
     for (unsigned i = 0; i < Rows; ++i) {
         for (unsigned j = 0; j < Cols; ++j) {
@@ -357,22 +357,22 @@ inline CUDA_CALLABLE mat_t<Rows, Cols, Type> mul(const mat_t<Rows, Cols, Type> &
 }
 
 template<unsigned Rows, unsigned Cols, typename Type>
-inline CUDA_CALLABLE mat_t<Rows, Cols, Type> mul(Type b, const mat_t<Rows, Cols, Type> &a) {
+inline __device__ mat_t<Rows, Cols, Type> mul(Type b, const mat_t<Rows, Cols, Type> &a) {
     return mul(a, b);
 }
 
 template<unsigned Rows, unsigned Cols, typename Type>
-inline CUDA_CALLABLE mat_t<Rows, Cols, Type> operator*(Type b, const mat_t<Rows, Cols, Type> &a) {
+inline __device__ mat_t<Rows, Cols, Type> operator*(Type b, const mat_t<Rows, Cols, Type> &a) {
     return mul(a, b);
 }
 
 template<unsigned Rows, unsigned Cols, typename Type>
-inline CUDA_CALLABLE mat_t<Rows, Cols, Type> operator*(const mat_t<Rows, Cols, Type> &a, Type b) {
+inline __device__ mat_t<Rows, Cols, Type> operator*(const mat_t<Rows, Cols, Type> &a, Type b) {
     return mul(a, b);
 }
 
 template<unsigned Rows, unsigned Cols, typename Type>
-inline CUDA_CALLABLE vec_t<Rows, Type> mul(const mat_t<Rows, Cols, Type> &a, const vec_t<Cols, Type> &b) {
+inline __device__ vec_t<Rows, Type> mul(const mat_t<Rows, Cols, Type> &a, const vec_t<Cols, Type> &b) {
     vec_t<Rows, Type> r = a.get_col(0) * b[0];
     for (unsigned i = 1; i < Cols; ++i) {
         r += a.get_col(i) * b[i];
@@ -381,7 +381,7 @@ inline CUDA_CALLABLE vec_t<Rows, Type> mul(const mat_t<Rows, Cols, Type> &a, con
 }
 
 template<unsigned Rows, unsigned Cols, unsigned ColsOut, typename Type>
-inline CUDA_CALLABLE mat_t<Rows, ColsOut, Type> mul(const mat_t<Rows, Cols, Type> &a, const mat_t<Cols, ColsOut, Type> &b) {
+inline __device__ mat_t<Rows, ColsOut, Type> mul(const mat_t<Rows, Cols, Type> &a, const mat_t<Cols, ColsOut, Type> &b) {
     mat_t<Rows, ColsOut, Type> t(0);
     for (unsigned i = 0; i < Rows; ++i) {
         for (unsigned j = 0; j < ColsOut; ++j) {
@@ -395,7 +395,7 @@ inline CUDA_CALLABLE mat_t<Rows, ColsOut, Type> mul(const mat_t<Rows, Cols, Type
 }
 
 template<unsigned Rows, unsigned Cols, typename Type>
-inline CUDA_CALLABLE Type ddot(const mat_t<Rows, Cols, Type> &a, const mat_t<Rows, Cols, Type> &b) {
+inline __device__ Type ddot(const mat_t<Rows, Cols, Type> &a, const mat_t<Rows, Cols, Type> &b) {
     // double dot product between a and b:
     Type r(0);
     for (unsigned i = 0; i < Rows; ++i) {
@@ -407,13 +407,13 @@ inline CUDA_CALLABLE Type ddot(const mat_t<Rows, Cols, Type> &a, const mat_t<Row
 }
 
 template<unsigned Rows, unsigned Cols, typename Type>
-inline CUDA_CALLABLE Type tensordot(const mat_t<Rows, Cols, Type> &a, const mat_t<Rows, Cols, Type> &b) {
+inline __device__ Type tensordot(const mat_t<Rows, Cols, Type> &a, const mat_t<Rows, Cols, Type> &b) {
     // corresponds to `np.tensordot()` with all axes being contracted
     return ddot(a, b);
 }
 
 template<unsigned Rows, unsigned Cols, typename Type>
-inline CUDA_CALLABLE mat_t<Cols, Rows, Type> transpose(const mat_t<Rows, Cols, Type> &a) {
+inline __device__ mat_t<Cols, Rows, Type> transpose(const mat_t<Rows, Cols, Type> &a) {
     mat_t<Cols, Rows, Type> t;
     for (unsigned i = 0; i < Cols; ++i) {
         for (unsigned j = 0; j < Rows; ++j) {
@@ -426,12 +426,12 @@ inline CUDA_CALLABLE mat_t<Cols, Rows, Type> transpose(const mat_t<Rows, Cols, T
 
 // Only implementing determinants for 2x2, 3x3 and 4x4 matrices for now...
 template<typename Type>
-inline CUDA_CALLABLE Type determinant(const mat_t<2, 2, Type> &m) {
+inline __device__ Type determinant(const mat_t<2, 2, Type> &m) {
     return m.data[0][0] * m.data[1][1] - m.data[1][0] * m.data[0][1];
 }
 
 template<typename Type>
-inline CUDA_CALLABLE Type determinant(const mat_t<3, 3, Type> &m) {
+inline __device__ Type determinant(const mat_t<3, 3, Type> &m) {
     return dot(
         vec_t<3, Type>(m.data[0][0], m.data[0][1], m.data[0][2]),
         cross(
@@ -440,7 +440,7 @@ inline CUDA_CALLABLE Type determinant(const mat_t<3, 3, Type> &m) {
 }
 
 template<typename Type>
-inline CUDA_CALLABLE Type determinant(const mat_t<4, 4, Type> &m) {
+inline __device__ Type determinant(const mat_t<4, 4, Type> &m) {
     // adapted from USD GfMatrix4f::Inverse()
     Type x00, x01, x02, x03;
     Type x10, x11, x12, x13;
@@ -497,7 +497,7 @@ inline CUDA_CALLABLE Type determinant(const mat_t<4, 4, Type> &m) {
 }
 
 template<unsigned Rows, typename Type>
-inline CUDA_CALLABLE Type trace(const mat_t<Rows, Rows, Type> &m) {
+inline __device__ Type trace(const mat_t<Rows, Rows, Type> &m) {
     Type ret = m.data[0][0];
     for (unsigned i = 1; i < Rows; ++i) {
         ret += m.data[i][i];
@@ -506,7 +506,7 @@ inline CUDA_CALLABLE Type trace(const mat_t<Rows, Rows, Type> &m) {
 }
 
 template<unsigned Rows, typename Type>
-inline CUDA_CALLABLE vec_t<Rows, Type> get_diag(const mat_t<Rows, Rows, Type> &m) {
+inline __device__ vec_t<Rows, Type> get_diag(const mat_t<Rows, Rows, Type> &m) {
     vec_t<Rows, Type> ret;
     for (unsigned i = 0; i < Rows; ++i) {
         ret[i] = m.data[i][i];
@@ -516,7 +516,7 @@ inline CUDA_CALLABLE vec_t<Rows, Type> get_diag(const mat_t<Rows, Rows, Type> &m
 
 // Only implementing inverses for 2x2, 3x3 and 4x4 matrices for now...
 template<typename Type>
-inline CUDA_CALLABLE mat_t<2, 2, Type> inverse(const mat_t<2, 2, Type> &m) {
+inline __device__ mat_t<2, 2, Type> inverse(const mat_t<2, 2, Type> &m) {
     Type det = determinant(m);
     if (det > Type(kEps) || det < -Type(kEps)) {
         return mat_t<2, 2, Type>(m.data[1][1], -m.data[0][1],
@@ -528,7 +528,7 @@ inline CUDA_CALLABLE mat_t<2, 2, Type> inverse(const mat_t<2, 2, Type> &m) {
 }
 
 template<typename Type>
-inline CUDA_CALLABLE mat_t<3, 3, Type> inverse(const mat_t<3, 3, Type> &m) {
+inline __device__ mat_t<3, 3, Type> inverse(const mat_t<3, 3, Type> &m) {
     Type det = determinant(m);
 
     if (det != Type(0.0f)) {
@@ -553,7 +553,7 @@ inline CUDA_CALLABLE mat_t<3, 3, Type> inverse(const mat_t<3, 3, Type> &m) {
 }
 
 template<typename Type>
-inline CUDA_CALLABLE mat_t<4, 4, Type> inverse(const mat_t<4, 4, Type> &m) {
+inline __device__ mat_t<4, 4, Type> inverse(const mat_t<4, 4, Type> &m) {
     // adapted from USD GfMatrix4f::Inverse()
     Type x00, x01, x02, x03;
     Type x10, x11, x12, x13;
@@ -653,7 +653,7 @@ inline CUDA_CALLABLE mat_t<4, 4, Type> inverse(const mat_t<4, 4, Type> &m) {
 }
 
 template<unsigned Rows, typename Type>
-inline CUDA_CALLABLE mat_t<Rows, Rows, Type> diag(const vec_t<Rows, Type> &d) {
+inline __device__ mat_t<Rows, Rows, Type> diag(const vec_t<Rows, Type> &d) {
     mat_t<Rows, Rows, Type> ret(Type(0));
     for (unsigned i = 0; i < Rows; ++i) {
         ret.data[i][i] = d[i];
@@ -662,7 +662,7 @@ inline CUDA_CALLABLE mat_t<Rows, Rows, Type> diag(const vec_t<Rows, Type> &d) {
 }
 
 template<unsigned Rows, unsigned Cols, typename Type>
-inline CUDA_CALLABLE mat_t<Rows, Cols, Type> outer(const vec_t<Rows, Type> &a, const vec_t<Cols, Type> &b) {
+inline __device__ mat_t<Rows, Cols, Type> outer(const vec_t<Rows, Type> &a, const vec_t<Cols, Type> &b) {
     // col 0 = a * b[0] etc...
     mat_t<Rows, Cols, Type> ret;
     for (unsigned row = 0; row < Rows; ++row) {
@@ -675,7 +675,7 @@ inline CUDA_CALLABLE mat_t<Rows, Cols, Type> outer(const vec_t<Rows, Type> &a, c
 }
 
 template<typename Type>
-inline CUDA_CALLABLE mat_t<3, 3, Type> skew(const vec_t<3, Type> &a) {
+inline __device__ mat_t<3, 3, Type> skew(const vec_t<3, Type> &a) {
     mat_t<3, 3, Type> out(
         Type(0), -a[2], a[1],
         a[2], Type(0), -a[0],
@@ -685,7 +685,7 @@ inline CUDA_CALLABLE mat_t<3, 3, Type> skew(const vec_t<3, Type> &a) {
 }
 
 template<unsigned Rows, unsigned Cols, typename Type>
-inline CUDA_CALLABLE mat_t<Rows, Cols, Type> cw_mul(const mat_t<Rows, Cols, Type> &a, const mat_t<Rows, Cols, Type> &b) {
+inline __device__ mat_t<Rows, Cols, Type> cw_mul(const mat_t<Rows, Cols, Type> &a, const mat_t<Rows, Cols, Type> &b) {
     mat_t<Rows, Cols, Type> t;
     for (unsigned i = 0; i < Rows; ++i) {
         for (unsigned j = 0; j < Cols; ++j) {
@@ -697,7 +697,7 @@ inline CUDA_CALLABLE mat_t<Rows, Cols, Type> cw_mul(const mat_t<Rows, Cols, Type
 }
 
 template<unsigned Rows, unsigned Cols, typename Type>
-inline CUDA_CALLABLE mat_t<Rows, Cols, Type> cw_div(const mat_t<Rows, Cols, Type> &a, const mat_t<Rows, Cols, Type> &b) {
+inline __device__ mat_t<Rows, Cols, Type> cw_div(const mat_t<Rows, Cols, Type> &a, const mat_t<Rows, Cols, Type> &b) {
     mat_t<Rows, Cols, Type> t;
     for (unsigned i = 0; i < Rows; ++i) {
         for (unsigned j = 0; j < Cols; ++j) {
@@ -709,19 +709,19 @@ inline CUDA_CALLABLE mat_t<Rows, Cols, Type> cw_div(const mat_t<Rows, Cols, Type
 }
 
 template<typename Type>
-inline CUDA_CALLABLE vec_t<3, Type> transform_point(const mat_t<4, 4, Type> &m, const vec_t<3, Type> &v) {
+inline __device__ vec_t<3, Type> transform_point(const mat_t<4, 4, Type> &m, const vec_t<3, Type> &v) {
     vec_t<4, Type> out = mul(m, vec_t<4, Type>(v[0], v[1], v[2], Type(1)));
     return vec_t<3, Type>(out[0], out[1], out[2]);
 }
 
 template<typename Type>
-inline CUDA_CALLABLE vec_t<3, Type> transform_vector(const mat_t<4, 4, Type> &m, const vec_t<3, Type> &v) {
+inline __device__ vec_t<3, Type> transform_vector(const mat_t<4, 4, Type> &m, const vec_t<3, Type> &v) {
     vec_t<4, Type> out = mul(m, vec_t<4, Type>(v[0], v[1], v[2], 0.f));
     return vec_t<3, Type>(out[0], out[1], out[2]);
 }
 
 template<unsigned Rows, unsigned Cols, typename Type>
-CUDA_CALLABLE inline mat_t<Rows, Cols, Type> lerp(const mat_t<Rows, Cols, Type> &a, const mat_t<Rows, Cols, Type> &b, Type t) {
+__device__ inline mat_t<Rows, Cols, Type> lerp(const mat_t<Rows, Cols, Type> &a, const mat_t<Rows, Cols, Type> &b, Type t) {
     return a * (Type(1) - t) + b * t;
 }
 

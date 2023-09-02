@@ -13,12 +13,12 @@
 
 namespace wp {
 
-CUDA_CALLABLE inline int dense_index(int stride, int i, int j) {
+__device__ inline int dense_index(int stride, int i, int j) {
     return i * stride + j;
 }
 
 template<bool transpose>
-CUDA_CALLABLE inline int dense_index(int rows, int cols, int i, int j) {
+__device__ inline int dense_index(int rows, int cols, int i, int j) {
     if (transpose)
         return j * rows + i;
     else
@@ -26,7 +26,7 @@ CUDA_CALLABLE inline int dense_index(int rows, int cols, int i, int j) {
 }
 
 template<bool t1, bool t2, bool add>
-CUDA_CALLABLE inline void dense_gemm_impl(int m, int n, int p, const float *__restrict__ A, const float *__restrict__ B, float *__restrict__ C) {
+__device__ inline void dense_gemm_impl(int m, int n, int p, const float *__restrict__ A, const float *__restrict__ B, float *__restrict__ C) {
     for (int i = 0; i < m; i++) {
         for (int j = 0; j < n; ++j) {
             float sum = 0.0f;
@@ -44,7 +44,7 @@ CUDA_CALLABLE inline void dense_gemm_impl(int m, int n, int p, const float *__re
 }
 
 template<bool add = false>
-CUDA_CALLABLE inline void dense_gemm(int m, int n, int p, int t1, int t2, const array_t<float> &A, const array_t<float> &B, array_t<float> &C) {
+__device__ inline void dense_gemm(int m, int n, int p, int t1, int t2, const array_t<float> &A, const array_t<float> &B, array_t<float> &C) {
     if (t1 == 0 && t2 == 0)
         dense_gemm_impl<false, false, add>(m, n, p, A.data, B.data, C.data);
     else if (t1 == 1 && t2 == 0)
@@ -55,7 +55,7 @@ CUDA_CALLABLE inline void dense_gemm(int m, int n, int p, int t1, int t2, const 
         dense_gemm_impl<true, true, add>(m, n, p, A.data, B.data, C.data);
 }
 
-void CUDA_CALLABLE inline dense_chol(int n, const array_t<float> &A, float regularization, array_t<float> &L) {
+void __device__ inline dense_chol(int n, const array_t<float> &A, float regularization, array_t<float> &L) {
     for (int j = 0; j < n; ++j) {
         float s = A.data[dense_index(n, j, j)] + regularization;
 
@@ -82,7 +82,7 @@ void CUDA_CALLABLE inline dense_chol(int n, const array_t<float> &A, float regul
 }
 
 // Solves (L*L^T)x = b given the Cholesky factor L
-CUDA_CALLABLE inline void dense_subs(int n, const array_t<float> &L, const array_t<float> &b, array_t<float> &x) {
+__device__ inline void dense_subs(int n, const array_t<float> &L, const array_t<float> &b, array_t<float> &x) {
     // forward substitution
     for (int i = 0; i < n; ++i) {
         float s = b.data[i];
@@ -106,12 +106,12 @@ CUDA_CALLABLE inline void dense_subs(int n, const array_t<float> &L, const array
     }
 }
 
-CUDA_CALLABLE inline void dense_solve(int n, const array_t<float> &A, const array_t<float> &L, const array_t<float> &b, array_t<float> &x) {
+__device__ inline void dense_solve(int n, const array_t<float> &A, const array_t<float> &L, const array_t<float> &b, array_t<float> &x) {
     dense_subs(n, L, b, x);
 }
 
 template<typename F>
-CUDA_CALLABLE inline void mlp(const array_t<float> &weights, const array_t<float> &bias, F activation, int index, const array_t<float> &x, array_t<float> &out) {
+__device__ inline void mlp(const array_t<float> &weights, const array_t<float> &bias, F activation, int index, const array_t<float> &x, array_t<float> &out) {
     const int m = weights.shape[0];
     const int n = weights.shape[1];
     const int b = x.shape[1];

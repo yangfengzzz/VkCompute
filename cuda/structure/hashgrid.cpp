@@ -46,7 +46,7 @@ void hash_grid_rebuild_device(const HashGrid &grid, const wp::vec3 *points, int 
 
 // host methods
 uint64_t hash_grid_create_host(int dim_x, int dim_y, int dim_z) {
-    HashGrid *grid = new HashGrid();
+    auto *grid = new HashGrid();
     memset(grid, 0, sizeof(HashGrid));
 
     grid->dim_x = dim_x;
@@ -60,9 +60,7 @@ uint64_t hash_grid_create_host(int dim_x, int dim_y, int dim_z) {
     return (uint64_t)(grid);
 }
 
-void hash_grid_destroy_host(uint64_t id) {
-    HashGrid *grid = (HashGrid *)(id);
-
+void hash_grid_destroy_host(HashGrid *grid) {
     free_host(grid->point_ids);
     free_host(grid->point_cells);
     free_host(grid->cell_starts);
@@ -71,9 +69,7 @@ void hash_grid_destroy_host(uint64_t id) {
     delete grid;
 }
 
-void hash_grid_reserve_host(uint64_t id, int num_points) {
-    HashGrid *grid = (HashGrid *)(id);
-
+void hash_grid_reserve_host(HashGrid *grid, int num_points) {
     if (num_points > grid->max_points) {
         free_host(grid->point_cells);
         free_host(grid->point_ids);
@@ -88,10 +84,8 @@ void hash_grid_reserve_host(uint64_t id, int num_points) {
     grid->num_points = num_points;
 }
 
-void hash_grid_update_host(uint64_t id, float cell_width, const wp::vec3 *points, int num_points) {
-    HashGrid *grid = (HashGrid *)(id);
-
-    hash_grid_reserve_host(id, num_points);
+void hash_grid_update_host(HashGrid *grid, float cell_width, const wp::vec3 *points, int num_points) {
+    hash_grid_reserve_host(grid, num_points);
 
     grid->cell_width = cell_width;
     grid->cell_width_inv = 1.0f / cell_width;

@@ -42,7 +42,7 @@ public:
     float max_p_dist_sq;
 };
 
-CUDA_CALLABLE inline void compute_integrals(
+__device__ inline void compute_integrals(
     const vec3 &a,
     const vec3 &b,
     const vec3 &c,
@@ -107,13 +107,13 @@ CUDA_CALLABLE inline void compute_integrals(
     }
 };
 
-CUDA_CALLABLE inline void my_swap(int &a, int &b) {
+__device__ inline void my_swap(int &a, int &b) {
     int c = a;
     a = b;
     b = c;
 }
 
-CUDA_CALLABLE inline void precompute_triangle_solid_angle_props(const vec3 &a, const vec3 &b, const vec3 &c, SolidAngleProps &my_data) {
+__device__ inline void precompute_triangle_solid_angle_props(const vec3 &a, const vec3 &b, const vec3 &c, SolidAngleProps &my_data) {
     const vec3 ab = b - a;
     const vec3 ac = c - a;
 
@@ -231,7 +231,7 @@ CUDA_CALLABLE inline void precompute_triangle_solid_angle_props(const vec3 &a, c
     my_data.two_n_zzy_n_yzz = 2.0f * Nzzy + n[1] * integral_zz;
 }
 
-CUDA_CALLABLE inline void combine_precomputed_solid_angle_props(SolidAngleProps &my_data, const SolidAngleProps *left_child_data, const SolidAngleProps *right_child_data) {
+__device__ inline void combine_precomputed_solid_angle_props(SolidAngleProps &my_data, const SolidAngleProps *left_child_data, const SolidAngleProps *right_child_data) {
     vec3 N = left_child_data->normal;
     vec3 areaP = left_child_data->area_P;
     float area = left_child_data->area;
@@ -332,7 +332,7 @@ CUDA_CALLABLE inline void combine_precomputed_solid_angle_props(SolidAngleProps 
 }
 
 // Return whether need to
-CUDA_CALLABLE inline bool evaluate_node_solid_angle(const vec3 &query_point, SolidAngleProps *current_data, float &solid_angle, const float accuracy_scale_sq) {
+__device__ inline bool evaluate_node_solid_angle(const vec3 &query_point, SolidAngleProps *current_data, float &solid_angle, const float accuracy_scale_sq) {
     SolidAngleProps &data = *current_data;
     float max_p_sq = data.max_p_dist_sq;
     vec3 q = query_point - data.average_p;
@@ -380,7 +380,7 @@ CUDA_CALLABLE inline bool evaluate_node_solid_angle(const vec3 &query_point, Sol
     return false;
 }
 
-CUDA_CALLABLE inline float robust_solid_angle(
+__device__ inline float robust_solid_angle(
     const vec3 &a,
     const vec3 &b,
     const vec3 &c,

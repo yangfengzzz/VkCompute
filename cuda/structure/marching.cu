@@ -382,17 +382,13 @@ uint64_t marching_cubes_create_device(void *context) {
     return (uint64_t)(mc);
 }
 
-void marching_cubes_destroy_device(uint64_t id) {
-    if (!id)
-        return;
-
-    wp::MarchingCubes *mc = (wp::MarchingCubes *)(id);
+void marching_cubes_destroy_device(wp::MarchingCubes *mc) {
     wp::marching_cubes_free(*mc);
     delete mc;
 }
 
 WP_API int marching_cubes_surface_device(
-    uint64_t id,
+    wp::MarchingCubes &mc,
     const float *field,
     int nx,
     int ny,
@@ -404,14 +400,8 @@ WP_API int marching_cubes_surface_device(
     int max_tris,
     int *out_num_verts,
     int *out_num_tris) {
-
-    if (!id)
-        return -1;
-
     if (!field)
         return -1;
-
-    wp::MarchingCubes &mc = *(wp::MarchingCubes *)(id);
 
     ContextGuard guard(mc.context);
 

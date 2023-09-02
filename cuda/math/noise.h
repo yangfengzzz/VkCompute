@@ -15,41 +15,41 @@
 
 namespace wp {
 
-inline CUDA_CALLABLE float smootherstep(float t) {
+inline __device__ float smootherstep(float t) {
     return t * t * t * (t * (t * 6.f - 15.f) + 10.f);
 }
 
-inline CUDA_CALLABLE float smootherstep_gradient(float t) {
+inline __device__ float smootherstep_gradient(float t) {
     return 30.f * t * t * (t * (t - 2.f) + 1.f);
 }
 
-inline CUDA_CALLABLE float smoothstep(float t) {
+inline __device__ float smoothstep(float t) {
     return t * t * (3.0 - t * 2.0);
 }
 
-inline CUDA_CALLABLE float smoothstep_gradient(float t) {
+inline __device__ float smoothstep_gradient(float t) {
     return 6.f * t * (1.f - t);
 }
 
-inline CUDA_CALLABLE float interpolate(float a0, float a1, float t) {
+inline __device__ float interpolate(float a0, float a1, float t) {
     return (a1 - a0) * smootherstep(t) + a0;
     // return (a1 - a0) * smoothstep(t) + a0;
     // return (a1 - a0) * t + a0;
 }
 
-inline CUDA_CALLABLE float interpolate_gradient(float a0, float a1, float t, float d_a0, float d_a1, float d_t) {
+inline __device__ float interpolate_gradient(float a0, float a1, float t, float d_a0, float d_a1, float d_t) {
     return (d_a1 - d_a0) * smootherstep(t) + (a1 - a0) * smootherstep_gradient(t) * d_t + d_a0;
     // return (d_a1 - d_a0) * smoothstep(t) + (a1 - a0) * smoothstep_gradient(t) * d_t + d_a0;
     // return (d_a1 - d_a0) * t + (a1 - a0) * d_t + d_a0;
 }
 
-inline CUDA_CALLABLE float random_gradient_1d(uint32 state, int ix) {
+inline __device__ float random_gradient_1d(uint32 state, int ix) {
     const uint32_t p1 = 73856093;
     uint32 idx = ix * p1 + state;
     return randf(idx, -1.f, 1.f);
 }
 
-inline CUDA_CALLABLE vec2 random_gradient_2d(uint32 state, int ix, int iy) {
+inline __device__ vec2 random_gradient_2d(uint32 state, int ix, int iy) {
     const uint32_t p1 = 73856093;
     const uint32_t p2 = 19349663;
     uint32 idx = ix * p1 ^ iy * p2 + state;
@@ -59,7 +59,7 @@ inline CUDA_CALLABLE vec2 random_gradient_2d(uint32 state, int ix, int iy) {
     return vec2(x, y);
 }
 
-inline CUDA_CALLABLE vec3 random_gradient_3d(uint32 state, int ix, int iy, int iz) {
+inline __device__ vec3 random_gradient_3d(uint32 state, int ix, int iy, int iz) {
     const uint32 p1 = 73856093;
     const uint32 p2 = 19349663;
     const uint32 p3 = 53471161;
@@ -72,7 +72,7 @@ inline CUDA_CALLABLE vec3 random_gradient_3d(uint32 state, int ix, int iy, int i
     return normalize(vec3(x, y, z));
 }
 
-inline CUDA_CALLABLE vec4 random_gradient_4d(uint32 state, int ix, int iy, int iz, int it) {
+inline __device__ vec4 random_gradient_4d(uint32 state, int ix, int iy, int iz, int it) {
     const uint32 p1 = 73856093;
     const uint32 p2 = 19349663;
     const uint32 p3 = 53471161;
@@ -87,47 +87,47 @@ inline CUDA_CALLABLE vec4 random_gradient_4d(uint32 state, int ix, int iy, int i
     return normalize(vec4(x, y, z, t));
 }
 
-inline CUDA_CALLABLE float dot_grid_gradient_1d(uint32 state, int ix, float dx) {
+inline __device__ float dot_grid_gradient_1d(uint32 state, int ix, float dx) {
     float gradient = random_gradient_1d(state, ix);
     return dx * gradient;
 }
 
-inline CUDA_CALLABLE float dot_grid_gradient_1d_gradient(uint32 state, int ix, float d_dx) {
+inline __device__ float dot_grid_gradient_1d_gradient(uint32 state, int ix, float d_dx) {
     float gradient = random_gradient_1d(state, ix);
     return d_dx * gradient;
 }
 
-inline CUDA_CALLABLE float dot_grid_gradient_2d(uint32 state, int ix, int iy, float dx, float dy) {
+inline __device__ float dot_grid_gradient_2d(uint32 state, int ix, int iy, float dx, float dy) {
     vec2 gradient = random_gradient_2d(state, ix, iy);
     return (dx * gradient[0] + dy * gradient[1]);
 }
 
-inline CUDA_CALLABLE float dot_grid_gradient_2d_gradient(uint32 state, int ix, int iy, float d_dx, float d_dy) {
+inline __device__ float dot_grid_gradient_2d_gradient(uint32 state, int ix, int iy, float d_dx, float d_dy) {
     vec2 gradient = random_gradient_2d(state, ix, iy);
     return (d_dx * gradient[0] + d_dy * gradient[1]);
 }
 
-inline CUDA_CALLABLE float dot_grid_gradient_3d(uint32 state, int ix, int iy, int iz, float dx, float dy, float dz) {
+inline __device__ float dot_grid_gradient_3d(uint32 state, int ix, int iy, int iz, float dx, float dy, float dz) {
     vec3 gradient = random_gradient_3d(state, ix, iy, iz);
     return (dx * gradient[0] + dy * gradient[1] + dz * gradient[2]);
 }
 
-inline CUDA_CALLABLE float dot_grid_gradient_3d_gradient(uint32 state, int ix, int iy, int iz, float d_dx, float d_dy, float d_dz) {
+inline __device__ float dot_grid_gradient_3d_gradient(uint32 state, int ix, int iy, int iz, float d_dx, float d_dy, float d_dz) {
     vec3 gradient = random_gradient_3d(state, ix, iy, iz);
     return (d_dx * gradient[0] + d_dy * gradient[1] + d_dz * gradient[2]);
 }
 
-inline CUDA_CALLABLE float dot_grid_gradient_4d(uint32 state, int ix, int iy, int iz, int it, float dx, float dy, float dz, float dt) {
+inline __device__ float dot_grid_gradient_4d(uint32 state, int ix, int iy, int iz, int it, float dx, float dy, float dz, float dt) {
     vec4 gradient = random_gradient_4d(state, ix, iy, iz, it);
     return (dx * gradient[0] + dy * gradient[1] + dz * gradient[2] + dt * gradient[3]);
 }
 
-inline CUDA_CALLABLE float dot_grid_gradient_4d_gradient(uint32 state, int ix, int iy, int iz, int it, float d_dx, float d_dy, float d_dz, float d_dt) {
+inline __device__ float dot_grid_gradient_4d_gradient(uint32 state, int ix, int iy, int iz, int it, float d_dx, float d_dy, float d_dz, float d_dt) {
     vec4 gradient = random_gradient_4d(state, ix, iy, iz, it);
     return (d_dx * gradient[0] + d_dy * gradient[1] + d_dz * gradient[2] + d_dt * gradient[3]);
 }
 
-inline CUDA_CALLABLE float noise_1d(uint32 state, int x0, int x1, float dx) {
+inline __device__ float noise_1d(uint32 state, int x0, int x1, float dx) {
     //vX
     float v0 = dot_grid_gradient_1d(state, x0, dx);
     float v1 = dot_grid_gradient_1d(state, x1, dx - 1.f);
@@ -135,7 +135,7 @@ inline CUDA_CALLABLE float noise_1d(uint32 state, int x0, int x1, float dx) {
     return interpolate(v0, v1, dx);
 }
 
-inline CUDA_CALLABLE float noise_1d_gradient(uint32 state, int x0, int x1, float dx) {
+inline __device__ float noise_1d_gradient(uint32 state, int x0, int x1, float dx) {
     float v0 = dot_grid_gradient_1d(state, x0, dx);
     float d_v0_dx = dot_grid_gradient_1d_gradient(state, x0, 1.f);
 
@@ -145,7 +145,7 @@ inline CUDA_CALLABLE float noise_1d_gradient(uint32 state, int x0, int x1, float
     return interpolate_gradient(v0, v1, dx, d_v0_dx, d_v1_dx, 1.f);
 }
 
-inline CUDA_CALLABLE float noise_2d(uint32 state, int x0, int y0, int x1, int y1, float dx, float dy) {
+inline __device__ float noise_2d(uint32 state, int x0, int y0, int x1, int y1, float dx, float dy) {
     //vXY
     float v00 = dot_grid_gradient_2d(state, x0, y0, dx, dy);
     float v10 = dot_grid_gradient_2d(state, x1, y0, dx - 1.f, dy);
@@ -158,7 +158,7 @@ inline CUDA_CALLABLE float noise_2d(uint32 state, int x0, int y0, int x1, int y1
     return interpolate(xi0, xi1, dy);
 }
 
-inline CUDA_CALLABLE vec2 noise_2d_gradient(uint32 state, int x0, int y0, int x1, int y1, float dx, float dy) {
+inline __device__ vec2 noise_2d_gradient(uint32 state, int x0, int y0, int x1, int y1, float dx, float dy) {
     float v00 = dot_grid_gradient_2d(state, x0, y0, dx, dy);
     float d_v00_dx = dot_grid_gradient_2d_gradient(state, x0, y0, 1.f, 0.f);
     float d_v00_dy = dot_grid_gradient_2d_gradient(state, x0, y0, 0.0, 1.f);
@@ -189,7 +189,7 @@ inline CUDA_CALLABLE vec2 noise_2d_gradient(uint32 state, int x0, int y0, int x1
     return vec2(gradient_x, gradient_y);
 }
 
-inline CUDA_CALLABLE float noise_3d(uint32 state, int x0, int y0, int z0, int x1, int y1, int z1, float dx, float dy, float dz) {
+inline __device__ float noise_3d(uint32 state, int x0, int y0, int z0, int x1, int y1, int z1, float dx, float dy, float dz) {
     //vXYZ
     float v000 = dot_grid_gradient_3d(state, x0, y0, z0, dx, dy, dz);
     float v100 = dot_grid_gradient_3d(state, x1, y0, z0, dx - 1.f, dy, dz);
@@ -214,7 +214,7 @@ inline CUDA_CALLABLE float noise_3d(uint32 state, int x0, int y0, int z0, int x1
     return interpolate(yi0, yi1, dz);
 }
 
-inline CUDA_CALLABLE vec3 noise_3d_gradient(uint32 state, int x0, int y0, int z0, int x1, int y1, int z1, float dx, float dy, float dz) {
+inline __device__ vec3 noise_3d_gradient(uint32 state, int x0, int y0, int z0, int x1, int y1, int z1, float dx, float dy, float dz) {
     float v000 = dot_grid_gradient_3d(state, x0, y0, z0, dx, dy, dz);
     float d_v000_dx = dot_grid_gradient_3d_gradient(state, x0, y0, z0, 1.f, 0.f, 0.f);
     float d_v000_dy = dot_grid_gradient_3d_gradient(state, x0, y0, z0, 0.f, 1.f, 0.f);
@@ -292,7 +292,7 @@ inline CUDA_CALLABLE vec3 noise_3d_gradient(uint32 state, int x0, int y0, int z0
     return vec3(gradient_x, gradient_y, gradient_z);
 }
 
-inline CUDA_CALLABLE float noise_4d(uint32 state, int x0, int y0, int z0, int t0, int x1, int y1, int z1, int t1, float dx, float dy, float dz, float dt) {
+inline __device__ float noise_4d(uint32 state, int x0, int y0, int z0, int t0, int x1, int y1, int z1, int t1, float dx, float dy, float dz, float dt) {
     //vXYZT
     float v0000 = dot_grid_gradient_4d(state, x0, y0, z0, t0, dx, dy, dz, dt);
     float v1000 = dot_grid_gradient_4d(state, x1, y0, z0, t0, dx - 1.f, dy, dz, dt);
@@ -341,7 +341,7 @@ inline CUDA_CALLABLE float noise_4d(uint32 state, int x0, int y0, int z0, int t0
     return interpolate(zi0, zi1, dt);
 }
 
-inline CUDA_CALLABLE vec4 noise_4d_gradient(uint32 state, int x0, int y0, int z0, int t0, int x1, int y1, int z1, int t1, float dx, float dy, float dz, float dt) {
+inline __device__ vec4 noise_4d_gradient(uint32 state, int x0, int y0, int z0, int t0, int x1, int y1, int z1, int t1, float dx, float dy, float dz, float dt) {
     float v0000 = dot_grid_gradient_4d(state, x0, y0, z0, t0, dx, dy, dz, dt);
     float d_v0000_dx = dot_grid_gradient_4d_gradient(state, x0, y0, z0, t0, 1.f, 0.f, 0.f, 0.f);
     float d_v0000_dy = dot_grid_gradient_4d_gradient(state, x0, y0, z0, t0, 0.f, 1.f, 0.f, 0.f);
@@ -532,7 +532,7 @@ inline CUDA_CALLABLE vec4 noise_4d_gradient(uint32 state, int x0, int y0, int z0
 
 // non-periodic Perlin noise
 
-inline CUDA_CALLABLE float noise(uint32 state, float x) {
+inline __device__ float noise(uint32 state, float x) {
     float dx = x - floor(x);
 
     int x0 = (int)floor(x);
@@ -541,7 +541,7 @@ inline CUDA_CALLABLE float noise(uint32 state, float x) {
     return noise_1d(state, x0, x1, dx);
 }
 
-inline CUDA_CALLABLE float noise(uint32 state, const vec2 &xy) {
+inline __device__ float noise(uint32 state, const vec2 &xy) {
     float dx = xy[0] - floor(xy[0]);
     float dy = xy[1] - floor(xy[1]);
 
@@ -554,7 +554,7 @@ inline CUDA_CALLABLE float noise(uint32 state, const vec2 &xy) {
     return noise_2d(state, x0, y0, x1, y1, dx, dy);
 }
 
-inline CUDA_CALLABLE float noise(uint32 state, const vec3 &xyz) {
+inline __device__ float noise(uint32 state, const vec3 &xyz) {
     float dx = xyz[0] - floor(xyz[0]);
     float dy = xyz[1] - floor(xyz[1]);
     float dz = xyz[2] - floor(xyz[2]);
@@ -570,7 +570,7 @@ inline CUDA_CALLABLE float noise(uint32 state, const vec3 &xyz) {
     return noise_3d(state, x0, y0, z0, x1, y1, z1, dx, dy, dz);
 }
 
-inline CUDA_CALLABLE float noise(uint32 state, const vec4 &xyzt) {
+inline __device__ float noise(uint32 state, const vec4 &xyzt) {
     float dx = xyzt[0] - floor(xyzt[0]);
     float dy = xyzt[1] - floor(xyzt[1]);
     float dz = xyzt[2] - floor(xyzt[2]);
@@ -591,7 +591,7 @@ inline CUDA_CALLABLE float noise(uint32 state, const vec4 &xyzt) {
 
 // periodic Perlin noise
 
-inline CUDA_CALLABLE float pnoise(uint32 state, float x, int px) {
+inline __device__ float pnoise(uint32 state, float x, int px) {
     float dx = x - floor(x);
 
     int x0 = mod(((int)floor(x)), px);
@@ -601,7 +601,7 @@ inline CUDA_CALLABLE float pnoise(uint32 state, float x, int px) {
 }
 
 
-inline CUDA_CALLABLE float pnoise(uint32 state, const vec2 &xy, int px, int py) {
+inline __device__ float pnoise(uint32 state, const vec2 &xy, int px, int py) {
     float dx = xy[0] - floor(xy[0]);
     float dy = xy[1] - floor(xy[1]);
 
@@ -614,7 +614,7 @@ inline CUDA_CALLABLE float pnoise(uint32 state, const vec2 &xy, int px, int py) 
     return noise_2d(state, x0, y0, x1, y1, dx, dy);
 }
 
-inline CUDA_CALLABLE float pnoise(uint32 state, const vec3 &xyz, int px, int py, int pz) {
+inline __device__ float pnoise(uint32 state, const vec3 &xyz, int px, int py, int pz) {
     float dx = xyz[0] - floor(xyz[0]);
     float dy = xyz[1] - floor(xyz[1]);
     float dz = xyz[2] - floor(xyz[2]);
@@ -630,7 +630,7 @@ inline CUDA_CALLABLE float pnoise(uint32 state, const vec3 &xyz, int px, int py,
     return noise_3d(state, x0, y0, z0, x1, y1, z1, dx, dy, dz);
 }
 
-inline CUDA_CALLABLE float pnoise(uint32 state, const vec4 &xyzt, int px, int py, int pz, int pt) {
+inline __device__ float pnoise(uint32 state, const vec4 &xyzt, int px, int py, int pz, int pt) {
     float dx = xyzt[0] - floor(xyzt[0]);
     float dy = xyzt[1] - floor(xyzt[1]);
     float dz = xyzt[2] - floor(xyzt[2]);
@@ -651,7 +651,7 @@ inline CUDA_CALLABLE float pnoise(uint32 state, const vec4 &xyzt, int px, int py
 
 // curl noise
 
-inline CUDA_CALLABLE vec2 curlnoise(uint32 state, const vec2 &xy) {
+inline __device__ vec2 curlnoise(uint32 state, const vec2 &xy) {
     float dx = xy[0] - floor(xy[0]);
     float dy = xy[1] - floor(xy[1]);
 
@@ -665,7 +665,7 @@ inline CUDA_CALLABLE vec2 curlnoise(uint32 state, const vec2 &xy) {
     return vec2(-grad_field[1], grad_field[0]);
 }
 
-inline CUDA_CALLABLE vec3 curlnoise(uint32 state, const vec3 &xyz) {
+inline __device__ vec3 curlnoise(uint32 state, const vec3 &xyz) {
     float dx = xyz[0] - floor(xyz[0]);
     float dy = xyz[1] - floor(xyz[1]);
     float dz = xyz[2] - floor(xyz[2]);
@@ -690,7 +690,7 @@ inline CUDA_CALLABLE vec3 curlnoise(uint32 state, const vec3 &xyz) {
         grad_field_2[0] - grad_field_1[1]);
 }
 
-inline CUDA_CALLABLE vec3 curlnoise(uint32 state, const vec4 &xyzt) {
+inline __device__ vec3 curlnoise(uint32 state, const vec4 &xyzt) {
     float dx = xyzt[0] - floor(xyzt[0]);
     float dy = xyzt[1] - floor(xyzt[1]);
     float dz = xyzt[2] - floor(xyzt[2]);

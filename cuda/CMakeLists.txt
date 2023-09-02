@@ -23,7 +23,7 @@ set(CORE_FILES
 )
 
 set(MATH_FILES
-        math/crt.cpp)
+        math/temp.cu)
 
 set(STRUCTURE_FILES
         structure/bvh.cpp
@@ -57,7 +57,7 @@ set(PROJECT_FILES
         ${UTILS_FILES}
         ${CORE_FILES}
         ${MATH_FILES}
-        ${STRUCTURE_FILES}
+#        ${STRUCTURE_FILES}
         ${SOLVER_FILES}
 )
 

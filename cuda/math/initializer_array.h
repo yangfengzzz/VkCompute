@@ -15,11 +15,11 @@ template<unsigned Length, typename Type>
 struct initializer_array {
     const Type storage[Length];
 
-    CUDA_CALLABLE const Type operator[](unsigned i) {
+    __device__ Type operator[](unsigned i) {
         return storage[i];
     }
 
-    CUDA_CALLABLE const Type operator[](unsigned i) const {
+    __device__ Type operator[](unsigned i) const {
         return storage[i];
     }
 };

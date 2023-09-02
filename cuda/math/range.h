@@ -21,8 +21,8 @@ namespace wp {
 
 // represents a built-in Python range() loop
 struct range_t {
-    CUDA_CALLABLE range_t() {}
-    CUDA_CALLABLE range_t(int) {}// for backward pass
+    __device__ range_t() {}
+    __device__ range_t(int) {}// for backward pass
 
     int start;
     int end;
@@ -31,7 +31,7 @@ struct range_t {
     int i;
 };
 
-CUDA_CALLABLE inline range_t range(int end) {
+__device__ inline range_t range(int end) {
     range_t r;
     r.start = 0;
     r.end = end;
@@ -42,7 +42,7 @@ CUDA_CALLABLE inline range_t range(int end) {
     return r;
 }
 
-CUDA_CALLABLE inline range_t range(int start, int end) {
+__device__ inline range_t range(int start, int end) {
     range_t r;
     r.start = start;
     r.end = end;
@@ -53,7 +53,7 @@ CUDA_CALLABLE inline range_t range(int start, int end) {
     return r;
 }
 
-CUDA_CALLABLE inline range_t range(int start, int end, int step) {
+__device__ inline range_t range(int start, int end, int step) {
     range_t r;
     r.start = start;
     r.end = end;
@@ -64,14 +64,14 @@ CUDA_CALLABLE inline range_t range(int start, int end, int step) {
     return r;
 }
 
-CUDA_CALLABLE inline int iter_next(range_t &r) {
+__device__ inline int iter_next(range_t &r) {
     int iter = r.i;
 
     r.i += r.step;
     return iter;
 }
 
-CUDA_CALLABLE inline bool iter_cmp(const range_t &r) {
+__device__ inline bool iter_cmp(const range_t &r) {
     // implements for-loop comparison to emulate Python range() loops with negative arguments
     if (r.step == 0)
         // degenerate case where step == 0
@@ -84,7 +84,7 @@ CUDA_CALLABLE inline bool iter_cmp(const range_t &r) {
         return r.i > r.end;
 }
 
-CUDA_CALLABLE inline range_t iter_reverse(const range_t &r) {
+__device__ inline range_t iter_reverse(const range_t &r) {
     // generates a reverse range, equivalent to reversed(range())
     range_t rev;
     rev.start = r.end - 1;

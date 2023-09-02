@@ -168,7 +168,7 @@ void mesh_refit_device(uint64_t id) {
             bvh_refit_with_solid_angle_device(m.bvh, m);
         } else {
             // todo
-//            bvh_refit_device(m.bvh, m.bounds);
+            //            bvh_refit_device(m.bvh, m.bounds);
         }
     }
 }

@@ -13,8 +13,8 @@ namespace wp {
 template<typename Type>
 struct quat_t {
     // zero constructor for adjoint variable initialization
-    inline CUDA_CALLABLE quat_t(Type x = Type(0), Type y = Type(0), Type z = Type(0), Type w = Type(0)) : x(x), y(y), z(z), w(w) {}
-    explicit inline CUDA_CALLABLE quat_t(const vec_t<3, Type> &v, Type w = Type(0)) : x(v[0]), y(v[1]), z(v[2]), w(w) {}
+    inline __device__ quat_t(Type x = Type(0), Type y = Type(0), Type z = Type(0), Type w = Type(0)) : x(x), y(y), z(z), w(w) {}
+    explicit inline __device__ quat_t(const vec_t<3, Type> &v, Type w = Type(0)) : x(v[0]), y(v[1]), z(v[2]), w(w) {}
 
     // imaginary part
     Type x;
@@ -31,17 +31,17 @@ using quatf = quat_t<float>;
 using quatd = quat_t<double>;
 
 template<typename Type>
-inline CUDA_CALLABLE bool operator==(const quat_t<Type> &a, const quat_t<Type> &b) {
+inline __device__ bool operator==(const quat_t<Type> &a, const quat_t<Type> &b) {
     return a.x == b.x && a.y == b.y && a.z == b.z && a.w == b.w;
 }
 
 template<typename Type>
-inline bool CUDA_CALLABLE isfinite(const quat_t<Type> &q) {
+inline bool __device__ isfinite(const quat_t<Type> &q) {
     return isfinite(q.x) && isfinite(q.y) && isfinite(q.z) && isfinite(q.w);
 }
 
 template<typename Type>
-inline CUDA_CALLABLE quat_t<Type> atomic_add(quat_t<Type> *addr, quat_t<Type> value) {
+inline __device__ quat_t<Type> atomic_add(quat_t<Type> *addr, quat_t<Type> value) {
     Type x = atomic_add(&(addr->x), value.x);
     Type y = atomic_add(&(addr->y), value.y);
     Type z = atomic_add(&(addr->z), value.z);
@@ -53,7 +53,7 @@ inline CUDA_CALLABLE quat_t<Type> atomic_add(quat_t<Type> *addr, quat_t<Type> va
 // forward methods
 
 template<typename Type>
-inline CUDA_CALLABLE quat_t<Type> quat_from_axis_angle(const vec_t<3, Type> &axis, Type angle) {
+inline __device__ quat_t<Type> quat_from_axis_angle(const vec_t<3, Type> &axis, Type angle) {
     Type half = angle * Type(Type(0.5));
     Type w = cos(half);
 
@@ -64,14 +64,14 @@ inline CUDA_CALLABLE quat_t<Type> quat_from_axis_angle(const vec_t<3, Type> &axi
 }
 
 template<typename Type>
-inline CUDA_CALLABLE void quat_to_axis_angle(const quat_t<Type> &q, vec_t<3, Type> &axis, Type &angle) {
+inline __device__ void quat_to_axis_angle(const quat_t<Type> &q, vec_t<3, Type> &axis, Type &angle) {
     vec_t<3, Type> v = vec_t<3, Type>(q.x, q.y, q.z);
     axis = q.w < Type(0) ? -normalize(v) : normalize(v);
     angle = Type(2) * atan2(length(v), abs(q.w));
 }
 
 template<typename Type>
-inline CUDA_CALLABLE quat_t<Type> quat_rpy(Type roll, Type pitch, Type yaw) {
+inline __device__ quat_t<Type> quat_rpy(Type roll, Type pitch, Type yaw) {
     Type cy = cos(yaw * Type(0.5));
     Type sy = sin(yaw * Type(0.5));
     Type cr = cos(roll * Type(0.5));
@@ -88,33 +88,33 @@ inline CUDA_CALLABLE quat_t<Type> quat_rpy(Type roll, Type pitch, Type yaw) {
 }
 
 template<typename Type>
-inline CUDA_CALLABLE quat_t<Type> quat_inverse(const quat_t<Type> &q) {
+inline __device__ quat_t<Type> quat_inverse(const quat_t<Type> &q) {
     return quat_t<Type>(-q.x, -q.y, -q.z, q.w);
 }
 
 template<typename Type>
-inline CUDA_CALLABLE Type dot(const quat_t<Type> &a, const quat_t<Type> &b) {
+inline __device__ Type dot(const quat_t<Type> &a, const quat_t<Type> &b) {
     return a.x * b.x + a.y * b.y + a.z * b.z + a.w * b.w;
 }
 
 template<typename Type>
-inline CUDA_CALLABLE Type tensordot(const quat_t<Type> &a, const quat_t<Type> &b) {
+inline __device__ Type tensordot(const quat_t<Type> &a, const quat_t<Type> &b) {
     // corresponds to `np.tensordot()` with all axes being contracted
     return dot(a, b);
 }
 
 template<typename Type>
-inline CUDA_CALLABLE Type length(const quat_t<Type> &q) {
+inline __device__ Type length(const quat_t<Type> &q) {
     return sqrt(dot(q, q));
 }
 
 template<typename Type>
-inline CUDA_CALLABLE Type length_sq(const quat_t<Type> &q) {
+inline __device__ Type length_sq(const quat_t<Type> &q) {
     return dot(q, q);
 }
 
 template<typename Type>
-inline CUDA_CALLABLE quat_t<Type> normalize(const quat_t<Type> &q) {
+inline __device__ quat_t<Type> normalize(const quat_t<Type> &q) {
     Type l = length(q);
     if (l > Type(kEps)) {
         Type inv_l = Type(1) / l;
@@ -126,17 +126,17 @@ inline CUDA_CALLABLE quat_t<Type> normalize(const quat_t<Type> &q) {
 }
 
 template<typename Type>
-inline CUDA_CALLABLE quat_t<Type> add(const quat_t<Type> &a, const quat_t<Type> &b) {
+inline __device__ quat_t<Type> add(const quat_t<Type> &a, const quat_t<Type> &b) {
     return quat_t<Type>(a.x + b.x, a.y + b.y, a.z + b.z, a.w + b.w);
 }
 
 template<typename Type>
-inline CUDA_CALLABLE quat_t<Type> sub(const quat_t<Type> &a, const quat_t<Type> &b) {
+inline __device__ quat_t<Type> sub(const quat_t<Type> &a, const quat_t<Type> &b) {
     return quat_t<Type>(a.x - b.x, a.y - b.y, a.z - b.z, a.w - b.w);
 }
 
 template<typename Type>
-inline CUDA_CALLABLE quat_t<Type> mul(const quat_t<Type> &a, const quat_t<Type> &b) {
+inline __device__ quat_t<Type> mul(const quat_t<Type> &a, const quat_t<Type> &b) {
     return quat_t<Type>(a.w * b.x + b.w * a.x + a.y * b.z - b.y * a.z,
                         a.w * b.y + b.w * a.y + a.z * b.x - b.z * a.x,
                         a.w * b.z + b.w * a.z + a.x * b.y - b.x * a.y,
@@ -144,38 +144,38 @@ inline CUDA_CALLABLE quat_t<Type> mul(const quat_t<Type> &a, const quat_t<Type> 
 }
 
 template<typename Type>
-inline CUDA_CALLABLE quat_t<Type> mul(const quat_t<Type> &a, Type s) {
+inline __device__ quat_t<Type> mul(const quat_t<Type> &a, Type s) {
     return quat_t<Type>(a.x * s, a.y * s, a.z * s, a.w * s);
 }
 
 template<typename Type>
-inline CUDA_CALLABLE quat_t<Type> mul(Type s, const quat_t<Type> &a) {
+inline __device__ quat_t<Type> mul(Type s, const quat_t<Type> &a) {
     return mul(a, s);
 }
 
 // division
 template<typename Type>
-inline CUDA_CALLABLE quat_t<Type> div(quat_t<Type> q, Type s) {
+inline __device__ quat_t<Type> div(quat_t<Type> q, Type s) {
     return quat_t<Type>(q.x / s, q.y / s, q.z / s, q.w / s);
 }
 
 template<typename Type>
-inline CUDA_CALLABLE quat_t<Type> operator/(quat_t<Type> a, Type s) {
+inline __device__ quat_t<Type> operator/(quat_t<Type> a, Type s) {
     return div(a, s);
 }
 
 template<typename Type>
-inline CUDA_CALLABLE quat_t<Type> operator*(Type s, const quat_t<Type> &a) {
+inline __device__ quat_t<Type> operator*(Type s, const quat_t<Type> &a) {
     return mul(a, s);
 }
 
 template<typename Type>
-inline CUDA_CALLABLE quat_t<Type> operator*(const quat_t<Type> &a, Type s) {
+inline __device__ quat_t<Type> operator*(const quat_t<Type> &a, Type s) {
     return mul(a, s);
 }
 
 template<typename Type>
-inline CUDA_CALLABLE vec_t<3, Type> quat_rotate(const quat_t<Type> &q, const vec_t<3, Type> &x) {
+inline __device__ vec_t<3, Type> quat_rotate(const quat_t<Type> &q, const vec_t<3, Type> &x) {
     Type c = (Type(2) * q.w * q.w - Type(1));
     Type d = Type(2) * (q.x * x.c[0] + q.y * x.c[1] + q.z * x.c[2]);
     return vec_t<3, Type>(
@@ -185,7 +185,7 @@ inline CUDA_CALLABLE vec_t<3, Type> quat_rotate(const quat_t<Type> &q, const vec
 }
 
 template<typename Type>
-inline CUDA_CALLABLE vec_t<3, Type> quat_rotate_inv(const quat_t<Type> &q, const vec_t<3, Type> &x) {
+inline __device__ vec_t<3, Type> quat_rotate_inv(const quat_t<Type> &q, const vec_t<3, Type> &x) {
     Type c = (Type(2) * q.w * q.w - Type(1));
     Type d = Type(2) * (q.x * x.c[0] + q.y * x.c[1] + q.z * x.c[2]);
     return vec_t<3, Type>(
@@ -195,7 +195,7 @@ inline CUDA_CALLABLE vec_t<3, Type> quat_rotate_inv(const quat_t<Type> &q, const
 }
 
 template<typename Type>
-inline CUDA_CALLABLE quat_t<Type> quat_slerp(const quat_t<Type> &q0, const quat_t<Type> &q1, Type t) {
+inline __device__ quat_t<Type> quat_slerp(const quat_t<Type> &q0, const quat_t<Type> &q1, Type t) {
     vec_t<3, Type> axis;
     Type angle;
     quat_to_axis_angle(mul(quat_inverse(q0), q1), axis, angle);
@@ -203,7 +203,7 @@ inline CUDA_CALLABLE quat_t<Type> quat_slerp(const quat_t<Type> &q0, const quat_
 }
 
 template<typename Type>
-inline CUDA_CALLABLE mat_t<3, 3, Type> quat_to_matrix(const quat_t<Type> &q) {
+inline __device__ mat_t<3, 3, Type> quat_to_matrix(const quat_t<Type> &q) {
     vec_t<3, Type> c1 = quat_rotate(q, vec_t<3, Type>(1.0, 0.0, 0.0));
     vec_t<3, Type> c2 = quat_rotate(q, vec_t<3, Type>(0.0, 1.0, 0.0));
     vec_t<3, Type> c3 = quat_rotate(q, vec_t<3, Type>(0.0, 0.0, 1.0));
@@ -212,7 +212,7 @@ inline CUDA_CALLABLE mat_t<3, 3, Type> quat_to_matrix(const quat_t<Type> &q) {
 }
 
 template<typename Type>
-inline CUDA_CALLABLE quat_t<Type> quat_from_matrix(const mat_t<3, 3, Type> &m) {
+inline __device__ quat_t<Type> quat_from_matrix(const mat_t<3, 3, Type> &m) {
     const Type tr = m.data[0][0] + m.data[1][1] + m.data[2][2];
     Type x, y, z, w, h = Type(0);
 
@@ -265,7 +265,7 @@ inline CUDA_CALLABLE quat_t<Type> quat_from_matrix(const mat_t<3, 3, Type> &m) {
 }
 
 template<typename Type>
-inline CUDA_CALLABLE Type index(const quat_t<Type> &a, int idx) {
+inline __device__ Type index(const quat_t<Type> &a, int idx) {
 #if FP_CHECK
     if (idx < 0 || idx > 3) {
         printf("quat_t index %d out of bounds at %s %d", idx, __FILE__, __LINE__);
@@ -290,12 +290,12 @@ inline CUDA_CALLABLE Type index(const quat_t<Type> &a, int idx) {
 }
 
 template<typename Type>
-CUDA_CALLABLE inline quat_t<Type> lerp(const quat_t<Type> &a, const quat_t<Type> &b, Type t) {
+__device__ inline quat_t<Type> lerp(const quat_t<Type> &a, const quat_t<Type> &b, Type t) {
     return a * (Type(1) - t) + b * t;
 }
 
 template<unsigned Rows, unsigned Cols, typename Type>
-inline CUDA_CALLABLE mat_t<Rows, Cols, Type>::mat_t(const vec_t<3, Type> &pos, const quat_t<Type> &rot, const vec_t<3, Type> &scale) {
+inline __device__ mat_t<Rows, Cols, Type>::mat_t(const vec_t<3, Type> &pos, const quat_t<Type> &rot, const vec_t<3, Type> &scale) {
     mat_t<3, 3, Type> R = quat_to_matrix(rot);
 
     data[0][0] = R.data[0][0] * scale[0];
@@ -320,7 +320,7 @@ inline CUDA_CALLABLE mat_t<Rows, Cols, Type>::mat_t(const vec_t<3, Type> &pos, c
 }
 
 template<typename Type = float32>
-inline CUDA_CALLABLE quat_t<Type> quat_identity() {
+inline __device__ quat_t<Type> quat_identity() {
     return quat_t<Type>(Type(0), Type(0), Type(0), Type(1));
 }
 

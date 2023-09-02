@@ -69,7 +69,6 @@ void radix_sort_pairs_host(int *keys, int *values, int n) {
     }
 }
 
-
 void radix_sort_pairs_int_host(uint64_t keys, uint64_t values, int n) {
     radix_sort_pairs_host(
         reinterpret_cast<int *>(keys),

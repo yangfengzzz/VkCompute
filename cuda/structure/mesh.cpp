@@ -185,9 +185,7 @@ uint64_t mesh_create_device(void *context, array_t<wp::vec3> points, array_t<wp:
     return mesh_id;
 }
 
-void mesh_destroy_host(uint64_t id) {
-    Mesh *m = (Mesh *)(id);
-
+void mesh_destroy_host(Mesh *m) {
     delete[] m->bounds;
     if (m->solid_angle_props) {
         delete[] m->solid_angle_props;
@@ -214,9 +212,7 @@ void mesh_destroy_device(uint64_t id) {
     }
 }
 
-void mesh_refit_host(uint64_t id) {
-    Mesh *m = (Mesh *)(id);
-
+void mesh_refit_host(Mesh *m) {
     float sum = 0.0;
     for (int i = 0; i < m->num_tris; ++i) {
         m->bounds[i] = bounds3();

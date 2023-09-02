@@ -17,34 +17,34 @@ template<typename Type>
 using spatial_vector_t = vec_t<6, Type>;
 
 template<typename Type>
-CUDA_CALLABLE inline Type spatial_dot(const spatial_vector_t<Type> &a, const spatial_vector_t<Type> &b) {
+__device__ inline Type spatial_dot(const spatial_vector_t<Type> &a, const spatial_vector_t<Type> &b) {
     return dot(a, b);
 }
 
 template<typename Type>
-CUDA_CALLABLE inline vec_t<3, Type> &w_vec(spatial_vector_t<Type> &a) {
+__device__ inline vec_t<3, Type> &w_vec(spatial_vector_t<Type> &a) {
     return *(vec_t<3, Type> *)(&a);
 }
 
 template<typename Type>
-CUDA_CALLABLE inline vec_t<3, Type> &v_vec(spatial_vector_t<Type> &a) {
+__device__ inline vec_t<3, Type> &v_vec(spatial_vector_t<Type> &a) {
     return *(vec_t<3, Type> *)(&a.c[3]);
 }
 
 template<typename Type>
-CUDA_CALLABLE inline const vec_t<3, Type> &w_vec(const spatial_vector_t<Type> &a) {
+__device__ inline const vec_t<3, Type> &w_vec(const spatial_vector_t<Type> &a) {
     spatial_vector_t<Type> &non_const_vec = *(spatial_vector_t<Type> *)(const_cast<Type *>(&a.c[0]));
     return w_vec(non_const_vec);
 }
 
 template<typename Type>
-CUDA_CALLABLE inline const vec_t<3, Type> &v_vec(const spatial_vector_t<Type> &a) {
+__device__ inline const vec_t<3, Type> &v_vec(const spatial_vector_t<Type> &a) {
     spatial_vector_t<Type> &non_const_vec = *(spatial_vector_t<Type> *)(const_cast<Type *>(&a.c[0]));
     return v_vec(non_const_vec);
 }
 
 template<typename Type>
-CUDA_CALLABLE inline spatial_vector_t<Type> spatial_cross(const spatial_vector_t<Type> &a, const spatial_vector_t<Type> &b) {
+__device__ inline spatial_vector_t<Type> spatial_cross(const spatial_vector_t<Type> &a, const spatial_vector_t<Type> &b) {
     vec_t<3, Type> w = cross(w_vec(a), w_vec(b));
     vec_t<3, Type> v = cross(v_vec(a), w_vec(b)) + cross(w_vec(a), v_vec(b));
 
@@ -52,7 +52,7 @@ CUDA_CALLABLE inline spatial_vector_t<Type> spatial_cross(const spatial_vector_t
 }
 
 template<typename Type>
-CUDA_CALLABLE inline spatial_vector_t<Type> spatial_cross_dual(const spatial_vector_t<Type> &a, const spatial_vector_t<Type> &b) {
+__device__ inline spatial_vector_t<Type> spatial_cross_dual(const spatial_vector_t<Type> &a, const spatial_vector_t<Type> &b) {
     vec_t<3, Type> w = cross(w_vec(a), w_vec(b)) + cross(v_vec(a), v_vec(b));
     vec_t<3, Type> v = cross(w_vec(a), v_vec(b));
 
@@ -60,12 +60,12 @@ CUDA_CALLABLE inline spatial_vector_t<Type> spatial_cross_dual(const spatial_vec
 }
 
 template<typename Type>
-CUDA_CALLABLE inline vec_t<3, Type> spatial_top(const spatial_vector_t<Type> &a) {
+__device__ inline vec_t<3, Type> spatial_top(const spatial_vector_t<Type> &a) {
     return w_vec(a);
 }
 
 template<typename Type>
-CUDA_CALLABLE inline vec_t<3, Type> spatial_bottom(const spatial_vector_t<Type> &a) {
+__device__ inline vec_t<3, Type> spatial_bottom(const spatial_vector_t<Type> &a) {
     return v_vec(a);
 }
 
@@ -77,16 +77,16 @@ struct transform_t {
     vec_t<3, Type> p;
     quat_t<Type> q;
 
-    CUDA_CALLABLE inline transform_t(vec_t<3, Type> p = vec_t<3, Type>(), quat_t<Type> q = quat_t<Type>()) : p(p), q(q) {}
-    CUDA_CALLABLE inline transform_t(Type) {}// helps uniform initialization
+    __device__ inline transform_t(vec_t<3, Type> p = vec_t<3, Type>(), quat_t<Type> q = quat_t<Type>()) : p(p), q(q) {}
+    __device__ inline transform_t(Type) {}// helps uniform initialization
 
-    CUDA_CALLABLE inline Type operator[](int index) const {
+    __device__ inline Type operator[](int index) const {
         assert(index < 7);
 
         return p.c[index];
     }
 
-    CUDA_CALLABLE inline Type &operator[](int index) {
+    __device__ inline Type &operator[](int index) {
         assert(index < 7);
 
         return p.c[index];
@@ -94,102 +94,102 @@ struct transform_t {
 };
 
 template<typename Type = float32>
-CUDA_CALLABLE inline transform_t<Type> transform_identity() {
+__device__ inline transform_t<Type> transform_identity() {
     return transform_t<Type>(vec_t<3, Type>(), quat_identity<Type>());
 }
 
 template<typename Type>
-inline CUDA_CALLABLE bool operator==(const transform_t<Type> &a, const transform_t<Type> &b) {
+inline __device__ bool operator==(const transform_t<Type> &a, const transform_t<Type> &b) {
     return a.p == b.p && a.q == b.q;
 }
 
 template<typename Type>
-inline bool CUDA_CALLABLE isfinite(const transform_t<Type> &t) {
+inline bool __device__ isfinite(const transform_t<Type> &t) {
     return isfinite(t.p) && isfinite(t.q);
 }
 
 template<typename Type>
-CUDA_CALLABLE inline vec_t<3, Type> transform_get_translation(const transform_t<Type> &t) {
+__device__ inline vec_t<3, Type> transform_get_translation(const transform_t<Type> &t) {
     return t.p;
 }
 
 template<typename Type>
-CUDA_CALLABLE inline quat_t<Type> transform_get_rotation(const transform_t<Type> &t) {
+__device__ inline quat_t<Type> transform_get_rotation(const transform_t<Type> &t) {
     return t.q;
 }
 
 template<typename Type>
-CUDA_CALLABLE inline transform_t<Type> transform_multiply(const transform_t<Type> &a, const transform_t<Type> &b) {
+__device__ inline transform_t<Type> transform_multiply(const transform_t<Type> &a, const transform_t<Type> &b) {
     return {quat_rotate(a.q, b.p) + a.p, mul(a.q, b.q)};
 }
 
 template<typename Type>
-CUDA_CALLABLE inline transform_t<Type> transform_inverse(const transform_t<Type> &t) {
+__device__ inline transform_t<Type> transform_inverse(const transform_t<Type> &t) {
     quat_t<Type> q_inv = quat_inverse(t.q);
     return transform_t<Type>(-quat_rotate(q_inv, t.p), q_inv);
 }
 
 template<typename Type>
-CUDA_CALLABLE inline vec_t<3, Type> transform_vector(const transform_t<Type> &t, const vec_t<3, Type> &x) {
+__device__ inline vec_t<3, Type> transform_vector(const transform_t<Type> &t, const vec_t<3, Type> &x) {
     return quat_rotate(t.q, x);
 }
 
 template<typename Type>
-CUDA_CALLABLE inline vec_t<3, Type> transform_point(const transform_t<Type> &t, const vec_t<3, Type> &x) {
+__device__ inline vec_t<3, Type> transform_point(const transform_t<Type> &t, const vec_t<3, Type> &x) {
     return t.p + quat_rotate(t.q, x);
 }
 
 // not totally sure why you'd want to do this seeing as adding/subtracting two rotation
 // quats doesn't seem to do anything meaningful
 template<typename Type>
-CUDA_CALLABLE inline transform_t<Type> add(const transform_t<Type> &a, const transform_t<Type> &b) {
+__device__ inline transform_t<Type> add(const transform_t<Type> &a, const transform_t<Type> &b) {
     return {a.p + b.p, a.q + b.q};
 }
 
 template<typename Type>
-CUDA_CALLABLE inline transform_t<Type> sub(const transform_t<Type> &a, const transform_t<Type> &b) {
+__device__ inline transform_t<Type> sub(const transform_t<Type> &a, const transform_t<Type> &b) {
     return {a.p - b.p, a.q - b.q};
 }
 
 // also not sure why you'd want to do this seeing as the quat would end up unnormalized
 template<typename Type>
-CUDA_CALLABLE inline transform_t<Type> mul(const transform_t<Type> &a, Type s) {
+__device__ inline transform_t<Type> mul(const transform_t<Type> &a, Type s) {
     return {a.p * s, a.q * s};
 }
 
 template<typename Type>
-CUDA_CALLABLE inline transform_t<Type> mul(Type s, const transform_t<Type> &a) {
+__device__ inline transform_t<Type> mul(Type s, const transform_t<Type> &a) {
     return mul(a, s);
 }
 
 template<typename Type>
-CUDA_CALLABLE inline transform_t<Type> mul(const transform_t<Type> &a, const transform_t<Type> &b) {
+__device__ inline transform_t<Type> mul(const transform_t<Type> &a, const transform_t<Type> &b) {
     return transform_multiply(a, b);
 }
 
 template<typename Type>
-CUDA_CALLABLE inline transform_t<Type> operator*(const transform_t<Type> &a, Type s) {
+__device__ inline transform_t<Type> operator*(const transform_t<Type> &a, Type s) {
     return mul(a, s);
 }
 
 template<typename Type>
-CUDA_CALLABLE inline transform_t<Type> operator*(Type s, const transform_t<Type> &a) {
+__device__ inline transform_t<Type> operator*(Type s, const transform_t<Type> &a) {
     return mul(a, s);
 }
 
 template<typename Type>
-inline CUDA_CALLABLE Type tensordot(const transform_t<Type> &a, const transform_t<Type> &b) {
+inline __device__ Type tensordot(const transform_t<Type> &a, const transform_t<Type> &b) {
     // corresponds to `np.tensordot()` with all axes being contracted
     return tensordot(a.p, b.p) + tensordot(a.q, b.q);
 }
 
 template<typename Type>
-inline CUDA_CALLABLE Type index(const transform_t<Type> &t, int i) {
+inline __device__ Type index(const transform_t<Type> &t, int i) {
     return t[i];
 }
 
 template<typename Type>
-inline CUDA_CALLABLE transform_t<Type> atomic_add(transform_t<Type> *addr, const transform_t<Type> &value) {
+inline __device__ transform_t<Type> atomic_add(transform_t<Type> *addr, const transform_t<Type> &value) {
     vec_t<3, Type> p = atomic_add(&addr->p, value.p);
     quat_t<Type> q = atomic_add(&addr->q, value.q);
 
@@ -197,10 +197,10 @@ inline CUDA_CALLABLE transform_t<Type> atomic_add(transform_t<Type> *addr, const
 }
 
 template<typename Type>
-CUDA_CALLABLE void print(transform_t<Type> t);
+__device__ void print(transform_t<Type> t);
 
 template<typename Type>
-CUDA_CALLABLE inline transform_t<Type> lerp(const transform_t<Type> &a, const transform_t<Type> &b, Type t) {
+__device__ inline transform_t<Type> lerp(const transform_t<Type> &a, const transform_t<Type> &b, Type t) {
     return a * (Type(1) - t) + b * t;
 }
 
@@ -208,7 +208,7 @@ template<typename Type>
 using spatial_matrix_t = mat_t<6, 6, Type>;
 
 template<typename Type>
-inline CUDA_CALLABLE spatial_matrix_t<Type> spatial_adjoint(const mat_t<3, 3, Type> &R, const mat_t<3, 3, Type> &S) {
+inline __device__ spatial_matrix_t<Type> spatial_adjoint(const mat_t<3, 3, Type> &R, const mat_t<3, 3, Type> &S) {
     spatial_matrix_t<Type> adT;
 
     // T = [Rah,   0]
@@ -232,13 +232,13 @@ inline CUDA_CALLABLE spatial_matrix_t<Type> spatial_adjoint(const mat_t<3, 3, Ty
     return adT;
 }
 
-CUDA_CALLABLE inline int row_index(int stride, int i, int j) {
+__device__ inline int row_index(int stride, int i, int j) {
     return i * stride + j;
 }
 
 // builds spatial Jacobian J which is an (joint_count*6)x(dof_count) matrix
 template<typename Type>
-CUDA_CALLABLE inline void spatial_jacobian(
+__device__ inline void spatial_jacobian(
     const spatial_vector_t<Type> *S,
     const int *joint_parents,
     const int *joint_qd_start,
@@ -284,7 +284,7 @@ CUDA_CALLABLE inline void spatial_jacobian(
 }
 
 template<typename Type>
-CUDA_CALLABLE inline void spatial_mass(const spatial_matrix_t<Type> *I_s, int joint_start, int joint_count, int M_start, Type *M) {
+__device__ inline void spatial_mass(const spatial_matrix_t<Type> *I_s, int joint_start, int joint_count, int M_start, Type *M) {
     const int stride = joint_count * 6;
 
     for (int l = 0; l < joint_count; ++l) {

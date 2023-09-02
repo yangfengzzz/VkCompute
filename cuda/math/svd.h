@@ -18,14 +18,14 @@ namespace wp {
 // TODO: replace sqrt with rsqrt
 
 template<typename Type>
-inline CUDA_CALLABLE
+inline __device__
     Type
     accurateSqrt(Type x) {
     return x / sqrt(x);
 }
 
 template<typename Type>
-inline CUDA_CALLABLE void condSwap(bool c, Type &X, Type &Y) {
+inline __device__ void condSwap(bool c, Type &X, Type &Y) {
     // used in step 2
     Type Z = X;
     X = c ? Y : X;
@@ -33,7 +33,7 @@ inline CUDA_CALLABLE void condSwap(bool c, Type &X, Type &Y) {
 }
 
 template<typename Type>
-inline CUDA_CALLABLE void condNegSwap(bool c, Type &X, Type &Y) {
+inline __device__ void condNegSwap(bool c, Type &X, Type &Y) {
     // used in step 2 and 3
     Type Z = -X;
     X = c ? Y : X;
@@ -42,7 +42,7 @@ inline CUDA_CALLABLE void condNegSwap(bool c, Type &X, Type &Y) {
 
 // matrix multiplication M = A * B
 template<typename Type>
-inline CUDA_CALLABLE void multAB(Type a11, Type a12, Type a13,
+inline __device__ void multAB(Type a11, Type a12, Type a13,
                                  Type a21, Type a22, Type a23,
                                  Type a31, Type a32, Type a33,
                                  //
@@ -67,7 +67,7 @@ inline CUDA_CALLABLE void multAB(Type a11, Type a12, Type a13,
 
 // matrix multiplication M = Transpose[A] * B
 template<typename Type>
-inline CUDA_CALLABLE void multAtB(Type a11, Type a12, Type a13,
+inline __device__ void multAtB(Type a11, Type a12, Type a13,
                                   Type a21, Type a22, Type a23,
                                   Type a31, Type a32, Type a33,
                                   //
@@ -90,7 +90,7 @@ inline CUDA_CALLABLE void multAtB(Type a11, Type a12, Type a13,
 }
 
 template<typename Type>
-inline CUDA_CALLABLE void quatToMat3(const Type *qV,
+inline __device__ void quatToMat3(const Type *qV,
                                      Type &m11, Type &m12, Type &m13,
                                      Type &m21, Type &m22, Type &m23,
                                      Type &m31, Type &m32, Type &m33) {
@@ -121,7 +121,7 @@ inline CUDA_CALLABLE void quatToMat3(const Type *qV,
 }
 
 template<typename Type>
-inline CUDA_CALLABLE void approximateGivensQuaternion(Type a11, Type a12, Type a22, Type &ch, Type &sh) {
+inline __device__ void approximateGivensQuaternion(Type a11, Type a12, Type a22, Type &ch, Type &sh) {
     /*
      * Given givens angle computed by approximateGivensAngles,
      * compute the corresponding rotation quaternion.
@@ -135,7 +135,7 @@ inline CUDA_CALLABLE void approximateGivensQuaternion(Type a11, Type a12, Type a
 }
 
 template<typename Type>
-inline CUDA_CALLABLE void jacobiConjugation(const int x, const int y, const int z,
+inline __device__ void jacobiConjugation(const int x, const int y, const int z,
                                             Type &s11,
                                             Type &s21, Type &s22,
                                             Type &s31, Type &s32, Type &s33,
@@ -199,7 +199,7 @@ inline CUDA_CALLABLE void jacobiConjugation(const int x, const int y, const int 
 }
 
 template<typename Type>
-inline CUDA_CALLABLE
+inline __device__
     Type
     dist2(Type x, Type y, Type z) {
     return x * x + y * y + z * z;
@@ -207,7 +207,7 @@ inline CUDA_CALLABLE
 
 // finds transformation that diagonalizes a symmetric matrix
 template<typename Type>
-inline CUDA_CALLABLE void jacobiEigenanlysis(// symmetric matrix
+inline __device__ void jacobiEigenanlysis(// symmetric matrix
     Type &s11,
     Type &s21, Type &s22,
     Type &s31, Type &s32, Type &s33,
@@ -229,7 +229,7 @@ inline CUDA_CALLABLE void jacobiEigenanlysis(// symmetric matrix
 }
 
 template<typename Type>
-inline CUDA_CALLABLE void sortSingularValues(// matrix that we want to decompose
+inline __device__ void sortSingularValues(// matrix that we want to decompose
     Type &b11, Type &b12, Type &b13,
     Type &b21, Type &b22, Type &b23,
     Type &b31, Type &b32, Type &b33,
@@ -267,7 +267,7 @@ inline CUDA_CALLABLE void sortSingularValues(// matrix that we want to decompose
 }
 
 template<typename Type>
-inline CUDA_CALLABLE void QRGivensQuaternion(Type a1, Type a2, Type &ch, Type &sh) {
+inline __device__ void QRGivensQuaternion(Type a1, Type a2, Type &ch, Type &sh) {
     // a1 = pivot point on diagonal
     // a2 = lower triangular entry we want to annihilate
     Type epsilon = _EPSILON;
@@ -283,7 +283,7 @@ inline CUDA_CALLABLE void QRGivensQuaternion(Type a1, Type a2, Type &ch, Type &s
 }
 
 template<typename Type>
-inline CUDA_CALLABLE void QRDecomposition(// matrix that we want to decompose
+inline __device__ void QRDecomposition(// matrix that we want to decompose
     Type b11, Type b12, Type b13,
     Type b21, Type b22, Type b23,
     Type b31, Type b32, Type b33,
@@ -365,7 +365,7 @@ inline CUDA_CALLABLE void QRDecomposition(// matrix that we want to decompose
 }
 
 template<typename Type>
-inline CUDA_CALLABLE void _svd(// input A
+inline __device__ void _svd(// input A
     Type a11, Type a12, Type a13,
     Type a21, Type a22, Type a23,
     Type a31, Type a32, Type a33,
@@ -413,7 +413,7 @@ inline CUDA_CALLABLE void _svd(// input A
 }
 
 template<typename Type>
-inline CUDA_CALLABLE void svd3(const mat_t<3, 3, Type> &A, mat_t<3, 3, Type> &U, vec_t<3, Type> &sigma, mat_t<3, 3, Type> &V) {
+inline __device__ void svd3(const mat_t<3, 3, Type> &A, mat_t<3, 3, Type> &U, vec_t<3, Type> &sigma, mat_t<3, 3, Type> &V) {
     Type s12, s13, s21, s23, s31, s32;
     _svd(A.data[0][0], A.data[0][1], A.data[0][2],
          A.data[1][0], A.data[1][1], A.data[1][2],
@@ -433,7 +433,7 @@ inline CUDA_CALLABLE void svd3(const mat_t<3, 3, Type> &A, mat_t<3, 3, Type> &U,
 }
 
 template<typename Type>
-inline CUDA_CALLABLE void qr3(const mat_t<3, 3, Type> &A, mat_t<3, 3, Type> &Q, mat_t<3, 3, Type> &R) {
+inline __device__ void qr3(const mat_t<3, 3, Type> &A, mat_t<3, 3, Type> &Q, mat_t<3, 3, Type> &R) {
     QRDecomposition(A.data[0][0], A.data[0][1], A.data[0][2],
                     A.data[1][0], A.data[1][1], A.data[1][2],
                     A.data[2][0], A.data[2][1], A.data[2][2],
@@ -448,7 +448,7 @@ inline CUDA_CALLABLE void qr3(const mat_t<3, 3, Type> &A, mat_t<3, 3, Type> &Q, 
 }
 
 template<typename Type>
-inline CUDA_CALLABLE void eig3(const mat_t<3, 3, Type> &A, mat_t<3, 3, Type> &Q, vec_t<3, Type> &d) {
+inline __device__ void eig3(const mat_t<3, 3, Type> &A, mat_t<3, 3, Type> &Q, vec_t<3, Type> &d) {
     Type qV[4];
     Type s11 = A.data[0][0];
     Type s21 = A.data[1][0];

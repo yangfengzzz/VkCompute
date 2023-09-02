@@ -281,4 +281,3 @@ WP_API void array_fill_host(void *arr_ptr, int arr_type, const void *value_ptr, 
 // TODO: compile as separate translation units
 #include "bvh.cpp"
 #include "scan.cpp"
-

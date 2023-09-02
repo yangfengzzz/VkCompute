@@ -11,8 +11,8 @@
 namespace wp {
 
 struct HashGrid {
-    float cell_width;
-    float cell_width_inv;
+    float cell_width{};
+    float cell_width_inv{};
 
     int *point_cells{nullptr};// cell id of a point
     int *point_ids{nullptr};  // index to original point
@@ -20,14 +20,14 @@ struct HashGrid {
     int *cell_starts{nullptr};// start index of a range of indices belonging to a cell, dim_x*dim_y*dim_z in length
     int *cell_ends{nullptr};  // end index of a range of indices belonging to a cell, dim_x*dim_y*dim_z in length
 
-    int dim_x;
-    int dim_y;
-    int dim_z;
+    int dim_x{};
+    int dim_y{};
+    int dim_z{};
 
-    int num_points;
-    int max_points;
+    int num_points{};
+    int max_points{};
 
-    void *context;
+    void *context{};
 };
 
 // convert a virtual (world) cell coordinate to a physical one
@@ -73,31 +73,31 @@ struct hash_grid_query_t {
     CUDA_CALLABLE hash_grid_query_t() {}
     CUDA_CALLABLE hash_grid_query_t(int) {}// for backward pass
 
-    int x_start;
-    int y_start;
-    int z_start;
+    int x_start{};
+    int y_start{};
+    int z_start{};
 
-    int x_end;
-    int y_end;
-    int z_end;
+    int x_end{};
+    int y_end{};
+    int z_end{};
 
-    int x;
-    int y;
-    int z;
+    int x{};
+    int y{};
+    int z{};
 
-    int cell;
-    int cell_index;// offset in the current cell (index into cell_indices)
-    int cell_end;  // index following the end of this cell
+    int cell{};
+    int cell_index{};// offset in the current cell (index into cell_indices)
+    int cell_end{};  // index following the end of this cell
 
-    int current;// index of the current iterator value
+    int current{};// index of the current iterator value
 
     HashGrid grid;
 };
 
-CUDA_CALLABLE inline hash_grid_query_t hash_grid_query(uint64_t id, wp::vec3 pos, float radius) {
+CUDA_CALLABLE inline hash_grid_query_t hash_grid_query(const HashGrid *grid, wp::vec3 pos, float radius) {
     hash_grid_query_t query;
 
-    query.grid = *(const HashGrid *)(id);
+    query.grid = *grid;
 
     // convert coordinate to grid
     query.x_start = int((pos[0] - radius) * query.grid.cell_width_inv);
@@ -170,8 +170,7 @@ CUDA_CALLABLE inline hash_grid_query_t iter_reverse(const hash_grid_query_t &que
     return query;
 }
 
-CUDA_CALLABLE inline int hash_grid_point_id(uint64_t id, int &index) {
-    const HashGrid *grid = (const HashGrid *)(id);
+CUDA_CALLABLE inline int hash_grid_point_id(const HashGrid *grid, int &index) {
     if (grid->point_ids == nullptr)
         return -1;
     return grid->point_ids[index];

@@ -103,14 +103,7 @@ CUDA_CALLABLE inline uint32_t morton3(float x, float y, float z) {
     return (part1by2(uz) << 2) | (part1by2(uy) << 1) | part1by2(ux);
 }
 
-// making the class accessible from python
-
-CUDA_CALLABLE inline BVH bvh_get(uint64_t id) {
-    return *(BVH *)(id);
-}
-
-CUDA_CALLABLE inline int bvh_get_num_bounds(uint64_t id) {
-    BVH bvh = bvh_get(id);
+CUDA_CALLABLE inline int bvh_get_num_bounds(const BVH &bvh) {
     return bvh.num_bounds;
 }
 
@@ -136,8 +129,7 @@ struct bvh_query_t {
     int bounds_nr;
 };
 
-CUDA_CALLABLE inline bvh_query_t bvh_query(
-    uint64_t id, bool is_ray, const vec3 &lower, const vec3 &upper) {
+CUDA_CALLABLE inline bvh_query_t bvh_query(const BVH &bvh, bool is_ray, const vec3 &lower, const vec3 &upper) {
     // This routine traverses the BVH tree until it finds
     // the first overlapping bound.
 
@@ -145,8 +137,6 @@ CUDA_CALLABLE inline bvh_query_t bvh_query(
     bvh_query_t query;
 
     query.bounds_nr = -1;
-
-    BVH bvh = bvh_get(id);
 
     query.bvh = bvh;
     query.is_ray = is_ray;
@@ -206,14 +196,12 @@ CUDA_CALLABLE inline bvh_query_t bvh_query(
     return query;
 }
 
-CUDA_CALLABLE inline bvh_query_t bvh_query_aabb(
-    uint64_t id, const vec3 &lower, const vec3 &upper) {
-    return bvh_query(id, false, lower, upper);
+CUDA_CALLABLE inline bvh_query_t bvh_query_aabb(const BVH &bvh, const vec3 &lower, const vec3 &upper) {
+    return bvh_query(bvh, false, lower, upper);
 }
 
-CUDA_CALLABLE inline bvh_query_t bvh_query_ray(
-    uint64_t id, const vec3 &start, const vec3 &dir) {
-    return bvh_query(id, true, start, dir);
+CUDA_CALLABLE inline bvh_query_t bvh_query_ray(const BVH &bvh, const vec3 &start, const vec3 &dir) {
+    return bvh_query(bvh, true, start, dir);
 }
 
 CUDA_CALLABLE inline bool bvh_query_next(bvh_query_t &query, int &index) {

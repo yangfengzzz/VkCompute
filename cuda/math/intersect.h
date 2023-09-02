@@ -7,10 +7,11 @@
 #pragma once
 
 #include "vec.h"
+#include <cuda.h>
 
 namespace wp {
 
-CUDA_CALLABLE inline vec3 closest_point_to_aabb(const vec3 &p, const vec3 &lower, const vec3 &upper) {
+__device__ inline vec3 closest_point_to_aabb(const vec3 &p, const vec3 &lower, const vec3 &upper) {
     vec3 c;
 
     {
@@ -37,7 +38,7 @@ CUDA_CALLABLE inline vec3 closest_point_to_aabb(const vec3 &p, const vec3 &lower
     return c;
 }
 
-CUDA_CALLABLE inline vec2 closest_point_to_triangle(const vec3 &a, const vec3 &b, const vec3 &c, const vec3 &p) {
+__device__ inline vec2 closest_point_to_triangle(const vec3 &a, const vec3 &b, const vec3 &c, const vec3 &p) {
     vec3 ab = b - a;
     vec3 ac = c - a;
     vec3 ap = p - a;
@@ -103,7 +104,7 @@ CUDA_CALLABLE inline vec2 closest_point_to_triangle(const vec3 &a, const vec3 &b
     return vec2(u, v);
 }
 
-CUDA_CALLABLE inline bool intersect_ray_aabb(const vec3 &pos, const vec3 &rcp_dir, const vec3 &lower, const vec3 &upper, float &t) {
+__device__ inline bool intersect_ray_aabb(const vec3 &pos, const vec3 &rcp_dir, const vec3 &lower, const vec3 &upper, float &t) {
     float l1, l2, lmin, lmax;
 
     l1 = (lower[0] - pos[0]) * rcp_dir[0];
@@ -129,7 +130,7 @@ CUDA_CALLABLE inline bool intersect_ray_aabb(const vec3 &pos, const vec3 &rcp_di
 }
 
 // Moller and Trumbore's method
-CUDA_CALLABLE inline bool intersect_ray_tri_moller(const vec3 &p, const vec3 &dir, const vec3 &a, const vec3 &b, const vec3 &c, float &t, float &u, float &v, float &w, float &sign, vec3 *normal) {
+__device__ inline bool intersect_ray_tri_moller(const vec3 &p, const vec3 &dir, const vec3 &a, const vec3 &b, const vec3 &c, float &t, float &u, float &v, float &w, float &sign, vec3 *normal) {
     vec3 ab = b - a;
     vec3 ac = c - a;
     vec3 n = cross(ab, ac);
@@ -159,7 +160,7 @@ CUDA_CALLABLE inline bool intersect_ray_tri_moller(const vec3 &p, const vec3 &di
     return true;
 }
 
-CUDA_CALLABLE inline bool intersect_ray_tri_rtcd(const vec3 &p, const vec3 &dir, const vec3 &a, const vec3 &b, const vec3 &c, float &t, float &u, float &v, float &w, float &sign, vec3 *normal) {
+__device__ inline bool intersect_ray_tri_rtcd(const vec3 &p, const vec3 &dir, const vec3 &a, const vec3 &b, const vec3 &c, float &t, float &u, float &v, float &w, float &sign, vec3 *normal) {
     const vec3 ab = b - a;
     const vec3 ac = c - a;
 
@@ -214,15 +215,15 @@ inline int __float_as_int(float f) {
 
 #endif
 
-CUDA_CALLABLE inline float xorf(float x, int y) {
+__device__ inline float xorf(float x, int y) {
     return __int_as_float(__float_as_int(x) ^ y);
 }
 
-CUDA_CALLABLE inline int sign_mask(float x) {
+__device__ inline int sign_mask(float x) {
     return __float_as_int(x) & 0x80000000;
 }
 
-CUDA_CALLABLE inline int max_dim(vec3 a) {
+__device__ inline int max_dim(vec3 a) {
     float x = abs(a[0]);
     float y = abs(a[1]);
     float z = abs(a[2]);
@@ -232,7 +233,7 @@ CUDA_CALLABLE inline int max_dim(vec3 a) {
 
 // computes the difference of products a*b - c*d using
 // FMA instructions for improved numerical precision
-CUDA_CALLABLE inline float diff_product(float a, float b, float c, float d) {
+__device__ inline float diff_product(float a, float b, float c, float d) {
     float cd = c * d;
     float diff = fmaf(a, b, -cd);
     float error = fmaf(-c, d, cd);
@@ -241,7 +242,7 @@ CUDA_CALLABLE inline float diff_product(float a, float b, float c, float d) {
 }
 
 // http://jcgt.org/published/0002/01/05/
-CUDA_CALLABLE inline bool intersect_ray_tri_woop(const vec3 &p, const vec3 &dir, const vec3 &a, const vec3 &b, const vec3 &c, float &t, float &u, float &v, float &sign, vec3 *normal) {
+__device__ inline bool intersect_ray_tri_woop(const vec3 &p, const vec3 &dir, const vec3 &a, const vec3 &b, const vec3 &c, float &t, float &u, float &v, float &sign, vec3 *normal) {
     // todo: precompute for ray
 
     int kz = max_dim(dir);
@@ -331,13 +332,13 @@ CUDA_CALLABLE inline bool intersect_ray_tri_woop(const vec3 &p, const vec3 &dir,
 // Möller's method
 #include "intersect_tri.h"
 
-CUDA_CALLABLE inline int intersect_tri_tri(
+__device__ inline int intersect_tri_tri(
     vec3 &v0, vec3 &v1, vec3 &v2,
     vec3 &u0, vec3 &u1, vec3 &u2) {
     return NoDivTriTriIsect(&v0[0], &v1[0], &v2[0], &u0[0], &u1[0], &u2[0]);
 }
 
-static CUDA_CALLABLE vec3 closest_point_edge_edge(vec3 var_p1,
+static __device__ vec3 closest_point_edge_edge(vec3 var_p1,
                                                   vec3 var_q1,
                                                   vec3 var_p2,
                                                   vec3 var_q2,

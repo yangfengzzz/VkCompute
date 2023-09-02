@@ -15,53 +15,53 @@
 
 namespace wp {
 
-inline CUDA_CALLABLE uint32 rand_pcg(uint32 state) {
+inline __device__ uint32 rand_pcg(uint32 state) {
     uint32 b = state * 747796405u + 2891336453u;
     uint32 c = ((b >> ((b >> 28u) + 4u)) ^ b) * 277803737u;
     return (c >> 22u) ^ c;
 }
 
-inline CUDA_CALLABLE uint32 rand_init(int seed) { return rand_pcg(uint32(seed)); }
-inline CUDA_CALLABLE uint32 rand_init(int seed, int offset) { return rand_pcg(uint32(seed) + rand_pcg(uint32(offset))); }
+inline __device__ uint32 rand_init(int seed) { return rand_pcg(uint32(seed)); }
+inline __device__ uint32 rand_init(int seed, int offset) { return rand_pcg(uint32(seed) + rand_pcg(uint32(offset))); }
 
-inline CUDA_CALLABLE int randi(uint32 &state) {
+inline __device__ int randi(uint32 &state) {
     state = rand_pcg(state);
     return int(state);
 }
-inline CUDA_CALLABLE int randi(uint32 &state, int min, int max) {
+inline __device__ int randi(uint32 &state, int min, int max) {
     state = rand_pcg(state);
     return state % (max - min) + min;
 }
 
-inline CUDA_CALLABLE float randf(uint32 &state) {
+inline __device__ float randf(uint32 &state) {
     state = rand_pcg(state);
     return (state >> 8) * (1.0f / 16777216.0f);
 }
-inline CUDA_CALLABLE float randf(uint32 &state, float min, float max) { return (max - min) * randf(state) + min; }
+inline __device__ float randf(uint32 &state, float min, float max) { return (max - min) * randf(state) + min; }
 
 // Box-Muller method
-inline CUDA_CALLABLE float randn(uint32 &state) { return sqrt(-2.f * log(randf(state))) * cos(2.f * M_PI * randf(state)); }
+inline __device__ float randn(uint32 &state) { return sqrt(-2.f * log(randf(state))) * cos(2.f * M_PI * randf(state)); }
 
-inline CUDA_CALLABLE int sample_cdf(uint32 &state, const array_t<float> &cdf) {
+inline __device__ int sample_cdf(uint32 &state, const array_t<float> &cdf) {
     float u = randf(state);
     return lower_bound<float>(cdf, u);
 }
 
-inline CUDA_CALLABLE vec2 sample_triangle(uint32 &state) {
+inline __device__ vec2 sample_triangle(uint32 &state) {
     float r = sqrt(randf(state));
     float u = 1.0 - r;
     float v = randf(state) * r;
     return vec2(u, v);
 }
 
-inline CUDA_CALLABLE vec2 sample_unit_ring(uint32 &state) {
+inline __device__ vec2 sample_unit_ring(uint32 &state) {
     float theta = randf(state, 0.f, 2.f * M_PI);
     float x = cos(theta);
     float y = sin(theta);
     return vec2(x, y);
 }
 
-inline CUDA_CALLABLE vec2 sample_unit_disk(uint32 &state) {
+inline __device__ vec2 sample_unit_disk(uint32 &state) {
     float r = sqrt(randf(state));
     float theta = randf(state, 0.f, 2.f * M_PI);
     float x = r * cos(theta);
@@ -69,7 +69,7 @@ inline CUDA_CALLABLE vec2 sample_unit_disk(uint32 &state) {
     return vec2(x, y);
 }
 
-inline CUDA_CALLABLE vec3 sample_unit_sphere_surface(uint32 &state) {
+inline __device__ vec3 sample_unit_sphere_surface(uint32 &state) {
     float phi = acos(1.f - 2.f * randf(state));
     float theta = randf(state, 0.f, 2.f * M_PI);
     float x = cos(theta) * sin(phi);
@@ -78,7 +78,7 @@ inline CUDA_CALLABLE vec3 sample_unit_sphere_surface(uint32 &state) {
     return vec3(x, y, z);
 }
 
-inline CUDA_CALLABLE vec3 sample_unit_sphere(uint32 &state) {
+inline __device__ vec3 sample_unit_sphere(uint32 &state) {
     float phi = acos(1.f - 2.f * randf(state));
     float theta = randf(state, 0.f, 2.f * M_PI);
     float r = pow(randf(state), 1.f / 3.f);
@@ -88,7 +88,7 @@ inline CUDA_CALLABLE vec3 sample_unit_sphere(uint32 &state) {
     return vec3(x, y, z);
 }
 
-inline CUDA_CALLABLE vec3 sample_unit_hemisphere_surface(uint32 &state) {
+inline __device__ vec3 sample_unit_hemisphere_surface(uint32 &state) {
     float phi = acos(1.f - randf(state));
     float theta = randf(state, 0.f, 2.f * M_PI);
     float x = cos(theta) * sin(phi);
@@ -97,7 +97,7 @@ inline CUDA_CALLABLE vec3 sample_unit_hemisphere_surface(uint32 &state) {
     return vec3(x, y, z);
 }
 
-inline CUDA_CALLABLE vec3 sample_unit_hemisphere(uint32 &state) {
+inline __device__ vec3 sample_unit_hemisphere(uint32 &state) {
     float phi = acos(1.f - randf(state));
     float theta = randf(state, 0.f, 2.f * M_PI);
     float r = pow(randf(state), 1.f / 3.f);
@@ -107,13 +107,13 @@ inline CUDA_CALLABLE vec3 sample_unit_hemisphere(uint32 &state) {
     return vec3(x, y, z);
 }
 
-inline CUDA_CALLABLE vec2 sample_unit_square(uint32 &state) {
+inline __device__ vec2 sample_unit_square(uint32 &state) {
     float x = randf(state) - 0.5f;
     float y = randf(state) - 0.5f;
     return vec2(x, y);
 }
 
-inline CUDA_CALLABLE vec3 sample_unit_cube(uint32 &state) {
+inline __device__ vec3 sample_unit_cube(uint32 &state) {
     float x = randf(state) - 0.5f;
     float y = randf(state) - 0.5f;
     float z = randf(state) - 0.5f;
@@ -128,7 +128,7 @@ inline CUDA_CALLABLE vec3 sample_unit_cube(uint32 &state) {
  * If random_loggam(k+1) is being used to compute log(k!) for an integer k, consider
  * using logfactorial(k) instead.
  */
-inline CUDA_CALLABLE float random_loggam(float x) {
+inline __device__ float random_loggam(float x) {
     float x0, x2, lg2pi, gl, gl0;
     uint32 n;
 
@@ -165,7 +165,7 @@ inline CUDA_CALLABLE float random_loggam(float x) {
     return gl;
 }
 
-inline CUDA_CALLABLE uint32 random_poisson_mult(uint32 &state, float lam) {
+inline __device__ uint32 random_poisson_mult(uint32 &state, float lam) {
     uint32 X;
     float prod, U, enlam;
 
@@ -189,7 +189,7 @@ inline CUDA_CALLABLE uint32 random_poisson_mult(uint32 &state, float lam) {
  * W. Hoermann
  * Insurance: Mathematics and Economics 12, 39-45 (1993)
  */
-inline CUDA_CALLABLE uint32 random_poisson(uint32 &state, float lam) {
+inline __device__ uint32 random_poisson(uint32 &state, float lam) {
     uint32 k;
     float U, V, slam, loglam, a, b, invalpha, vr, us;
 
@@ -223,7 +223,7 @@ inline CUDA_CALLABLE uint32 random_poisson(uint32 &state, float lam) {
 * poisson implementation uses half the precision used in NumPy's implementation
 * both precisions appear to converge in the statistical limit
 */
-inline CUDA_CALLABLE uint32 poisson(uint32 &state, float lam) {
+inline __device__ uint32 poisson(uint32 &state, float lam) {
     if (lam >= 10.f) {
         return random_poisson(state, lam);
     } else if (lam == 0.f) {

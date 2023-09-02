@@ -6,80 +6,33 @@
 
 #pragma once
 
-#include "crt.h"
+#include <cuda_runtime_api.h>
 
 namespace wp {
 
-#if FP_CHECK
-
-#define FP_ASSERT_FWD(value) \
-    print(value);            \
-    printf(")\n");           \
-    assert(0);
-
-#define FP_VERIFY_FWD_1(value)                                               \
-    if (!isfinite(value)) {                                                  \
-        printf("%s:%d - %s(arr, %d) ", __FILE__, __LINE__, __FUNCTION__, i); \
-        FP_ASSERT_FWD(value)                                                 \
-    }
-
-#define FP_VERIFY_FWD_2(value)                                                      \
-    if (!isfinite(value)) {                                                         \
-        printf("%s:%d - %s(arr, %d, %d) ", __FILE__, __LINE__, __FUNCTION__, i, j); \
-        FP_ASSERT_FWD(value)                                                        \
-    }
-
-#define FP_VERIFY_FWD_3(value)                                                             \
-    if (!isfinite(value)) {                                                                \
-        printf("%s:%d - %s(arr, %d, %d, %d) ", __FILE__, __LINE__, __FUNCTION__, i, j, k); \
-        FP_ASSERT_FWD(value)                                                               \
-    }
-
-#define FP_VERIFY_FWD_4(value)                                                                    \
-    if (!isfinite(value)) {                                                                       \
-        printf("%s:%d - %s(arr, %d, %d, %d, %d) ", __FILE__, __LINE__, __FUNCTION__, i, j, k, l); \
-        FP_ASSERT_FWD(value)                                                                      \
-    }
-
-#else
-
-#define FP_VERIFY_FWD_1(value) \
-    {}
-#define FP_VERIFY_FWD_2(value) \
-    {}
-#define FP_VERIFY_FWD_3(value) \
-    {}
-#define FP_VERIFY_FWD_4(value) \
-    {}
-
-#endif// WP_FP_CHECK
-
 const int ARRAY_MAX_DIMS = 4;// must match constant in types.py
-
 const int ARRAY_TYPE_REGULAR = 0;// must match constant in types.py
 const int ARRAY_TYPE_INDEXED = 1;// must match constant in types.py
 
 struct shape_t {
     int dims[ARRAY_MAX_DIMS];
 
-    CUDA_CALLABLE inline shape_t() : dims() {}
+    __device__ inline shape_t() : dims() {}
 
-    CUDA_CALLABLE inline int operator[](int i) const {
-        assert(i < ARRAY_MAX_DIMS);
+    __device__ inline int operator[](int i) const {
         return dims[i];
     }
 
-    CUDA_CALLABLE inline int &operator[](int i) {
-        assert(i < ARRAY_MAX_DIMS);
+    __device__ inline int &operator[](int i) {
         return dims[i];
     }
 };
 
-CUDA_CALLABLE inline int index(const shape_t &s, int i) {
+__device__ inline int index(const shape_t &s, int i) {
     return s.dims[i];
 }
 
-inline CUDA_CALLABLE void print(shape_t s) {
+inline __device__ void print(shape_t s) {
     // todo: only print valid dims, currently shape has a fixed size
     // but we don't know how many dims are valid (e.g.: 1d, 2d, etc)
     // should probably store ndim with shape
@@ -88,10 +41,10 @@ inline CUDA_CALLABLE void print(shape_t s) {
 
 template<typename T>
 struct array_t {
-    CUDA_CALLABLE inline array_t() {}
-    CUDA_CALLABLE inline array_t(int) {}// for backward a = 0 initialization syntax
+    __device__ inline array_t() {}
+    __device__ inline array_t(int) {}// for backward a = 0 initialization syntax
 
-    CUDA_CALLABLE array_t(T *data, int size, T *grad = nullptr) : data(data), grad(grad) {
+    __device__ array_t(T *data, int size, T *grad = nullptr) : data(data), grad(grad) {
         // constructor for 1d array
         shape.dims[0] = size;
         shape.dims[1] = 0;
@@ -103,7 +56,7 @@ struct array_t {
         strides[2] = 0;
         strides[3] = 0;
     }
-    CUDA_CALLABLE array_t(T *data, int dim0, int dim1, T *grad = nullptr) : data(data), grad(grad) {
+    __device__ array_t(T *data, int dim0, int dim1, T *grad = nullptr) : data(data), grad(grad) {
         // constructor for 2d array
         shape.dims[0] = dim0;
         shape.dims[1] = dim1;
@@ -115,7 +68,7 @@ struct array_t {
         strides[2] = 0;
         strides[3] = 0;
     }
-    CUDA_CALLABLE array_t(T *data, int dim0, int dim1, int dim2, T *grad = nullptr) : data(data), grad(grad) {
+    __device__ array_t(T *data, int dim0, int dim1, int dim2, T *grad = nullptr) : data(data), grad(grad) {
         // constructor for 3d array
         shape.dims[0] = dim0;
         shape.dims[1] = dim1;
@@ -127,7 +80,7 @@ struct array_t {
         strides[2] = sizeof(T);
         strides[3] = 0;
     }
-    CUDA_CALLABLE array_t(T *data, int dim0, int dim1, int dim2, int dim3, T *grad = nullptr) : data(data), grad(grad) {
+    __device__ array_t(T *data, int dim0, int dim1, int dim2, int dim3, T *grad = nullptr) : data(data), grad(grad) {
         // constructor for 4d array
         shape.dims[0] = dim0;
         shape.dims[1] = dim1;
@@ -140,7 +93,7 @@ struct array_t {
         strides[3] = sizeof(T);
     }
 
-    CUDA_CALLABLE inline bool empty() const { return !data; }
+    __device__ inline bool empty() const { return !data; }
 
     T *data{nullptr};
     T *grad{nullptr};
@@ -148,7 +101,7 @@ struct array_t {
     int strides[ARRAY_MAX_DIMS];
     int ndim;
 
-    CUDA_CALLABLE inline operator T *() const { return data; }
+    __device__ inline operator T *() const { return data; }
 };
 
 // TODO:
@@ -156,10 +109,10 @@ struct array_t {
 // - templated dimensionality? (also for array_t to save space when passing arrays to kernels)
 template<typename T>
 struct indexedarray_t {
-    CUDA_CALLABLE inline indexedarray_t() {}
-    CUDA_CALLABLE inline indexedarray_t(int) {}// for backward a = 0 initialization syntax
+    __device__ inline indexedarray_t() {}
+    __device__ inline indexedarray_t(int) {}// for backward a = 0 initialization syntax
 
-    CUDA_CALLABLE inline bool empty() const { return !arr.data; }
+    __device__ inline bool empty() const { return !arr.data; }
 
     array_t<T> arr;
     int *indices[ARRAY_MAX_DIMS];// index array per dimension (can be NULL)
@@ -168,29 +121,29 @@ struct indexedarray_t {
 
 // return stride (in bytes) of the given index
 template<typename T>
-CUDA_CALLABLE inline size_t stride(const array_t<T> &a, int dim) {
+__device__ inline size_t stride(const array_t<T> &a, int dim) {
     return size_t(a.strides[dim]);
 }
 
 template<typename T>
-CUDA_CALLABLE inline T *data_at_byte_offset(const array_t<T> &a, size_t byte_offset) {
+__device__ inline T *data_at_byte_offset(const array_t<T> &a, size_t byte_offset) {
     return reinterpret_cast<T *>(reinterpret_cast<char *>(a.data) + byte_offset);
 }
 
 template<typename T>
-CUDA_CALLABLE inline T *grad_at_byte_offset(const array_t<T> &a, size_t byte_offset) {
+__device__ inline T *grad_at_byte_offset(const array_t<T> &a, size_t byte_offset) {
     return reinterpret_cast<T *>(reinterpret_cast<char *>(a.grad) + byte_offset);
 }
 
 template<typename T>
-CUDA_CALLABLE inline size_t byte_offset(const array_t<T> &arr, int i) {
+__device__ inline size_t byte_offset(const array_t<T> &arr, int i) {
     assert(i >= 0 && i < arr.shape[0]);
 
     return i * stride(arr, 0);
 }
 
 template<typename T>
-CUDA_CALLABLE inline size_t byte_offset(const array_t<T> &arr, int i, int j) {
+__device__ inline size_t byte_offset(const array_t<T> &arr, int i, int j) {
     assert(i >= 0 && i < arr.shape[0]);
     assert(j >= 0 && j < arr.shape[1]);
 
@@ -198,7 +151,7 @@ CUDA_CALLABLE inline size_t byte_offset(const array_t<T> &arr, int i, int j) {
 }
 
 template<typename T>
-CUDA_CALLABLE inline size_t byte_offset(const array_t<T> &arr, int i, int j, int k) {
+__device__ inline size_t byte_offset(const array_t<T> &arr, int i, int j, int k) {
     assert(i >= 0 && i < arr.shape[0]);
     assert(j >= 0 && j < arr.shape[1]);
     assert(k >= 0 && k < arr.shape[2]);
@@ -207,7 +160,7 @@ CUDA_CALLABLE inline size_t byte_offset(const array_t<T> &arr, int i, int j, int
 }
 
 template<typename T>
-CUDA_CALLABLE inline size_t byte_offset(const array_t<T> &arr, int i, int j, int k, int l) {
+__device__ inline size_t byte_offset(const array_t<T> &arr, int i, int j, int k, int l) {
     assert(i >= 0 && i < arr.shape[0]);
     assert(j >= 0 && j < arr.shape[1]);
     assert(k >= 0 && k < arr.shape[2]);
@@ -217,75 +170,59 @@ CUDA_CALLABLE inline size_t byte_offset(const array_t<T> &arr, int i, int j, int
 }
 
 template<typename T>
-CUDA_CALLABLE inline T &index(const array_t<T> &arr, int i) {
+__device__ inline T &index(const array_t<T> &arr, int i) {
     assert(arr.ndim == 1);
     T &result = *data_at_byte_offset(arr, byte_offset(arr, i));
-    FP_VERIFY_FWD_1(result)
-
     return result;
 }
 
 template<typename T>
-CUDA_CALLABLE inline T &index(const array_t<T> &arr, int i, int j) {
+__device__ inline T &index(const array_t<T> &arr, int i, int j) {
     assert(arr.ndim == 2);
     T &result = *data_at_byte_offset(arr, byte_offset(arr, i, j));
-    FP_VERIFY_FWD_2(result)
-
     return result;
 }
 
 template<typename T>
-CUDA_CALLABLE inline T &index(const array_t<T> &arr, int i, int j, int k) {
+__device__ inline T &index(const array_t<T> &arr, int i, int j, int k) {
     assert(arr.ndim == 3);
     T &result = *data_at_byte_offset(arr, byte_offset(arr, i, j, k));
-    FP_VERIFY_FWD_3(result)
-
     return result;
 }
 
 template<typename T>
-CUDA_CALLABLE inline T &index(const array_t<T> &arr, int i, int j, int k, int l) {
+__device__ inline T &index(const array_t<T> &arr, int i, int j, int k, int l) {
     assert(arr.ndim == 4);
     T &result = *data_at_byte_offset(arr, byte_offset(arr, i, j, k, l));
-    FP_VERIFY_FWD_4(result)
-
     return result;
 }
 
 template<typename T>
-CUDA_CALLABLE inline T &index_grad(const array_t<T> &arr, int i) {
+__device__ inline T &index_grad(const array_t<T> &arr, int i) {
     T &result = *grad_at_byte_offset(arr, byte_offset(arr, i));
-    FP_VERIFY_FWD_1(result)
-
     return result;
 }
 
 template<typename T>
-CUDA_CALLABLE inline T &index_grad(const array_t<T> &arr, int i, int j) {
+__device__ inline T &index_grad(const array_t<T> &arr, int i, int j) {
     T &result = *grad_at_byte_offset(arr, byte_offset(arr, i, j));
-    FP_VERIFY_FWD_2(result)
-
     return result;
 }
 
 template<typename T>
-CUDA_CALLABLE inline T &index_grad(const array_t<T> &arr, int i, int j, int k) {
+__device__ inline T &index_grad(const array_t<T> &arr, int i, int j, int k) {
     T &result = *grad_at_byte_offset(arr, byte_offset(arr, i, j, k));
-    FP_VERIFY_FWD_3(result)
-
     return result;
 }
 
 template<typename T>
-CUDA_CALLABLE inline T &index_grad(const array_t<T> &arr, int i, int j, int k, int l) {
+__device__ inline T &index_grad(const array_t<T> &arr, int i, int j, int k, int l) {
     T &result = *grad_at_byte_offset(arr, byte_offset(arr, i, j, k, l));
-    FP_VERIFY_FWD_4(result)
-
     return result;
 }
 
 template<typename T>
-CUDA_CALLABLE inline T &index(const indexedarray_t<T> &iarr, int i) {
+__device__ inline T &index(const indexedarray_t<T> &iarr, int i) {
     assert(iarr.arr.ndim == 1);
     assert(i >= 0 && i < iarr.shape[0]);
 
@@ -295,13 +232,11 @@ CUDA_CALLABLE inline T &index(const indexedarray_t<T> &iarr, int i) {
     }
 
     T &result = *data_at_byte_offset(iarr.arr, byte_offset(iarr.arr, i));
-    FP_VERIFY_FWD_1(result)
-
     return result;
 }
 
 template<typename T>
-CUDA_CALLABLE inline T &index(const indexedarray_t<T> &iarr, int i, int j) {
+__device__ inline T &index(const indexedarray_t<T> &iarr, int i, int j) {
     assert(iarr.arr.ndim == 2);
     assert(i >= 0 && i < iarr.shape[0]);
     assert(j >= 0 && j < iarr.shape[1]);
@@ -316,13 +251,11 @@ CUDA_CALLABLE inline T &index(const indexedarray_t<T> &iarr, int i, int j) {
     }
 
     T &result = *data_at_byte_offset(iarr.arr, byte_offset(iarr.arr, i, j));
-    FP_VERIFY_FWD_1(result)
-
     return result;
 }
 
 template<typename T>
-CUDA_CALLABLE inline T &index(const indexedarray_t<T> &iarr, int i, int j, int k) {
+__device__ inline T &index(const indexedarray_t<T> &iarr, int i, int j, int k) {
     assert(iarr.arr.ndim == 3);
     assert(i >= 0 && i < iarr.shape[0]);
     assert(j >= 0 && j < iarr.shape[1]);
@@ -342,13 +275,11 @@ CUDA_CALLABLE inline T &index(const indexedarray_t<T> &iarr, int i, int j, int k
     }
 
     T &result = *data_at_byte_offset(iarr.arr, byte_offset(iarr.arr, i, j, k));
-    FP_VERIFY_FWD_1(result)
-
     return result;
 }
 
 template<typename T>
-CUDA_CALLABLE inline T &index(const indexedarray_t<T> &iarr, int i, int j, int k, int l) {
+__device__ inline T &index(const indexedarray_t<T> &iarr, int i, int j, int k, int l) {
     assert(iarr.arr.ndim == 4);
     assert(i >= 0 && i < iarr.shape[0]);
     assert(j >= 0 && j < iarr.shape[1]);
@@ -373,13 +304,11 @@ CUDA_CALLABLE inline T &index(const indexedarray_t<T> &iarr, int i, int j, int k
     }
 
     T &result = *data_at_byte_offset(iarr.arr, byte_offset(iarr.arr, i, j, k, l));
-    FP_VERIFY_FWD_1(result)
-
     return result;
 }
 
 template<typename T>
-CUDA_CALLABLE inline array_t<T> view(array_t<T> &src, int i) {
+__device__ inline array_t<T> view(array_t<T> &src, int i) {
     assert(src.ndim > 1);
     assert(i >= 0 && i < src.shape[0]);
 
@@ -397,7 +326,7 @@ CUDA_CALLABLE inline array_t<T> view(array_t<T> &src, int i) {
 }
 
 template<typename T>
-CUDA_CALLABLE inline array_t<T> view(array_t<T> &src, int i, int j) {
+__device__ inline array_t<T> view(array_t<T> &src, int i, int j) {
     assert(src.ndim > 2);
     assert(i >= 0 && i < src.shape[0]);
     assert(j >= 0 && j < src.shape[1]);
@@ -414,7 +343,7 @@ CUDA_CALLABLE inline array_t<T> view(array_t<T> &src, int i, int j) {
 }
 
 template<typename T>
-CUDA_CALLABLE inline array_t<T> view(array_t<T> &src, int i, int j, int k) {
+__device__ inline array_t<T> view(array_t<T> &src, int i, int j, int k) {
     assert(src.ndim > 3);
     assert(i >= 0 && i < src.shape[0]);
     assert(j >= 0 && j < src.shape[1]);
@@ -430,7 +359,7 @@ CUDA_CALLABLE inline array_t<T> view(array_t<T> &src, int i, int j, int k) {
 }
 
 template<typename T>
-CUDA_CALLABLE inline indexedarray_t<T> view(indexedarray_t<T> &src, int i) {
+__device__ inline indexedarray_t<T> view(indexedarray_t<T> &src, int i) {
     assert(src.arr.ndim > 1);
 
     if (src.indices[0]) {
@@ -451,7 +380,7 @@ CUDA_CALLABLE inline indexedarray_t<T> view(indexedarray_t<T> &src, int i) {
 }
 
 template<typename T>
-CUDA_CALLABLE inline indexedarray_t<T> view(indexedarray_t<T> &src, int i, int j) {
+__device__ inline indexedarray_t<T> view(indexedarray_t<T> &src, int i, int j) {
     assert(src.arr.ndim > 2);
 
     if (src.indices[0]) {
@@ -474,7 +403,7 @@ CUDA_CALLABLE inline indexedarray_t<T> view(indexedarray_t<T> &src, int i, int j
 }
 
 template<typename T>
-CUDA_CALLABLE inline indexedarray_t<T> view(indexedarray_t<T> &src, int i, int j, int k) {
+__device__ inline indexedarray_t<T> view(indexedarray_t<T> &src, int i, int j, int k) {
     assert(src.arr.ndim > 3);
 
     if (src.indices[0]) {
@@ -501,7 +430,7 @@ CUDA_CALLABLE inline indexedarray_t<T> view(indexedarray_t<T> &src, int i, int j
 // TODO: lower_bound() for indexed arrays?
 
 template<typename T>
-CUDA_CALLABLE inline int lower_bound(const array_t<T> &arr, int arr_begin, int arr_end, T value) {
+__device__ inline int lower_bound(const array_t<T> &arr, int arr_begin, int arr_end, T value) {
     assert(arr.ndim == 1);
 
     int lower = arr_begin;
@@ -521,88 +450,80 @@ CUDA_CALLABLE inline int lower_bound(const array_t<T> &arr, int arr_begin, int a
 }
 
 template<typename T>
-CUDA_CALLABLE inline int lower_bound(const array_t<T> &arr, T value) {
+__device__ inline int lower_bound(const array_t<T> &arr, T value) {
     return lower_bound(arr, 0, arr.shape[0], value);
 }
 
 template<template<typename> class A, typename T>
-inline CUDA_CALLABLE T atomic_add(const A<T> &buf, int i, T value) { return atomic_add(&index(buf, i), value); }
+inline __device__ T atomic_add(const A<T> &buf, int i, T value) { return atomic_add(&index(buf, i), value); }
 template<template<typename> class A, typename T>
-inline CUDA_CALLABLE T atomic_add(const A<T> &buf, int i, int j, T value) { return atomic_add(&index(buf, i, j), value); }
+inline __device__ T atomic_add(const A<T> &buf, int i, int j, T value) { return atomic_add(&index(buf, i, j), value); }
 template<template<typename> class A, typename T>
-inline CUDA_CALLABLE T atomic_add(const A<T> &buf, int i, int j, int k, T value) { return atomic_add(&index(buf, i, j, k), value); }
+inline __device__ T atomic_add(const A<T> &buf, int i, int j, int k, T value) { return atomic_add(&index(buf, i, j, k), value); }
 template<template<typename> class A, typename T>
-inline CUDA_CALLABLE T atomic_add(const A<T> &buf, int i, int j, int k, int l, T value) { return atomic_add(&index(buf, i, j, k, l), value); }
+inline __device__ T atomic_add(const A<T> &buf, int i, int j, int k, int l, T value) { return atomic_add(&index(buf, i, j, k, l), value); }
 
 template<template<typename> class A, typename T>
-inline CUDA_CALLABLE T atomic_sub(const A<T> &buf, int i, T value) { return atomic_add(&index(buf, i), -value); }
+inline __device__ T atomic_sub(const A<T> &buf, int i, T value) { return atomic_add(&index(buf, i), -value); }
 template<template<typename> class A, typename T>
-inline CUDA_CALLABLE T atomic_sub(const A<T> &buf, int i, int j, T value) { return atomic_add(&index(buf, i, j), -value); }
+inline __device__ T atomic_sub(const A<T> &buf, int i, int j, T value) { return atomic_add(&index(buf, i, j), -value); }
 template<template<typename> class A, typename T>
-inline CUDA_CALLABLE T atomic_sub(const A<T> &buf, int i, int j, int k, T value) { return atomic_add(&index(buf, i, j, k), -value); }
+inline __device__ T atomic_sub(const A<T> &buf, int i, int j, int k, T value) { return atomic_add(&index(buf, i, j, k), -value); }
 template<template<typename> class A, typename T>
-inline CUDA_CALLABLE T atomic_sub(const A<T> &buf, int i, int j, int k, int l, T value) { return atomic_add(&index(buf, i, j, k, l), -value); }
+inline __device__ T atomic_sub(const A<T> &buf, int i, int j, int k, int l, T value) { return atomic_add(&index(buf, i, j, k, l), -value); }
 
 template<template<typename> class A, typename T>
-inline CUDA_CALLABLE T atomic_min(const A<T> &buf, int i, T value) { return atomic_min(&index(buf, i), value); }
+inline __device__ T atomic_min(const A<T> &buf, int i, T value) { return atomic_min(&index(buf, i), value); }
 template<template<typename> class A, typename T>
-inline CUDA_CALLABLE T atomic_min(const A<T> &buf, int i, int j, T value) { return atomic_min(&index(buf, i, j), value); }
+inline __device__ T atomic_min(const A<T> &buf, int i, int j, T value) { return atomic_min(&index(buf, i, j), value); }
 template<template<typename> class A, typename T>
-inline CUDA_CALLABLE T atomic_min(const A<T> &buf, int i, int j, int k, T value) { return atomic_min(&index(buf, i, j, k), value); }
+inline __device__ T atomic_min(const A<T> &buf, int i, int j, int k, T value) { return atomic_min(&index(buf, i, j, k), value); }
 template<template<typename> class A, typename T>
-inline CUDA_CALLABLE T atomic_min(const A<T> &buf, int i, int j, int k, int l, T value) { return atomic_min(&index(buf, i, j, k, l), value); }
+inline __device__ T atomic_min(const A<T> &buf, int i, int j, int k, int l, T value) { return atomic_min(&index(buf, i, j, k, l), value); }
 
 template<template<typename> class A, typename T>
-inline CUDA_CALLABLE T atomic_max(const A<T> &buf, int i, T value) { return atomic_max(&index(buf, i), value); }
+inline __device__ T atomic_max(const A<T> &buf, int i, T value) { return atomic_max(&index(buf, i), value); }
 template<template<typename> class A, typename T>
-inline CUDA_CALLABLE T atomic_max(const A<T> &buf, int i, int j, T value) { return atomic_max(&index(buf, i, j), value); }
+inline __device__ T atomic_max(const A<T> &buf, int i, int j, T value) { return atomic_max(&index(buf, i, j), value); }
 template<template<typename> class A, typename T>
-inline CUDA_CALLABLE T atomic_max(const A<T> &buf, int i, int j, int k, T value) { return atomic_max(&index(buf, i, j, k), value); }
+inline __device__ T atomic_max(const A<T> &buf, int i, int j, int k, T value) { return atomic_max(&index(buf, i, j, k), value); }
 template<template<typename> class A, typename T>
-inline CUDA_CALLABLE T atomic_max(const A<T> &buf, int i, int j, int k, int l, T value) { return atomic_max(&index(buf, i, j, k, l), value); }
+inline __device__ T atomic_max(const A<T> &buf, int i, int j, int k, int l, T value) { return atomic_max(&index(buf, i, j, k, l), value); }
 
 template<template<typename> class A, typename T>
-inline CUDA_CALLABLE T load(const A<T> &buf, int i) { return index(buf, i); }
+inline __device__ T load(const A<T> &buf, int i) { return index(buf, i); }
 template<template<typename> class A, typename T>
-inline CUDA_CALLABLE T load(const A<T> &buf, int i, int j) { return index(buf, i, j); }
+inline __device__ T load(const A<T> &buf, int i, int j) { return index(buf, i, j); }
 template<template<typename> class A, typename T>
-inline CUDA_CALLABLE T load(const A<T> &buf, int i, int j, int k) { return index(buf, i, j, k); }
+inline __device__ T load(const A<T> &buf, int i, int j, int k) { return index(buf, i, j, k); }
 template<template<typename> class A, typename T>
-inline CUDA_CALLABLE T load(const A<T> &buf, int i, int j, int k, int l) { return index(buf, i, j, k, l); }
+inline __device__ T load(const A<T> &buf, int i, int j, int k, int l) { return index(buf, i, j, k, l); }
 
 template<template<typename> class A, typename T>
-inline CUDA_CALLABLE void store(const A<T> &buf, int i, T value) {
-    FP_VERIFY_FWD_1(value)
-
+inline __device__ void store(const A<T> &buf, int i, T value) {
     index(buf, i) = value;
 }
 template<template<typename> class A, typename T>
-inline CUDA_CALLABLE void store(const A<T> &buf, int i, int j, T value) {
-    FP_VERIFY_FWD_2(value)
-
+inline __device__ void store(const A<T> &buf, int i, int j, T value) {
     index(buf, i, j) = value;
 }
 template<template<typename> class A, typename T>
-inline CUDA_CALLABLE void store(const A<T> &buf, int i, int j, int k, T value) {
-    FP_VERIFY_FWD_3(value)
-
+inline __device__ void store(const A<T> &buf, int i, int j, int k, T value) {
     index(buf, i, j, k) = value;
 }
 template<template<typename> class A, typename T>
-inline CUDA_CALLABLE void store(const A<T> &buf, int i, int j, int k, int l, T value) {
-    FP_VERIFY_FWD_4(value)
-
+inline __device__ void store(const A<T> &buf, int i, int j, int k, int l, T value) {
     index(buf, i, j, k, l) = value;
 }
 
 // select operator to check for array being null
 template<typename T1, typename T2>
-CUDA_CALLABLE inline T2 select(const array_t<T1> &arr, const T2 &a, const T2 &b) { return arr.data ? b : a; }
+__device__ inline T2 select(const array_t<T1> &arr, const T2 &a, const T2 &b) { return arr.data ? b : a; }
 
 
 // stub for the case where we have an nested array inside a struct and
 // atomic add the whole struct onto an array (e.g.: during backwards pass)
 template<typename T>
-CUDA_CALLABLE inline void atomic_add(array_t<T> *, array_t<T>) {}
+__device__ inline void atomic_add(array_t<T> *, array_t<T>) {}
 
 }// namespace wp

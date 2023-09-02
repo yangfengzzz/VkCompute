@@ -121,7 +121,7 @@
         }                                         \
     }
 
-CUDA_CALLABLE inline int coplanar_tri_tri(float N[3], float V0[3], float V1[3], float V2[3],
+__device__ inline int coplanar_tri_tri(float N[3], float V0[3], float V1[3], float V2[3],
                                           float U0[3], float U1[3], float U2[3]) {
     float A[3];
     short i0, i1;
@@ -203,7 +203,7 @@ CUDA_CALLABLE inline int coplanar_tri_tri(float N[3], float V0[3], float V1[3], 
         }                                                                              \
     }
 
-CUDA_CALLABLE inline int NoDivTriTriIsect(float V0[3], float V1[3], float V2[3],
+__device__ inline int NoDivTriTriIsect(float V0[3], float V1[3], float V2[3],
                                           float U0[3], float U1[3], float U2[3]) {
     float E1[3], E2[3];
     float N1[3], N2[3], d1, d2;
