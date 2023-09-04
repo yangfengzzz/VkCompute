@@ -246,6 +246,16 @@ set(LINUX_D2D_FILES
         platform/unix/unix_d2d_platform.cpp
         platform/unix/direct_window.cpp)
 
+set(FG_FILES
+        fg/framegraph.h
+        fg/realize.h
+        fg/render_task.h
+        fg/render_task_base.h
+        fg/render_task_builder.h
+        fg/resource.h
+        fg/resource_base.h
+)
+
 source_group("\\" FILES ${FRAMEWORK_FILES})
 source_group("common\\" FILES ${COMMON_FILES})
 source_group("platform\\" FILES ${PLATFORM_FILES})
@@ -267,6 +277,7 @@ set(PROJECT_FILES
         ${COMPUTE_FILES}
         ${STATS_FILES}
         ${SHADER_FILES}
+        ${FG_FILES}
 )
 
 # Add files based on platform
