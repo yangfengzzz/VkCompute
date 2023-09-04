@@ -58,10 +58,11 @@ void RenderContext::prepare(size_t thread_count, const RenderTarget::CreateFunc 
         swapchain = nullptr;
 
         auto color_image = core::Image{device,
-                                       VkExtent3D{surface_extent.width, surface_extent.height, 1},
-                                       DEFAULT_VK_FORMAT,// We can use any format here that we like
-                                       VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT | VK_IMAGE_USAGE_TRANSFER_SRC_BIT,
-                                       VMA_MEMORY_USAGE_GPU_ONLY};
+                                       core::ImageDesc{
+                                           VkExtent3D{surface_extent.width, surface_extent.height, 1},
+                                           DEFAULT_VK_FORMAT,// We can use any format here that we like
+                                           VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT | VK_IMAGE_USAGE_TRANSFER_SRC_BIT,
+                                           VMA_MEMORY_USAGE_GPU_ONLY}};
 
         auto render_target = create_render_target_func(std::move(color_image));
         frames.emplace_back(std::make_unique<RenderFrame>(device, std::move(render_target), thread_count));

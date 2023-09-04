@@ -16,27 +16,31 @@ namespace vox::core {
 class Device;
 class ImageView;
 
+struct ImageDesc {
+    VkExtent3D extent{};
+    VkFormat format = VK_FORMAT_UNDEFINED;
+    VkImageUsageFlags image_usage{};
+    VmaMemoryUsage memory_usage = VMA_MEMORY_USAGE_UNKNOWN;
+    VkSampleCountFlagBits sample_count = VK_SAMPLE_COUNT_1_BIT;
+    uint32_t mip_levels = 1;
+    uint32_t array_layers = 1;
+    VkImageTiling tiling = VK_IMAGE_TILING_OPTIMAL;
+    VkImageCreateFlags flags = 0;
+};
+
 class Image : public VulkanResource<VkImage, VK_OBJECT_TYPE_IMAGE, const Device> {
 public:
+    Image(Device const &device,
+          ImageDesc desc,
+          uint32_t num_queue_families = 0,
+          const uint32_t *queue_families = nullptr);
+
     Image(Device const &device,
           VkImage handle,
           const VkExtent3D &extent,
           VkFormat format,
           VkImageUsageFlags image_usage,
           VkSampleCountFlagBits sample_count = VK_SAMPLE_COUNT_1_BIT);
-
-    Image(Device const &device,
-          const VkExtent3D &extent,
-          VkFormat format,
-          VkImageUsageFlags image_usage,
-          VmaMemoryUsage memory_usage,
-          VkSampleCountFlagBits sample_count = VK_SAMPLE_COUNT_1_BIT,
-          uint32_t mip_levels = 1,
-          uint32_t array_layers = 1,
-          VkImageTiling tiling = VK_IMAGE_TILING_OPTIMAL,
-          VkImageCreateFlags flags = 0,
-          uint32_t num_queue_families = 0,
-          const uint32_t *queue_families = nullptr);
 
     Image(const Image &) = delete;
 

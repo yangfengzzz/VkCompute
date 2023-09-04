@@ -47,40 +47,32 @@ inline VkImageType find_image_type(VkExtent3D extent) {
 }// namespace
 
 Image::Image(Device const &device,
-             const VkExtent3D &extent,
-             VkFormat format,
-             VkImageUsageFlags image_usage,
-             VmaMemoryUsage memory_usage,
-             VkSampleCountFlagBits sample_count,
-             const uint32_t mip_levels,
-             const uint32_t array_layers,
-             VkImageTiling tiling,
-             VkImageCreateFlags flags,
+             ImageDesc desc,
              uint32_t num_queue_families,
              const uint32_t *queue_families) : VulkanResource{VK_NULL_HANDLE, &device},
-                                               type{find_image_type(extent)},
-                                               extent{extent},
-                                               format{format},
-                                               sample_count{sample_count},
-                                               usage{image_usage},
-                                               array_layer_count{array_layers},
-                                               tiling{tiling} {
+                                               type{find_image_type(desc.extent)},
+                                               extent{desc.extent},
+                                               format{desc.format},
+                                               sample_count{desc.sample_count},
+                                               usage{desc.image_usage},
+                                               array_layer_count{desc.array_layers},
+                                               tiling{desc.tiling} {
     assert(mip_levels > 0 && "Image should have at least one level");
     assert(array_layers > 0 && "Image should have at least one layer");
 
-    subresource.mipLevel = mip_levels;
-    subresource.arrayLayer = array_layers;
+    subresource.mipLevel = desc.mip_levels;
+    subresource.arrayLayer = desc.array_layers;
 
     VkImageCreateInfo image_info{VK_STRUCTURE_TYPE_IMAGE_CREATE_INFO};
-    image_info.flags = flags;
+    image_info.flags = desc.flags;
     image_info.imageType = type;
     image_info.format = format;
     image_info.extent = extent;
-    image_info.mipLevels = mip_levels;
-    image_info.arrayLayers = array_layers;
+    image_info.mipLevels = desc.mip_levels;
+    image_info.arrayLayers = desc.array_layers;
     image_info.samples = sample_count;
     image_info.tiling = tiling;
-    image_info.usage = image_usage;
+    image_info.usage = desc.image_usage;
 
     if (num_queue_families != 0) {
         image_info.sharingMode = VK_SHARING_MODE_CONCURRENT;
@@ -89,9 +81,9 @@ Image::Image(Device const &device,
     }
 
     VmaAllocationCreateInfo memory_info{};
-    memory_info.usage = memory_usage;
+    memory_info.usage = desc.memory_usage;
 
-    if (image_usage & VK_IMAGE_USAGE_TRANSIENT_ATTACHMENT_BIT) {
+    if (desc.image_usage & VK_IMAGE_USAGE_TRANSIENT_ATTACHMENT_BIT) {
         memory_info.preferredFlags = VK_MEMORY_PROPERTY_LAZILY_ALLOCATED_BIT;
     }
 

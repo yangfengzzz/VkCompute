@@ -172,7 +172,7 @@ void Texture::create_vk_image(core::Device const &device,
     assert(!vk_image && vk_image_views.empty() && "Vulkan image already constructed");
 
     vk_image = std::make_unique<core::Image>(device,
-                                             get_extent(),
+                                             core::ImageDesc{get_extent(),
                                              format,
                                              image_usage,
                                              VMA_MEMORY_USAGE_GPU_ONLY,
@@ -180,7 +180,7 @@ void Texture::create_vk_image(core::Device const &device,
                                              to_u32(mipmaps.size()),
                                              layers,
                                              VK_IMAGE_TILING_OPTIMAL,
-                                             flags);
+                                             flags});
     vk_image->set_debug_name(name);
 }
 
