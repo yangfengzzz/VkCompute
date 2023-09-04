@@ -12,13 +12,25 @@
 
 namespace vox::core {
 struct ImageBarrier {
-    VkImage image;
-    ThsvsAccessType prev_access;
+    VkImage image{};
+    ThsvsAccessType prev_access{};
     ThsvsAccessType next_access;
-    VkImageAspectFlags aspect_mask;
-    bool discard;
+    VkImageAspectFlags aspect_mask{};
+    bool discard{false};
 };
 
 void record_image_barrier(Device &device, VkCommandBuffer cb, const ImageBarrier &barrier);
+
+struct AccessInfo {
+    VkPipelineStageFlags stage_mask;
+    VkAccessFlags access_mask;
+    VkImageLayout image_layout;
+};
+
+AccessInfo get_access_info(ThsvsAccessType access_type);
+
+VkImageAspectFlags image_aspect_mask_from_format(VkFormat format);
+
+VkImageAspectFlags image_aspect_mask_from_access_type_and_format(ThsvsAccessType access_type, VkFormat format);
 
 }// namespace vox::core
