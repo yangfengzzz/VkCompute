@@ -46,3 +46,6 @@
 [submodule "third_party/openvdb"]
 	path = third_party/openvdb
 	url = https://github.com/AcademySoftwareFoundation/openvdb.git
+[submodule "third_party/vk-sync"]
+	path = third_party/vk-sync
+	url = https://github.com/Tobski/simple_vulkan_synchronization.git
