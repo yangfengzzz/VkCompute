@@ -111,17 +111,15 @@ void Vk2CudaApp::after_prepare() {
 
     const size_t n_verts = cuda_sim->get_width() * cuda_sim->get_height();
     const size_t n_inds = (cuda_sim->get_width() - 1) * (cuda_sim->get_height() - 1) * 6;
-    height_buffer = std::make_unique<core::Buffer>(*device, n_verts * sizeof(float),
-                                                   VK_BUFFER_USAGE_TRANSFER_DST_BIT | VK_BUFFER_USAGE_VERTEX_BUFFER_BIT,
-                                                   VMA_MEMORY_USAGE_GPU_ONLY, external_pool.get());
+    height_buffer = std::make_unique<core::Buffer>(*device, core::BufferDesc{n_verts * sizeof(float), VK_BUFFER_USAGE_TRANSFER_DST_BIT | VK_BUFFER_USAGE_VERTEX_BUFFER_BIT, VMA_MEMORY_USAGE_GPU_ONLY}, external_pool.get());
 
-    auto index_buffer = core::Buffer(*device, n_inds * sizeof(uint32_t),
-                                     VK_BUFFER_USAGE_TRANSFER_DST_BIT | VK_BUFFER_USAGE_INDEX_BUFFER_BIT,
-                                     VMA_MEMORY_USAGE_GPU_ONLY);
+    auto index_buffer = core::Buffer(*device, core::BufferDesc{n_inds * sizeof(uint32_t),
+                                                               VK_BUFFER_USAGE_TRANSFER_DST_BIT | VK_BUFFER_USAGE_INDEX_BUFFER_BIT,
+                                                               VMA_MEMORY_USAGE_GPU_ONLY});
 
-    xy_buffer = std::make_unique<core::Buffer>(*device, n_verts * sizeof(Vector2F),
-                                               VK_BUFFER_USAGE_TRANSFER_DST_BIT | VK_BUFFER_USAGE_VERTEX_BUFFER_BIT,
-                                               VMA_MEMORY_USAGE_GPU_ONLY);
+    xy_buffer = std::make_unique<core::Buffer>(*device, core::BufferDesc{n_verts * sizeof(Vector2F),
+                                                                         VK_BUFFER_USAGE_TRANSFER_DST_BIT | VK_BUFFER_USAGE_VERTEX_BUFFER_BIT,
+                                                                         VMA_MEMORY_USAGE_GPU_ONLY});
     init_buffer(index_buffer);
 
     mesh = std::make_shared<BufferMesh>();

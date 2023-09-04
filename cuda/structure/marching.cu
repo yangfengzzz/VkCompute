@@ -7,7 +7,7 @@
 #include "cuda_context.h"
 #include "cuda_util.h"
 #include "marching.h"
-#include "math/math_utils.h"
+#include "math/cuda_math_utils.h"
 
 #include "thrust/device_ptr.h"
 #include "thrust/sort.h"

@@ -32,8 +32,9 @@ public:
         if (iter == shader_buffers_.end()) {
             shader_buffers_.insert(std::make_pair(
                 property_name,
-                std::make_unique<core::Buffer>(device_, sizeof(T), VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT,
-                                               VMA_MEMORY_USAGE_CPU_TO_GPU)));
+                std::make_unique<core::Buffer>(device_, core::BufferDesc{sizeof(T),
+                                                                         VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT,
+                                                                         VMA_MEMORY_USAGE_CPU_TO_GPU})));
         }
         iter = shader_buffers_.find(property_name);
         iter->second->update(&value, sizeof(T));
@@ -45,8 +46,9 @@ public:
         if (iter == shader_buffers_.end()) {
             shader_buffers_.insert(std::make_pair(
                 property_name,
-                std::make_unique<core::Buffer>(device_, sizeof(T) * value.size(),
-                                               VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT, VMA_MEMORY_USAGE_CPU_TO_GPU)));
+                std::make_unique<core::Buffer>(device_, core::BufferDesc{sizeof(T) * value.size(),
+                                                                         VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT,
+                                                                         VMA_MEMORY_USAGE_CPU_TO_GPU})));
         }
         iter = shader_buffers_.find(property_name);
         iter->second->update(value.data(), sizeof(T) * value.size());
@@ -58,8 +60,9 @@ public:
         if (iter == shader_buffers_.end()) {
             shader_buffers_.insert(std::make_pair(
                 property_name,
-                std::make_unique<core::Buffer>(device_, sizeof(T) * N, VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT,
-                                               VMA_MEMORY_USAGE_CPU_TO_GPU)));
+                std::make_unique<core::Buffer>(device_, core::BufferDesc{sizeof(T) * N,
+                                                                         VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT,
+                                                                         VMA_MEMORY_USAGE_CPU_TO_GPU})));
         }
         iter = shader_buffers_.find(property_name);
         iter->second->update(value.data(), sizeof(T) * N);

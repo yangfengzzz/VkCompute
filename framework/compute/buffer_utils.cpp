@@ -12,9 +12,9 @@ void set_device_buffer_via_staging_buffer(
     core::Device &device, core::Buffer &device_buffer,
     size_t buffer_size_in_bytes,
     const std::function<void(void *, size_t)> &staging_buffer_setter) {
-    auto stage_buffer = core::Buffer(device, buffer_size_in_bytes,
-                                     VK_BUFFER_USAGE_TRANSFER_SRC_BIT,
-                                     VMA_MEMORY_USAGE_CPU_ONLY);
+    auto stage_buffer = core::Buffer(device, core::BufferDesc{buffer_size_in_bytes,
+                                                              VK_BUFFER_USAGE_TRANSFER_SRC_BIT,
+                                                              VMA_MEMORY_USAGE_CPU_ONLY});
     auto src_staging_ptr = stage_buffer.map();
     staging_buffer_setter(src_staging_ptr, buffer_size_in_bytes);
     stage_buffer.unmap();
@@ -35,9 +35,9 @@ void get_device_buffer_via_staging_buffer(
     core::Device &device, core::Buffer &device_buffer,
     size_t buffer_size_in_bytes,
     const std::function<void(void *, size_t)> &staging_buffer_getter) {
-    auto stage_buffer = core::Buffer(device, buffer_size_in_bytes,
-                                     VK_BUFFER_USAGE_TRANSFER_DST_BIT,
-                                     VMA_MEMORY_USAGE_CPU_ONLY);
+    auto stage_buffer = core::Buffer(device, core::BufferDesc{buffer_size_in_bytes,
+                                                              VK_BUFFER_USAGE_TRANSFER_DST_BIT,
+                                                              VMA_MEMORY_USAGE_CPU_ONLY});
 
     auto &queue = device.get_queue_by_flags(VK_QUEUE_TRANSFER_BIT, 0);
     auto &cmd = device.request_command_buffer();

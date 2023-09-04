@@ -21,8 +21,9 @@ private:
 
 public:
     explicit AtomicMaterial(core::Device &device) : BaseMaterial(device, "atomicRender"), atomic_prop_("atomicCounter") {
-        atomic_buffer_ = std::make_unique<core::Buffer>(device, sizeof(uint32_t), VK_BUFFER_USAGE_STORAGE_BUFFER_BIT,
-                                                        VMA_MEMORY_USAGE_GPU_ONLY);
+        atomic_buffer_ = std::make_unique<core::Buffer>(device, core::BufferDesc{.size = sizeof(uint32_t),
+                                                                                 .buffer_usage = VK_BUFFER_USAGE_STORAGE_BUFFER_BIT,
+                                                                                 .memory_usage = VMA_MEMORY_USAGE_GPU_ONLY});
         shader_data_.set_buffer_functor(atomic_prop_, [this]() -> core::Buffer * { return atomic_buffer_.get(); });
 
         vertex_source_ = ShaderManager::get_singleton().load_shader("base/unlit.vert", VK_SHADER_STAGE_VERTEX_BIT);

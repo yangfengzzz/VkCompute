@@ -11,7 +11,7 @@
 #include <cuda_runtime_api.h>
 #include "initializer_array.h"
 #include "constant.h"
-#include "math_utils.h"
+#include "cuda_math_utils.h"
 
 namespace wp {
 

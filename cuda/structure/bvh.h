@@ -8,7 +8,7 @@
 
 #include "math/bounds.h"
 #include "math/intersect.h"
-#include "math/math_utils.h"
+#include "math/cuda_math_utils.h"
 
 namespace wp {
 

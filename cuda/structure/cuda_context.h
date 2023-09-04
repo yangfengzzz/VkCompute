@@ -34,9 +34,6 @@ void memtile_device(void *context, void *dest, const void *src, size_t srcsize, 
 int cuda_driver_version(); // CUDA driver version
 int cuda_toolkit_version();// CUDA Toolkit version used to build Warp
 
-int nvrtc_supported_arch_count();
-void nvrtc_supported_archs(int *archs);
-
 int cuda_device_get_count();
 void *cuda_device_primary_context_retain(int ordinal);
 void cuda_device_primary_context_release(int ordinal);
@@ -79,11 +76,6 @@ void *cuda_graph_end_capture(void *context);
 void cuda_graph_launch(void *context, void *graph);
 void cuda_graph_destroy(void *context, void *graph);
 
-size_t cuda_compile_program(const char *cuda_src, int arch, const char *include_dir, bool debug,
-                            bool verbose, bool verify_fp, bool fast_math, const char *output_file);
-
-void *cuda_load_module(void *context, const char *ptx);
-void cuda_unload_module(void *context, void *module);
 void *cuda_get_kernel(void *context, void *module, const char *name);
 size_t cuda_launch_kernel(void *context, void *kernel, size_t dim, void **args);
 

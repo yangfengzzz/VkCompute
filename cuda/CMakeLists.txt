@@ -23,7 +23,8 @@ set(CORE_FILES
 )
 
 set(MATH_FILES
-        math/temp.cu)
+        math/cuda_math_utils.cpp
+)
 
 set(STRUCTURE_FILES
         structure/cuda_util.cpp

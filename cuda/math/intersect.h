@@ -7,7 +7,7 @@
 #pragma once
 
 #include "math/vec.h"
-#include "math/math_utils.h"
+#include "math/cuda_math_utils.h"
 #include <cmath>
 
 namespace wp {

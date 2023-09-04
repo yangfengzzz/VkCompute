@@ -9,13 +9,13 @@
 #include "core/device.h"
 
 namespace vox::core {
-Buffer::Buffer(Device const &device, VkDeviceSize size, VkBufferUsageFlags buffer_usage,
-               VmaMemoryUsage memory_usage,
+Buffer::Buffer(Device const &device,
+               BufferDesc desc,
                BufferPool *pool,
                VmaAllocationCreateFlags flags,
                const std::vector<uint32_t> &queue_family_indices)
     : VulkanResource{VK_NULL_HANDLE, &device},
-      size{size} {
+      size{desc.size} {
 #ifdef VK_USE_PLATFORM_METAL_EXT
     // Workaround for Mac (MoltenVK requires unmapping https://github.com/KhronosGroup/MoltenVK/issues/175)
     // Force cleares the flag VMA_ALLOCATION_CREATE_MAPPED_BIT
@@ -25,7 +25,7 @@ Buffer::Buffer(Device const &device, VkDeviceSize size, VkBufferUsageFlags buffe
     persistent = (flags & VMA_ALLOCATION_CREATE_MAPPED_BIT) != 0;
 
     VkBufferCreateInfo buffer_info{VK_STRUCTURE_TYPE_BUFFER_CREATE_INFO};
-    buffer_info.usage = buffer_usage;
+    buffer_info.usage = desc.buffer_usage;
     buffer_info.size = size;
     if (queue_family_indices.size() >= 2) {
         buffer_info.sharingMode = VK_SHARING_MODE_CONCURRENT;
@@ -41,7 +41,7 @@ Buffer::Buffer(Device const &device, VkDeviceSize size, VkBufferUsageFlags buffe
 
     VmaAllocationCreateInfo memory_info{};
     memory_info.flags = flags;
-    memory_info.usage = memory_usage;
+    memory_info.usage = desc.memory_usage;
 
     VmaAllocationInfo allocation_info{};
     auto result = vmaCreateBuffer(device.get_memory_allocator(),

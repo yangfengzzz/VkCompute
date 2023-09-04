@@ -218,7 +218,9 @@ Buffer &FrameResource::allocate_buffer(const VkBufferUsageFlags usage, const VkD
 
     assert(thread_index < buffer_pool_it->second.size());
     auto &buffer_pool = buffer_pool_it->second[thread_index];
-    auto data = std::make_unique<Buffer>(device, size, usage, memory_usage, buffer_pool.get());
+    auto data = std::make_unique<Buffer>(device,
+                                         BufferDesc{.size = size, .buffer_usage = usage, .memory_usage = memory_usage},
+                                         buffer_pool.get());
     auto data_ptr = data.get();
     used_buffer.emplace_back(std::move(data));
     return *data_ptr;

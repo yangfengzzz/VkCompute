@@ -224,41 +224,46 @@ void ModelMesh::upload_data(bool no_longer_accessible) {
 
     command_buffer.begin(VK_COMMAND_BUFFER_USAGE_ONE_TIME_SUBMIT_BIT);
 
-    core::Buffer stage_buffer{device_, vertices.size() * sizeof(float), VK_BUFFER_USAGE_TRANSFER_SRC_BIT,
-                              VMA_MEMORY_USAGE_CPU_ONLY};
+    core::Buffer stage_buffer{device_,
+                              core::BufferDesc{.size = vertices.size() * sizeof(float),
+                                               .buffer_usage = VK_BUFFER_USAGE_TRANSFER_SRC_BIT,
+                                               .memory_usage = VMA_MEMORY_USAGE_CPU_ONLY}};
 
     stage_buffer.update(vertices.data(), vertices.size() * sizeof(float));
 
     auto new_vertex_buffer = std::make_unique<core::Buffer>(
-        device_, vertices.size() * sizeof(float),
-        VK_BUFFER_USAGE_TRANSFER_DST_BIT | VK_BUFFER_USAGE_VERTEX_BUFFER_BIT, VMA_MEMORY_USAGE_GPU_ONLY);
+        device_, core::BufferDesc{.size = vertices.size() * sizeof(float),
+                                  .buffer_usage = VK_BUFFER_USAGE_TRANSFER_DST_BIT | VK_BUFFER_USAGE_VERTEX_BUFFER_BIT,
+                                  .memory_usage = VMA_MEMORY_USAGE_GPU_ONLY});
 
     command_buffer.copy_buffer(stage_buffer, *new_vertex_buffer, vertices.size() * sizeof(float));
     set_vertex_buffer_binding(0, std::move(new_vertex_buffer));
     transient_buffers.push_back(std::move(stage_buffer));
 
     if (indices_type_ == VkIndexType::VK_INDEX_TYPE_UINT16) {
-        core::Buffer stage_buffer{device_, indices_16_.size() * sizeof(uint16_t), VK_BUFFER_USAGE_TRANSFER_SRC_BIT,
-                                  VMA_MEMORY_USAGE_CPU_ONLY};
+        core::Buffer stage_buffer{device_, core::BufferDesc{indices_16_.size() * sizeof(uint16_t),
+                                                            VK_BUFFER_USAGE_TRANSFER_SRC_BIT,
+                                                            VMA_MEMORY_USAGE_CPU_ONLY}};
 
         stage_buffer.update(indices_16_.data(), indices_16_.size() * sizeof(uint16_t));
 
-        core::Buffer new_index_buffer{device_, indices_16_.size() * sizeof(uint16_t),
-                                      VK_BUFFER_USAGE_TRANSFER_DST_BIT | VK_BUFFER_USAGE_INDEX_BUFFER_BIT,
-                                      VMA_MEMORY_USAGE_GPU_ONLY};
+        core::Buffer new_index_buffer{device_, core::BufferDesc{indices_16_.size() * sizeof(uint16_t),
+                                                                VK_BUFFER_USAGE_TRANSFER_DST_BIT | VK_BUFFER_USAGE_INDEX_BUFFER_BIT,
+                                                                VMA_MEMORY_USAGE_GPU_ONLY}};
 
         command_buffer.copy_buffer(stage_buffer, new_index_buffer, indices_16_.size() * sizeof(uint16_t));
         set_index_buffer_binding(std::make_unique<vox::IndexBufferBinding>(std::move(new_index_buffer), indices_type_));
         transient_buffers.push_back(std::move(stage_buffer));
     } else if (indices_type_ == VkIndexType::VK_INDEX_TYPE_UINT32) {
-        core::Buffer stage_buffer{device_, indices_32_.size() * sizeof(uint32_t), VK_BUFFER_USAGE_TRANSFER_SRC_BIT,
-                                  VMA_MEMORY_USAGE_CPU_ONLY};
+        core::Buffer stage_buffer{device_, core::BufferDesc{indices_32_.size() * sizeof(uint32_t),
+                                                            VK_BUFFER_USAGE_TRANSFER_SRC_BIT,
+                                                            VMA_MEMORY_USAGE_CPU_ONLY}};
 
         stage_buffer.update(indices_32_.data(), indices_32_.size() * sizeof(uint32_t));
 
-        core::Buffer new_index_buffer{device_, indices_32_.size() * sizeof(uint32_t),
-                                      VK_BUFFER_USAGE_TRANSFER_DST_BIT | VK_BUFFER_USAGE_INDEX_BUFFER_BIT,
-                                      VMA_MEMORY_USAGE_GPU_ONLY};
+        core::Buffer new_index_buffer{device_, core::BufferDesc{indices_32_.size() * sizeof(uint32_t),
+                                                                VK_BUFFER_USAGE_TRANSFER_DST_BIT | VK_BUFFER_USAGE_INDEX_BUFFER_BIT,
+                                                                VMA_MEMORY_USAGE_GPU_ONLY}};
 
         command_buffer.copy_buffer(stage_buffer, new_index_buffer, indices_32_.size() * sizeof(uint32_t));
         set_index_buffer_binding(std::make_unique<vox::IndexBufferBinding>(std::move(new_index_buffer), indices_type_));

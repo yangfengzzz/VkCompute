@@ -83,11 +83,12 @@ std::shared_ptr<Texture> TextureManager::load_texture_cubemap(const std::string 
 
 void TextureManager::upload_texture(vox::Texture *image) {
     const auto &queue = device_.get_queue_by_flags(VK_QUEUE_TRANSFER_BIT, 0);
-    core::CommandBuffer& command_buffer = device_.request_command_buffer();
+    core::CommandBuffer &command_buffer = device_.request_command_buffer();
     command_buffer.begin(VK_COMMAND_BUFFER_USAGE_ONE_TIME_SUBMIT_BIT);
 
-    vox::core::Buffer stage_buffer{device_, image->get_data().size(), VK_BUFFER_USAGE_TRANSFER_SRC_BIT,
-                                   VMA_MEMORY_USAGE_CPU_ONLY};
+    vox::core::Buffer stage_buffer{device_, core::BufferDesc{image->get_data().size(),
+                                                             VK_BUFFER_USAGE_TRANSFER_SRC_BIT,
+                                                             VMA_MEMORY_USAGE_CPU_ONLY}};
     stage_buffer.update(image->get_data());
 
     // Setup buffer copy regions for each mip level
@@ -124,7 +125,7 @@ void TextureManager::upload_texture(vox::Texture *image) {
     command_buffer.image_memory_barrier(image->get_vk_image(), VK_IMAGE_LAYOUT_UNDEFINED, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL);
 
     // Copy mip levels from staging buffer
-    command_buffer.copy_buffer_to_image(stage_buffer,  image->get_vk_image(), buffer_copy_regions);
+    command_buffer.copy_buffer_to_image(stage_buffer, image->get_vk_image(), buffer_copy_regions);
 
     // Change texture image layout to shader read after all mip levels have been copied
     command_buffer.image_memory_barrier(image->get_vk_image(), VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL);
@@ -174,7 +175,7 @@ std::shared_ptr<Texture> TextureManager::generate_ibl(const std::string &file, r
         auto &render_frame = render_context.get_active_frame();
         for (uint32_t lod = 0; lod < baker_mipmap_count; lod++) {
             float lod_roughness = float(lod) / float(baker_mipmap_count - 1);// linear
-            auto& buffer = render_frame.allocate_buffer(VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT, sizeof(float), VMA_MEMORY_USAGE_GPU_ONLY, 0);
+            auto &buffer = render_frame.allocate_buffer(VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT, sizeof(float), VMA_MEMORY_USAGE_GPU_ONLY, 0);
             buffer.convert_and_update(lod_roughness);
             // shader_data_.set_data("lodRoughness", buffer);
 
