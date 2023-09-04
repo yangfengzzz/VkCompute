@@ -28,6 +28,20 @@ struct ImageDesc {
     VkImageCreateFlags flags = 0;
 };
 
+inline bool operator==(const ImageDesc &x, const ImageDesc &y) {
+    return x.format == y.format &&
+           x.extent.width == y.extent.width &&
+           x.extent.height == y.extent.height &&
+           x.extent.depth == y.extent.depth &&
+           x.image_usage == y.image_usage &&
+           x.memory_usage == y.memory_usage &&
+           x.sample_count == y.sample_count &&
+           x.mip_levels == y.mip_levels &&
+           x.array_layers == y.array_layers &&
+           x.tiling == y.tiling &&
+           x.flags == y.flags;
+}
+
 class Image : public VulkanResource<VkImage, VK_OBJECT_TYPE_IMAGE, const Device> {
 public:
     Image(Device const &device,
@@ -83,24 +97,16 @@ public:
 
     [[nodiscard]] std::unordered_set<ImageView *> &get_views();
 
+    inline ImageDesc get_desc() { return desc; }
+
 private:
     VmaAllocation memory{VK_NULL_HANDLE};
 
     VkImageType type{};
 
-    VkExtent3D extent{};
-
-    VkFormat format{};
-
-    VkImageUsageFlags usage{};
-
-    VkSampleCountFlagBits sample_count{};
-
-    VkImageTiling tiling{};
+    ImageDesc desc{};
 
     VkImageSubresource subresource{};
-
-    uint32_t array_layer_count{0};
 
     /// Image views referring to this image
     std::unordered_set<ImageView *> views;
@@ -112,3 +118,26 @@ private:
 };
 
 }// namespace vox::core
+
+namespace std {
+template<>
+struct hash<vox::core::ImageDesc> {
+    std::size_t operator()(const vox::core::ImageDesc &desc) const {
+        std::size_t result = 0;
+
+        vox::hash_combine(result, desc.memory_usage);
+        vox::hash_combine(result, desc.sample_count);
+        vox::hash_combine(result, desc.image_usage);
+        vox::hash_combine(result, desc.array_layers);
+        vox::hash_combine(result, desc.format);
+        vox::hash_combine(result, desc.extent.width);
+        vox::hash_combine(result, desc.extent.height);
+        vox::hash_combine(result, desc.extent.depth);
+        vox::hash_combine(result, desc.flags);
+        vox::hash_combine(result, desc.mip_levels);
+        vox::hash_combine(result, desc.tiling);
+
+        return result;
+    }
+};
+}// namespace std

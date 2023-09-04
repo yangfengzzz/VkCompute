@@ -148,6 +148,7 @@ set(CORE_FILES
         core/resource_cache.h
         core/frame_resource.h
         core/sampled_image.h
+        core/transient_resource_cache.h
         # Source Files
         core/instance.cpp
         core/physical_device.cpp
@@ -182,6 +183,7 @@ set(CORE_FILES
         core/resource_cache.cpp
         core/frame_resource.cpp
         core/sampled_image.cpp
+        core/transient_resource_cache.cpp
 )
 
 set(PLATFORM_FILES

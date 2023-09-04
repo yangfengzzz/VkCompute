@@ -15,7 +15,7 @@ Buffer::Buffer(Device const &device,
                VmaAllocationCreateFlags flags,
                const std::vector<uint32_t> &queue_family_indices)
     : VulkanResource{VK_NULL_HANDLE, &device},
-      size{desc.size} {
+      desc{desc} {
 #ifdef VK_USE_PLATFORM_METAL_EXT
     // Workaround for Mac (MoltenVK requires unmapping https://github.com/KhronosGroup/MoltenVK/issues/175)
     // Force cleares the flag VMA_ALLOCATION_CREATE_MAPPED_BIT
@@ -26,7 +26,7 @@ Buffer::Buffer(Device const &device,
 
     VkBufferCreateInfo buffer_info{VK_STRUCTURE_TYPE_BUFFER_CREATE_INFO};
     buffer_info.usage = desc.buffer_usage;
-    buffer_info.size = size;
+    buffer_info.size = desc.size;
     if (queue_family_indices.size() >= 2) {
         buffer_info.sharingMode = VK_SHARING_MODE_CONCURRENT;
         buffer_info.queueFamilyIndexCount = static_cast<uint32_t>(queue_family_indices.size());
@@ -66,7 +66,7 @@ Buffer::Buffer(Device const &device,
                VkBufferUsageFlags usage,
                VkMemoryPropertyFlags properties)
     : VulkanResource{VK_NULL_HANDLE, &device},
-      size{size} {
+      desc{.size = size} {
     VkBufferCreateInfo bufferInfo = {};
     bufferInfo.sType = VK_STRUCTURE_TYPE_BUFFER_CREATE_INFO;
     bufferInfo.size = size;
@@ -107,7 +107,7 @@ Buffer::Buffer(Device const &device,
 Buffer::Buffer(Buffer &&other) noexcept : VulkanResource{other.handle, other.device},
                                           allocation{other.allocation},
                                           memory{other.memory},
-                                          size{other.size},
+                                          desc{other.desc},
                                           mapped_data{other.mapped_data},
                                           mapped{other.mapped} {
     // Reset other handles to avoid releasing on destruction
@@ -137,7 +137,7 @@ VkDeviceMemory Buffer::get_memory() const {
 }
 
 VkDeviceSize Buffer::get_size() const {
-    return size;
+    return desc.size;
 }
 
 uint8_t *Buffer::map() {
@@ -157,7 +157,7 @@ void Buffer::unmap() {
 }
 
 void Buffer::flush() const {
-    vmaFlushAllocation(device->get_memory_allocator(), allocation, 0, size);
+    vmaFlushAllocation(device->get_memory_allocator(), allocation, 0, desc.size);
 }
 
 void Buffer::update(const std::vector<uint8_t> &data, size_t offset) {

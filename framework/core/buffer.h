@@ -20,6 +20,12 @@ struct BufferDesc {
     VmaMemoryUsage memory_usage;
 };
 
+inline bool operator==(const BufferDesc &x, const BufferDesc &y) {
+    return x.size == y.size &&
+           x.buffer_usage == y.buffer_usage &&
+           x.memory_usage == y.memory_usage;
+}
+
 class Buffer : public VulkanResource<VkBuffer, VK_OBJECT_TYPE_BUFFER, const Device> {
 public:
     /**
@@ -155,6 +161,8 @@ public:
 	 */
     uint64_t get_device_address();
 
+    inline BufferDesc get_desc() { return desc; }
+
 public:
     static VkExternalMemoryHandleTypeFlagBits get_default_mem_handle_type() {
         return VK_EXTERNAL_MEMORY_HANDLE_TYPE_OPAQUE_FD_BIT;
@@ -165,7 +173,7 @@ private:
 
     VkDeviceMemory memory{VK_NULL_HANDLE};
 
-    VkDeviceSize size{0};
+    BufferDesc desc{};
 
     uint8_t *mapped_data{nullptr};
 
@@ -177,3 +185,17 @@ private:
 };
 
 }// namespace vox::core
+
+namespace std {
+template<>
+struct hash<vox::core::BufferDesc> {
+    std::size_t operator()(const vox::core::BufferDesc &desc) const {
+        std::size_t result = 0;
+
+        vox::hash_combine(result, desc.size);
+        vox::hash_combine(result, desc.memory_usage);
+        vox::hash_combine(result, desc.buffer_usage);
+        return result;
+    }
+};
+}// namespace std

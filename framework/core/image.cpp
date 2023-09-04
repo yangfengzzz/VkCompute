@@ -51,12 +51,7 @@ Image::Image(Device const &device,
              uint32_t num_queue_families,
              const uint32_t *queue_families) : VulkanResource{VK_NULL_HANDLE, &device},
                                                type{find_image_type(desc.extent)},
-                                               extent{desc.extent},
-                                               format{desc.format},
-                                               sample_count{desc.sample_count},
-                                               usage{desc.image_usage},
-                                               array_layer_count{desc.array_layers},
-                                               tiling{desc.tiling} {
+                                               desc{desc} {
     assert(mip_levels > 0 && "Image should have at least one level");
     assert(array_layers > 0 && "Image should have at least one layer");
 
@@ -66,12 +61,12 @@ Image::Image(Device const &device,
     VkImageCreateInfo image_info{VK_STRUCTURE_TYPE_IMAGE_CREATE_INFO};
     image_info.flags = desc.flags;
     image_info.imageType = type;
-    image_info.format = format;
-    image_info.extent = extent;
+    image_info.format = desc.format;
+    image_info.extent = desc.extent;
     image_info.mipLevels = desc.mip_levels;
     image_info.arrayLayers = desc.array_layers;
-    image_info.samples = sample_count;
-    image_info.tiling = tiling;
+    image_info.samples = desc.sample_count;
+    image_info.tiling = desc.tiling;
     image_info.usage = desc.image_usage;
 
     if (num_queue_families != 0) {
@@ -98,12 +93,13 @@ Image::Image(Device const &device,
 }
 
 Image::Image(Device const &device, VkImage handle, const VkExtent3D &extent, VkFormat format,
-             VkImageUsageFlags image_usage, VkSampleCountFlagBits sample_count) : VulkanResource{handle, &device},
-                                                                                  type{find_image_type(extent)},
-                                                                                  extent{extent},
-                                                                                  format{format},
-                                                                                  sample_count{sample_count},
-                                                                                  usage{image_usage} {
+             VkImageUsageFlags image_usage, VkSampleCountFlagBits sample_count)
+    : VulkanResource{handle, &device},
+      type{find_image_type(extent)},
+      desc{.extent = extent,
+           .format = format,
+           .image_usage = image_usage,
+           .sample_count = sample_count} {
     subresource.mipLevel = 1;
     subresource.arrayLayer = 1;
 }
@@ -112,11 +108,7 @@ Image::Image(Image &&other) noexcept
     : VulkanResource{std::move(other)},
       memory{other.memory},
       type{other.type},
-      extent{other.extent},
-      format{other.format},
-      sample_count{other.sample_count},
-      usage{other.usage},
-      tiling{other.tiling},
+      desc{other.desc},
       subresource{other.subresource},
       views(std::exchange(other.views, {})),
       mapped_data{other.mapped_data},
@@ -144,7 +136,7 @@ VmaAllocation Image::get_memory() const {
 
 uint8_t *Image::map() {
     if (!mapped_data) {
-        if (tiling != VK_IMAGE_TILING_LINEAR) {
+        if (desc.tiling != VK_IMAGE_TILING_LINEAR) {
             LOGW("Mapping image memory that is not linear")
         }
         VK_CHECK(vmaMapMemory(device->get_memory_allocator(), memory, reinterpret_cast<void **>(&mapped_data)));
@@ -166,23 +158,23 @@ VkImageType Image::get_type() const {
 }
 
 const VkExtent3D &Image::get_extent() const {
-    return extent;
+    return desc.extent;
 }
 
 VkFormat Image::get_format() const {
-    return format;
+    return desc.format;
 }
 
 VkSampleCountFlagBits Image::get_sample_count() const {
-    return sample_count;
+    return desc.sample_count;
 }
 
 VkImageUsageFlags Image::get_usage() const {
-    return usage;
+    return desc.image_usage;
 }
 
 VkImageTiling Image::get_tiling() const {
-    return tiling;
+    return desc.tiling;
 }
 
 VkImageSubresource Image::get_subresource() const {
@@ -190,7 +182,7 @@ VkImageSubresource Image::get_subresource() const {
 }
 
 uint32_t Image::get_array_layer_count() const {
-    return array_layer_count;
+    return desc.array_layers;
 }
 
 std::unordered_set<ImageView *> &Image::get_views() {
