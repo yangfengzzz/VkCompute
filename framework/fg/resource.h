@@ -33,7 +33,7 @@ public:
     }
     Resource(const Resource &that) = delete;
     Resource(Resource &&temp) = default;
-    ~Resource() = default;
+    ~Resource() override = default;
     Resource &operator=(const Resource &that) = delete;
     Resource &operator=(Resource &&temp) = default;
 

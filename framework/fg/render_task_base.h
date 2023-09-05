@@ -8,6 +8,7 @@
 
 #include <cstddef>
 #include <string>
+#include <utility>
 #include <vector>
 
 namespace vox::fg {
@@ -17,7 +18,8 @@ class ResourceBase;
 
 class RenderTaskBase {
 public:
-    explicit RenderTaskBase(const std::string &name) : name_(name), cull_immune_(false), ref_count_(0) {
+    explicit RenderTaskBase(std::string name)
+        : name_(std::move(name)), cull_immune_(false), ref_count_(0) {
     }
     RenderTaskBase(const RenderTaskBase &that) = delete;
     RenderTaskBase(RenderTaskBase &&temp) = default;
@@ -25,14 +27,14 @@ public:
     RenderTaskBase &operator=(const RenderTaskBase &that) = delete;
     RenderTaskBase &operator=(RenderTaskBase &&temp) = default;
 
-    const std::string &name() const {
+    [[nodiscard]] const std::string &name() const {
         return name_;
     }
     void set_name(const std::string &name) {
         name_ = name;
     }
 
-    bool cull_immune() const {
+    [[nodiscard]] bool cull_immune() const {
         return cull_immune_;
     }
     void set_cull_immune(const bool cull_immune) {

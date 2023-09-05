@@ -26,8 +26,10 @@ public:
 
     template<typename resource_type, typename description_type>
     resource_type *create(const std::string &name, const description_type &description);
+
     template<typename resource_type>
     resource_type *read(resource_type *resource);
+
     template<typename resource_type>
     resource_type *write(resource_type *resource);
 

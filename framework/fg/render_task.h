@@ -26,7 +26,7 @@ public:
     }
     RenderTask(const RenderTask &that) = delete;
     RenderTask(RenderTask &&temp) = default;
-    virtual ~RenderTask() = default;
+    ~RenderTask() override = default;
     RenderTask &operator=(const RenderTask &that) = delete;
     RenderTask &operator=(RenderTask &&temp) = default;
 

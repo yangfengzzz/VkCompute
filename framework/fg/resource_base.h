@@ -8,6 +8,7 @@
 
 #include <cstddef>
 #include <string>
+#include <utility>
 #include <vector>
 
 namespace vox::fg {
@@ -17,8 +18,8 @@ class RenderTaskBuilder;
 
 class ResourceBase {
 public:
-    explicit ResourceBase(const std::string &name, const RenderTaskBase *creator)
-        : name_(name), creator_(creator), ref_count_(0) {
+    explicit ResourceBase(std::string name, const RenderTaskBase *creator)
+        : name_(std::move(name)), creator_(creator), ref_count_(0) {
         static std::size_t id = 0;
         id_ = id++;
     }
@@ -28,18 +29,18 @@ public:
     ResourceBase &operator=(const ResourceBase &that) = delete;
     ResourceBase &operator=(ResourceBase &&temp) = default;
 
-    std::size_t id() const {
+    [[nodiscard]] std::size_t id() const {
         return id_;
     }
 
-    const std::string &name() const {
+    [[nodiscard]] const std::string &name() const {
         return name_;
     }
     void set_name(const std::string &name) {
         name_ = name;
     }
 
-    bool transient() const {
+    [[nodiscard]] bool transient() const {
         return creator_ != nullptr;
     }
 

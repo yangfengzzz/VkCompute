@@ -254,6 +254,8 @@ set(FG_FILES
         fg/render_task_builder.h
         fg/resource.h
         fg/resource_base.h
+        # Source Files
+        fg/framegraph.cpp
 )
 
 source_group("\\" FILES ${FRAMEWORK_FILES})
