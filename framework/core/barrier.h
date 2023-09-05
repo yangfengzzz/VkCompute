@@ -14,7 +14,7 @@ namespace vox::core {
 struct ImageBarrier {
     VkImage image{};
     ThsvsAccessType prev_access{};
-    ThsvsAccessType next_access;
+    ThsvsAccessType next_access{};
     VkImageAspectFlags aspect_mask{};
     bool discard{false};
 };
@@ -32,5 +32,9 @@ AccessInfo get_access_info(ThsvsAccessType access_type);
 VkImageAspectFlags image_aspect_mask_from_format(VkFormat format);
 
 VkImageAspectFlags image_aspect_mask_from_access_type_and_format(ThsvsAccessType access_type, VkFormat format);
+
+VkImageUsageFlags image_access_mask_to_usage_flags(VkAccessFlags access_mask);
+
+VkBufferUsageFlags buffer_access_mask_to_usage_flags(VkAccessFlags access_mask);
 
 }// namespace vox::core

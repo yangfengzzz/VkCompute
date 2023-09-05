@@ -19,10 +19,10 @@ class RenderTask : public RenderTaskBase {
 public:
     using data_type = data_type_;
 
-    explicit RenderTask(
-        const std::string &name,
-        const std::function<void(data_type &, RenderTaskBuilder &)> &setup,
-        const std::function<void(const data_type &)> &execute) : RenderTaskBase(name), setup_(setup), execute_(execute) {
+    explicit RenderTask(const std::string &name,
+                        const std::function<void(data_type &, RenderTaskBuilder &)> &setup,
+                        const std::function<void(const data_type &)> &execute)
+        : RenderTaskBase(name), setup_(setup), execute_(execute) {
     }
     RenderTask(const RenderTask &that) = delete;
     RenderTask(RenderTask &&temp) = default;

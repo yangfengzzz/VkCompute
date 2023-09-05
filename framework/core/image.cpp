@@ -52,8 +52,8 @@ Image::Image(Device const &device,
              const uint32_t *queue_families) : VulkanResource{VK_NULL_HANDLE, &device},
                                                type{find_image_type(desc.extent)},
                                                desc{desc} {
-    assert(mip_levels > 0 && "Image should have at least one level");
-    assert(array_layers > 0 && "Image should have at least one layer");
+    assert(desc.mip_levels > 0 && "Image should have at least one level");
+    assert(desc.array_layers > 0 && "Image should have at least one layer");
 
     subresource.mipLevel = desc.mip_levels;
     subresource.arrayLayer = desc.array_layers;

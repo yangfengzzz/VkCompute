@@ -510,4 +510,56 @@ VkImageAspectFlags image_aspect_mask_from_access_type_and_format(ThsvsAccessType
     }
 }
 
+VkImageUsageFlags image_access_mask_to_usage_flags(VkAccessFlags access_mask) {
+    switch (access_mask) {
+        case VK_ACCESS_SHADER_READ_BIT:
+            return VK_IMAGE_USAGE_SAMPLED_BIT;
+        case VK_ACCESS_SHADER_WRITE_BIT:
+            return VK_IMAGE_USAGE_STORAGE_BIT;
+        case VK_ACCESS_COLOR_ATTACHMENT_READ_BIT:
+        case VK_ACCESS_COLOR_ATTACHMENT_WRITE_BIT:
+            return VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT;
+        case VK_ACCESS_DEPTH_STENCIL_ATTACHMENT_READ_BIT:
+        case VK_ACCESS_DEPTH_STENCIL_ATTACHMENT_WRITE_BIT:
+            return VK_IMAGE_USAGE_DEPTH_STENCIL_ATTACHMENT_BIT;
+        case VK_ACCESS_TRANSFER_READ_BIT:
+            return VK_IMAGE_USAGE_TRANSFER_SRC_BIT;
+        case VK_ACCESS_TRANSFER_WRITE_BIT:
+            return VK_IMAGE_USAGE_TRANSFER_DST_BIT;
+        case VK_ACCESS_MEMORY_READ_BIT:
+        case VK_ACCESS_MEMORY_WRITE_BIT:
+            return VK_IMAGE_USAGE_STORAGE_BIT;
+        default:
+            LOGE("Invalid Access Flags {}", access_mask);
+    }
+    return 0;
+}
+
+VkBufferUsageFlags buffer_access_mask_to_usage_flags(VkAccessFlags access_mask) {
+    switch (access_mask) {
+        case VK_ACCESS_INDIRECT_COMMAND_READ_BIT:
+            return VK_BUFFER_USAGE_INDIRECT_BUFFER_BIT;
+        case VK_ACCESS_INDEX_READ_BIT:
+            return VK_BUFFER_USAGE_INDEX_BUFFER_BIT;
+        case VK_ACCESS_VERTEX_ATTRIBUTE_READ_BIT:
+            return VK_BUFFER_USAGE_UNIFORM_TEXEL_BUFFER_BIT;
+        case VK_ACCESS_UNIFORM_READ_BIT:
+            return VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT;
+        case VK_ACCESS_SHADER_READ_BIT:
+            return VK_BUFFER_USAGE_UNIFORM_TEXEL_BUFFER_BIT;
+        case VK_ACCESS_SHADER_WRITE_BIT:
+            return VK_BUFFER_USAGE_STORAGE_BUFFER_BIT;
+        case VK_ACCESS_TRANSFER_READ_BIT:
+            return VK_BUFFER_USAGE_TRANSFER_SRC_BIT;
+        case VK_ACCESS_TRANSFER_WRITE_BIT:
+            return VK_BUFFER_USAGE_TRANSFER_DST_BIT;
+        case VK_ACCESS_MEMORY_READ_BIT:
+        case VK_ACCESS_MEMORY_WRITE_BIT:
+            return VK_BUFFER_USAGE_STORAGE_BUFFER_BIT;
+        default:
+            LOGE("Invalid Access Flags {}", access_mask);
+    }
+    return 0;
+}
+
 }// namespace vox::core
