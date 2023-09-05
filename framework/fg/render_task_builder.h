@@ -6,7 +6,9 @@
 
 #pragma once
 
-#include <string>
+#include "core/device.h"
+#include <thsvs_simpler_vulkan_synchronization.h>
+#include "fg/common.h"
 
 namespace vox::fg {
 class Framegraph;
@@ -28,10 +30,12 @@ public:
     resource_type *create(const std::string &name, const description_type &description);
 
     template<typename resource_type>
-    resource_type *read(resource_type *resource);
+    resource_type *read(resource_type *resource, ThsvsAccessType access_type,
+                        PassResourceAccessSyncType sync_type = PassResourceAccessSyncType::AlwaysSync);
 
     template<typename resource_type>
-    resource_type *write(resource_type *resource);
+    resource_type *write(resource_type *resource, ThsvsAccessType access_type,
+                         PassResourceAccessSyncType sync_type = PassResourceAccessSyncType::AlwaysSync);
 
 protected:
     Framegraph *framegraph_;

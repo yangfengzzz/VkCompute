@@ -6,10 +6,8 @@
 
 #pragma once
 
-#include <cstddef>
-#include <string>
-#include <utility>
-#include <vector>
+#include "core/device.h"
+#include <thsvs_simpler_vulkan_synchronization.h>
 
 namespace vox::fg {
 class Framegraph;
@@ -18,8 +16,8 @@ class RenderTaskBuilder;
 
 class ResourceBase {
 public:
-    explicit ResourceBase(std::string name, const RenderTaskBase *creator)
-        : name_(std::move(name)), creator_(creator), ref_count_(0) {
+    explicit ResourceBase(std::string name, const RenderTaskBase *creator, ThsvsAccessType access_type)
+        : name_(std::move(name)), creator_(creator), ref_count_(0), access_type_(access_type) {
         static std::size_t id = 0;
         id_ = id++;
     }
@@ -40,6 +38,10 @@ public:
         name_ = name;
     }
 
+    [[nodiscard]] ThsvsAccessType access_type() const {
+        return access_type_;
+    }
+
     [[nodiscard]] bool transient() const {
         return creator_ != nullptr;
     }
@@ -51,6 +53,7 @@ protected:
     virtual void realize() = 0;
     virtual void derealize() = 0;
 
+    ThsvsAccessType access_type_;
     std::size_t id_;
     std::string name_;
     const RenderTaskBase *creator_;

@@ -6,15 +6,27 @@
 
 #pragma once
 
-#include <cstddef>
-#include <string>
-#include <utility>
-#include <vector>
+#include "core/command_buffer.h"
+#include <thsvs_simpler_vulkan_synchronization.h>
+#include "fg/common.h"
 
 namespace vox::fg {
 class Framegraph;
 class RenderTaskBuilder;
 class ResourceBase;
+
+struct PassResource {
+    const ResourceBase *handle;
+    ThsvsAccessType access_type;
+    PassResourceAccessSyncType sync_type;
+
+    PassResource(ResourceBase *handle,
+                 ThsvsAccessType access_type,
+                 PassResourceAccessSyncType sync_type)
+        : handle(handle),
+          access_type(access_type),
+          sync_type(sync_type) {}
+};
 
 class RenderTaskBase {
 public:
@@ -46,13 +58,13 @@ protected:
     friend RenderTaskBuilder;
 
     virtual void setup(RenderTaskBuilder &builder) = 0;
-    virtual void execute() const = 0;
+    virtual void execute(core::CommandBuffer& commandBuffer) const = 0;
 
     std::string name_;
     bool cull_immune_;
     std::vector<const ResourceBase *> creates_;
-    std::vector<const ResourceBase *> reads_;
-    std::vector<const ResourceBase *> writes_;
+    std::vector<PassResource> reads_;
+    std::vector<PassResource> writes_;
     std::size_t ref_count_;// Computed through framegraph compilation.
 };
 

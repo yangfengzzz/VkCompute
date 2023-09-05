@@ -21,7 +21,7 @@ public:
 
     explicit RenderTask(const std::string &name,
                         const std::function<void(data_type &, RenderTaskBuilder &)> &setup,
-                        const std::function<void(const data_type &)> &execute)
+                        const std::function<void(const data_type &, core::CommandBuffer &)> &execute)
         : RenderTaskBase(name), setup_(setup), execute_(execute) {
     }
     RenderTask(const RenderTask &that) = delete;
@@ -38,12 +38,13 @@ protected:
     void setup(RenderTaskBuilder &builder) override {
         setup_(data_, builder);
     }
-    void execute() const override {
-        execute_(data_);
+
+    void execute(core::CommandBuffer &commandBuffer) const override {
+        execute_(data_, commandBuffer);
     }
 
     data_type data_;
     const std::function<void(data_type &, RenderTaskBuilder &)> setup_;
-    const std::function<void(const data_type &)> execute_;
+    const std::function<void(const data_type &, core::CommandBuffer &)> execute_;
 };
 }// namespace vox::fg

@@ -50,7 +50,7 @@ public:
 
     void compile();
 
-    void execute() const;
+    void execute(core::CommandBuffer &commandBuffer) const;
 
     void clear();
 
@@ -80,16 +80,20 @@ resource_type *RenderTaskBuilder::create(const std::string &name, const descript
 }
 
 template<typename resource_type>
-resource_type *RenderTaskBuilder::read(resource_type *resource) {
+resource_type *RenderTaskBuilder::read(resource_type *resource, ThsvsAccessType access_type,
+                                       PassResourceAccessSyncType sync_type) {
     resource->readers_.push_back(render_task_);
-    render_task_->reads_.push_back(resource);
+    render_task_->reads_.push_back(PassResource{
+        resource, access_type, sync_type});
     return resource;
 }
 
 template<typename resource_type>
-resource_type *RenderTaskBuilder::write(resource_type *resource) {
+resource_type *RenderTaskBuilder::write(resource_type *resource, ThsvsAccessType access_type,
+                                        PassResourceAccessSyncType sync_type) {
     resource->writers_.push_back(render_task_);
-    render_task_->writes_.push_back(resource);
+    render_task_->writes_.push_back(PassResource{
+        resource, access_type, sync_type});
     return resource;
 }
 }// namespace vox::fg

@@ -28,7 +28,7 @@ void Framegraph::compile() {
             creator->ref_count_--;
         if (creator->ref_count_ == 0 && !creator->cull_immune()) {
             for (auto iteratee : creator->reads_) {
-                auto read_resource = const_cast<ResourceBase *>(iteratee);
+                auto read_resource = const_cast<ResourceBase *>(iteratee.handle);
                 if (read_resource->ref_count_ > 0)
                     read_resource->ref_count_--;
                 if (read_resource->ref_count_ == 0 && read_resource->transient())
@@ -42,7 +42,7 @@ void Framegraph::compile() {
                 writer->ref_count_--;
             if (writer->ref_count_ == 0 && !writer->cull_immune()) {
                 for (auto iteratee : writer->reads_) {
-                    auto read_resource = const_cast<ResourceBase *>(iteratee);
+                    auto read_resource = const_cast<ResourceBase *>(iteratee.handle);
                     if (read_resource->ref_count_ > 0)
                         read_resource->ref_count_--;
                     if (read_resource->ref_count_ == 0 && read_resource->transient())
@@ -69,29 +69,29 @@ void Framegraph::compile() {
         auto reads_writes = render_task->reads_;
         reads_writes.insert(reads_writes.end(), render_task->writes_.begin(), render_task->writes_.end());
         for (auto resource : reads_writes) {
-            if (!resource->transient())
+            if (!resource.handle->transient())
                 continue;
 
             auto valid = false;
             std::size_t last_index;
-            if (!resource->readers_.empty()) {
+            if (!resource.handle->readers_.empty()) {
                 auto last_reader = std::find_if(
                     render_tasks_.begin(),
                     render_tasks_.end(),
                     [&resource](const std::unique_ptr<RenderTaskBase> &iteratee) {
-                        return iteratee.get() == resource->readers_.back();
+                        return iteratee.get() == resource.handle->readers_.back();
                     });
                 if (last_reader != render_tasks_.end()) {
                     valid = true;
                     last_index = std::distance(render_tasks_.begin(), last_reader);
                 }
             }
-            if (!resource->writers_.empty()) {
+            if (!resource.handle->writers_.empty()) {
                 auto last_writer = std::find_if(
                     render_tasks_.begin(),
                     render_tasks_.end(),
                     [&resource](const std::unique_ptr<RenderTaskBase> &iteratee) {
-                        return iteratee.get() == resource->writers_.back();
+                        return iteratee.get() == resource.handle->writers_.back();
                     });
                 if (last_writer != render_tasks_.end()) {
                     valid = true;
@@ -100,17 +100,17 @@ void Framegraph::compile() {
             }
 
             if (valid && render_tasks_[last_index] == render_task)
-                derealized_resources.push_back(const_cast<ResourceBase *>(resource));
+                derealized_resources.push_back(const_cast<ResourceBase *>(resource.handle));
         }
 
         timeline_.push_back(step{render_task.get(), realized_resources, derealized_resources});
     }
 }
 
-void Framegraph::execute() const {
+void Framegraph::execute(core::CommandBuffer &commandBuffer) const {
     for (auto &step : timeline_) {
         for (auto resource : step.realized_resources) resource->realize();
-        step.render_task->execute();
+        step.render_task->execute(commandBuffer);
         for (auto resource : step.derealized_resources) resource->derealize();
     }
 }
@@ -147,7 +147,7 @@ void Framegraph::export_graphviz(const std::string &filepath) {
 
         stream << "\"" << render_task->name() << "\" -> { ";
         for (auto &resource : render_task->writes_)
-            stream << "\"" << resource->name() << "\" ";
+            stream << "\"" << resource.handle->name() << "\" ";
         stream << "} [color=gold]\n";
     }
     stream << "\n";

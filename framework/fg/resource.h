@@ -23,11 +23,12 @@ public:
     using actual_type = actual_type_;
 
     explicit Resource(const std::string &name, const RenderTaskBase *creator, const description_type &description)
-        : ResourceBase(name, creator), description_(description), actual_(std::unique_ptr<actual_type>()) {
+        : ResourceBase(name, creator, THSVS_ACCESS_NONE), description_(description), actual_(std::unique_ptr<actual_type>()) {
         // Transient (normal) constructor.
     }
-    explicit Resource(const std::string &name, const description_type &description, actual_type *actual = nullptr)
-        : ResourceBase(name, nullptr), description_(description), actual_(actual) {
+    explicit Resource(const std::string &name, const description_type &description,
+                      ThsvsAccessType access_type, actual_type *actual = nullptr)
+        : ResourceBase(name, nullptr, access_type), description_(description), actual_(actual) {
         // Retained (import) constructor.
         if (!actual) actual_ = fg::realize<description_type, actual_type>(description_);
     }
@@ -50,10 +51,14 @@ public:
 
 protected:
     void realize() override {
-        if (transient()) std::get<std::unique_ptr<actual_type>>(actual_) = fg::realize<description_type, actual_type>(description_);
+        if (transient()) {
+            std::get<std::unique_ptr<actual_type>>(actual_) = fg::realize<description_type, actual_type>(description_);
+        }
     }
     void derealize() override {
-        if (transient()) std::get<std::unique_ptr<actual_type>>(actual_).reset();
+        if (transient()) {
+            std::get<std::unique_ptr<actual_type>>(actual_).reset();
+        }
     }
 
     description_type description_;
