@@ -108,11 +108,11 @@ void Framegraph::compile() {
     }
 }
 
-void Framegraph::execute(core::CommandBuffer &commandBuffer) const {
+void Framegraph::execute(core::CommandBuffer &commandBuffer) {
     for (auto &step : timeline_) {
         // alloc transient resource
         for (auto resource : step.realized_resources) {
-            resource->realize();
+            resource->realize(cache_);
             resource->access_type_ = THSVS_ACCESS_NONE;
         }
 
@@ -127,14 +127,13 @@ void Framegraph::execute(core::CommandBuffer &commandBuffer) const {
 
         // recycle transient resource
         for (auto resource : step.derealized_resources) {
-            resource->derealize();
+            resource->derealize(cache_);
         }
     }
 }
 
 void Framegraph::transition_resource(core::CommandBuffer &commandBuffer, PassResource &pass) {
-    if (pass.handle->access_type() == pass.access_type
-        && pass.sync_type == PassResourceAccessSyncType::SkipSyncIfSameAccessType) {
+    if (pass.handle->access_type() == pass.access_type && pass.sync_type == PassResourceAccessSyncType::SkipSyncIfSameAccessType) {
         return;
     }
 

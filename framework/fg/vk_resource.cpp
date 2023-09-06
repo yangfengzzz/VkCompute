@@ -5,17 +5,28 @@
 //  property of any third parties.
 
 #include "fg/vk_resource.h"
+#include "fg/transient_resource_cache.h"
 #include "core/barrier.h"
 
 namespace vox::fg {
 template<>
-std::unique_ptr<core::Buffer> realize(const core::BufferDesc &description) {
-    return nullptr;
+std::unique_ptr<core::Buffer> realize(TransientResourceCache &cache, const core::BufferDesc &description) {
+    return cache.get_buffer(description);
 }
 
 template<>
-std::unique_ptr<core::Image> realize(const core::ImageDesc &description) {
-    return nullptr;
+void derealize(TransientResourceCache &cache, std::unique_ptr<core::Buffer> actual) {
+    cache.insert_buffer(std::move(actual));
+}
+
+template<>
+std::unique_ptr<core::Image> realize(TransientResourceCache &cache, const core::ImageDesc &description) {
+    return cache.get_image(description);
+}
+
+template<>
+void derealize(TransientResourceCache &cache, std::unique_ptr<core::Image> actual) {
+    cache.insert_image(std::move(actual));
 }
 
 void set_barrier(core::CommandBuffer &cb, PassResource &pass) {

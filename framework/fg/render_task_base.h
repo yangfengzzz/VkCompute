@@ -53,7 +53,7 @@ protected:
     friend RenderTaskBuilder;
 
     virtual void setup(RenderTaskBuilder &builder) = 0;
-    virtual void execute(core::CommandBuffer& commandBuffer) const = 0;
+    virtual void execute(core::CommandBuffer &commandBuffer) const = 0;
 
     std::string name_;
     bool cull_immune_;

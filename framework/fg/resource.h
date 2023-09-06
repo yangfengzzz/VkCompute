@@ -50,15 +50,15 @@ public:
     }
 
 private:
-    void realize() override {
+    void realize(TransientResourceCache &cache) override {
         if (transient()) {
-            std::get<std::unique_ptr<actual_type>>(actual_) = fg::realize<description_type, actual_type>(description_);
+            std::get<std::unique_ptr<actual_type>>(actual_) = fg::realize<description_type, actual_type>(cache, description_);
         }
     }
 
-    void derealize() override {
+    void derealize(TransientResourceCache &cache) override {
         if (transient()) {
-            std::get<std::unique_ptr<actual_type>>(actual_).reset();
+            fg::derealize(cache, std::get<std::unique_ptr<actual_type>>(actual_));
         }
     }
 

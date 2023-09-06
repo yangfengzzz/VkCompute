@@ -11,19 +11,19 @@
 #include <unordered_map>
 #include <optional>
 
-namespace vox::core {
+namespace vox::fg {
 class TransientResourceCache {
 public:
-    std::shared_ptr<Image> get_image(const ImageDesc &desc);
+    std::unique_ptr<core::Image> get_image(const core::ImageDesc &desc);
 
-    void insert_image(std::shared_ptr<Image> image);
+    void insert_image(std::unique_ptr<core::Image> image);
 
-    std::shared_ptr<Buffer> get_buffer(const BufferDesc &desc);
+    std::unique_ptr<core::Buffer> get_buffer(const core::BufferDesc &desc);
 
-    void insert_buffer(std::shared_ptr<Buffer> buffer);
+    void insert_buffer(std::unique_ptr<core::Buffer> buffer);
 
 private:
-    std::unordered_map<ImageDesc, std::vector<std::shared_ptr<Image>>> images;
-    std::unordered_map<BufferDesc, std::vector<std::shared_ptr<Buffer>>> buffers;
+    std::unordered_map<core::ImageDesc, std::vector<std::unique_ptr<core::Image>>> images;
+    std::unordered_map<core::BufferDesc, std::vector<std::unique_ptr<core::Buffer>>> buffers;
 };
-}// namespace vox::core
+}// namespace vox::fg

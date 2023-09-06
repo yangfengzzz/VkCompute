@@ -51,8 +51,8 @@ protected:
     friend Framegraph;
     friend RenderTaskBuilder;
 
-    virtual void realize() = 0;
-    virtual void derealize() = 0;
+    virtual void realize(TransientResourceCache &cache) = 0;
+    virtual void derealize(TransientResourceCache &cache) = 0;
 
     ThsvsAccessType access_type_;
     std::size_t id_;

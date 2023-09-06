@@ -16,10 +16,16 @@ using BufferResource = Resource<core::BufferDesc, core::Buffer>;
 using ImageResource = Resource<core::ImageDesc, core::Image>;
 
 template<>
-std::unique_ptr<core::Buffer> realize(const core::BufferDesc &description);
+std::unique_ptr<core::Buffer> realize(TransientResourceCache &cache, const core::BufferDesc &description);
 
 template<>
-std::unique_ptr<core::Image> realize(const core::ImageDesc &description);
+void derealize(TransientResourceCache &cache, std::unique_ptr<core::Buffer> actual);
+
+template<>
+std::unique_ptr<core::Image> realize(TransientResourceCache &cache, const core::ImageDesc &description);
+
+template<>
+void derealize(TransientResourceCache &cache, std::unique_ptr<core::Image> actual);
 
 void set_barrier(core::CommandBuffer &cb, PassResource &pass);
 

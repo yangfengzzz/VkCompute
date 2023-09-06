@@ -18,6 +18,7 @@
 #include "fg/render_task.h"
 #include "fg/render_task_builder.h"
 #include "fg/resource.h"
+#include "fg/transient_resource_cache.h"
 
 namespace vox::fg {
 class Framegraph {
@@ -50,7 +51,7 @@ public:
 
     void compile();
 
-    void execute(core::CommandBuffer &commandBuffer) const;
+    void execute(core::CommandBuffer &commandBuffer);
 
     void clear();
 
@@ -70,6 +71,8 @@ private:
     std::vector<std::unique_ptr<RenderTaskBase>> render_tasks_;
     std::vector<std::unique_ptr<ResourceBase>> resources_;
     std::vector<step> timeline_;// Computed through framegraph compilation.
+
+    TransientResourceCache cache_;
 };
 
 template<typename resource_type, typename description_type>
