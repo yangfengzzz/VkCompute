@@ -252,8 +252,12 @@ set(FG_FILES
         fg/render_task_builder.h
         fg/resource.h
         fg/resource_base.h
+        fg/transient_resource_cache.h
+        fg/vk_resource.h
         # Source Files
         fg/framegraph.cpp
+        fg/transient_resource_cache.cpp
+        fg/vk_resource.cpp
 )
 
 source_group("\\" FILES ${FRAMEWORK_FILES})

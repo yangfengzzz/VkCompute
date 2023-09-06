@@ -20,7 +20,7 @@ public:
         return pool;
     }
 
-    bool is_exported() {
+    [[nodiscard]] bool is_exported() const {
         return is_exported_;
     }
 

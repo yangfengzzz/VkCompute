@@ -56,8 +56,10 @@ public:
 
     void export_graphviz(const std::string &filepath);
 
-protected:
+private:
     friend RenderTaskBuilder;
+
+    static void transition_resource(core::CommandBuffer &commandBuffer, PassResource &resource);
 
     struct step {
         RenderTaskBase *render_task;

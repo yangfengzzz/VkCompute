@@ -37,7 +37,7 @@ public:
     resource_type *write(resource_type *resource, ThsvsAccessType access_type,
                          PassResourceAccessSyncType sync_type = PassResourceAccessSyncType::AlwaysSync);
 
-protected:
+private:
     Framegraph *framegraph_;
     RenderTaskBase *render_task_;
 };

@@ -12,15 +12,16 @@
 #include <thsvs_simpler_vulkan_synchronization.h>
 
 namespace vox::core {
-void record_image_barrier(Device &device, VkCommandBuffer cb, const ImageBarrier &barrier) {
+void record_image_barrier(core::CommandBuffer &cb, const ImageBarrier &barrier) {
     auto range = VkImageSubresourceRange{
         .aspectMask = barrier.aspect_mask,
         .baseMipLevel = 0,
         .levelCount = 0,
         .baseArrayLayer = 0,
-        .layerCount = 0,
+        .layerCount = barrier.image.get_array_layer_count(),
     };
 
+    auto &device = cb.get_device();
     ThsvsImageBarrier imageBarrier{
         .prevAccessCount = 1,
         .pPrevAccesses = &barrier.prev_access,
@@ -31,12 +32,29 @@ void record_image_barrier(Device &device, VkCommandBuffer cb, const ImageBarrier
         .discardContents = barrier.discard,
         .srcQueueFamilyIndex = device.get_queue_family_index(VK_QUEUE_GRAPHICS_BIT),
         .dstQueueFamilyIndex = device.get_queue_family_index(VK_QUEUE_GRAPHICS_BIT),
-        .image = barrier.image,
+        .image = barrier.image.get_handle(),
         .subresourceRange = range,
     };
-    thsvsCmdPipelineBarrier(cb, nullptr,
+    thsvsCmdPipelineBarrier(cb.get_handle(), nullptr,
                             0, nullptr,
                             1, &imageBarrier);
+}
+
+void record_buffer_barrier(core::CommandBuffer &cb, const BufferBarrier &barrier) {
+    auto &device = cb.get_device();
+    ThsvsBufferBarrier bufferBarrier{
+        .prevAccessCount = 1,
+        .pPrevAccesses = &barrier.prev_access,
+        .nextAccessCount = 1,
+        .pNextAccesses = &barrier.next_access,
+        .srcQueueFamilyIndex = device.get_queue_family_index(VK_QUEUE_GRAPHICS_BIT),
+        .dstQueueFamilyIndex = device.get_queue_family_index(VK_QUEUE_GRAPHICS_BIT),
+        .buffer = barrier.buffer.get_handle(),
+        .offset = 0,
+        .size = barrier.buffer.get_size()};
+    thsvsCmdPipelineBarrier(cb.get_handle(), nullptr,
+                            1, &bufferBarrier,
+                            0, nullptr);
 }
 
 AccessInfo get_access_info(ThsvsAccessType access_type) {
@@ -508,58 +526,6 @@ VkImageAspectFlags image_aspect_mask_from_access_type_and_format(ThsvsAccessType
         default:
             return 0;
     }
-}
-
-VkImageUsageFlags image_access_mask_to_usage_flags(VkAccessFlags access_mask) {
-    switch (access_mask) {
-        case VK_ACCESS_SHADER_READ_BIT:
-            return VK_IMAGE_USAGE_SAMPLED_BIT;
-        case VK_ACCESS_SHADER_WRITE_BIT:
-            return VK_IMAGE_USAGE_STORAGE_BIT;
-        case VK_ACCESS_COLOR_ATTACHMENT_READ_BIT:
-        case VK_ACCESS_COLOR_ATTACHMENT_WRITE_BIT:
-            return VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT;
-        case VK_ACCESS_DEPTH_STENCIL_ATTACHMENT_READ_BIT:
-        case VK_ACCESS_DEPTH_STENCIL_ATTACHMENT_WRITE_BIT:
-            return VK_IMAGE_USAGE_DEPTH_STENCIL_ATTACHMENT_BIT;
-        case VK_ACCESS_TRANSFER_READ_BIT:
-            return VK_IMAGE_USAGE_TRANSFER_SRC_BIT;
-        case VK_ACCESS_TRANSFER_WRITE_BIT:
-            return VK_IMAGE_USAGE_TRANSFER_DST_BIT;
-        case VK_ACCESS_MEMORY_READ_BIT:
-        case VK_ACCESS_MEMORY_WRITE_BIT:
-            return VK_IMAGE_USAGE_STORAGE_BIT;
-        default:
-            LOGE("Invalid Access Flags {}", access_mask);
-    }
-    return 0;
-}
-
-VkBufferUsageFlags buffer_access_mask_to_usage_flags(VkAccessFlags access_mask) {
-    switch (access_mask) {
-        case VK_ACCESS_INDIRECT_COMMAND_READ_BIT:
-            return VK_BUFFER_USAGE_INDIRECT_BUFFER_BIT;
-        case VK_ACCESS_INDEX_READ_BIT:
-            return VK_BUFFER_USAGE_INDEX_BUFFER_BIT;
-        case VK_ACCESS_VERTEX_ATTRIBUTE_READ_BIT:
-            return VK_BUFFER_USAGE_UNIFORM_TEXEL_BUFFER_BIT;
-        case VK_ACCESS_UNIFORM_READ_BIT:
-            return VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT;
-        case VK_ACCESS_SHADER_READ_BIT:
-            return VK_BUFFER_USAGE_UNIFORM_TEXEL_BUFFER_BIT;
-        case VK_ACCESS_SHADER_WRITE_BIT:
-            return VK_BUFFER_USAGE_STORAGE_BUFFER_BIT;
-        case VK_ACCESS_TRANSFER_READ_BIT:
-            return VK_BUFFER_USAGE_TRANSFER_SRC_BIT;
-        case VK_ACCESS_TRANSFER_WRITE_BIT:
-            return VK_BUFFER_USAGE_TRANSFER_DST_BIT;
-        case VK_ACCESS_MEMORY_READ_BIT:
-        case VK_ACCESS_MEMORY_WRITE_BIT:
-            return VK_BUFFER_USAGE_STORAGE_BUFFER_BIT;
-        default:
-            LOGE("Invalid Access Flags {}", access_mask);
-    }
-    return 0;
 }
 
 }// namespace vox::core

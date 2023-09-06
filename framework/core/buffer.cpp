@@ -42,6 +42,9 @@ Buffer::Buffer(Device const &device,
     VmaAllocationCreateInfo memory_info{};
     memory_info.flags = flags;
     memory_info.usage = desc.memory_usage;
+    if (pool) {
+        memory_info.pool = pool->get_handle();
+    }
 
     VmaAllocationInfo allocation_info{};
     auto result = vmaCreateBuffer(device.get_memory_allocator(),

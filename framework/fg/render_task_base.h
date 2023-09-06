@@ -16,16 +16,9 @@ class RenderTaskBuilder;
 class ResourceBase;
 
 struct PassResource {
-    const ResourceBase *handle;
+    ResourceBase *handle;
     ThsvsAccessType access_type;
     PassResourceAccessSyncType sync_type;
-
-    PassResource(ResourceBase *handle,
-                 ThsvsAccessType access_type,
-                 PassResourceAccessSyncType sync_type)
-        : handle(handle),
-          access_type(access_type),
-          sync_type(sync_type) {}
 };
 
 class RenderTaskBase {
@@ -42,6 +35,7 @@ public:
     [[nodiscard]] const std::string &name() const {
         return name_;
     }
+
     void set_name(const std::string &name) {
         name_ = name;
     }
@@ -49,6 +43,7 @@ public:
     [[nodiscard]] bool cull_immune() const {
         return cull_immune_;
     }
+
     void set_cull_immune(const bool cull_immune) {
         cull_immune_ = cull_immune;
     }

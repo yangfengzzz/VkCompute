@@ -34,6 +34,7 @@ public:
     [[nodiscard]] const std::string &name() const {
         return name_;
     }
+
     void set_name(const std::string &name) {
         name_ = name;
     }

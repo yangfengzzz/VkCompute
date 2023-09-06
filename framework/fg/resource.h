@@ -17,7 +17,7 @@ namespace vox::fg {
 class RenderTaskBase;
 
 template<typename description_type_, typename actual_type_>
-class Resource : public ResourceBase {
+class Resource final : public ResourceBase {
 public:
     using description_type = description_type_;
     using actual_type = actual_type_;
@@ -49,12 +49,13 @@ public:
                    std::get<actual_type *>(actual_);
     }
 
-protected:
+private:
     void realize() override {
         if (transient()) {
             std::get<std::unique_ptr<actual_type>>(actual_) = fg::realize<description_type, actual_type>(description_);
         }
     }
+
     void derealize() override {
         if (transient()) {
             std::get<std::unique_ptr<actual_type>>(actual_).reset();

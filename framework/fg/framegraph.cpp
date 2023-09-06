@@ -5,6 +5,7 @@
 //  property of any third parties.
 
 #include "fg/framegraph.h"
+#include "fg/vk_resource.h"
 
 namespace vox::fg {
 void Framegraph::compile() {
@@ -109,10 +110,36 @@ void Framegraph::compile() {
 
 void Framegraph::execute(core::CommandBuffer &commandBuffer) const {
     for (auto &step : timeline_) {
-        for (auto resource : step.realized_resources) resource->realize();
+        // alloc transient resource
+        for (auto resource : step.realized_resources) {
+            resource->realize();
+            resource->access_type_ = THSVS_ACCESS_NONE;
+        }
+
+        // set barrier
+        for (auto pass : step.render_task->reads_) {
+            transition_resource(commandBuffer, pass);
+        }
+        for (auto pass : step.render_task->writes_) {
+            transition_resource(commandBuffer, pass);
+        }
         step.render_task->execute(commandBuffer);
-        for (auto resource : step.derealized_resources) resource->derealize();
+
+        // recycle transient resource
+        for (auto resource : step.derealized_resources) {
+            resource->derealize();
+        }
     }
+}
+
+void Framegraph::transition_resource(core::CommandBuffer &commandBuffer, PassResource &pass) {
+    if (pass.handle->access_type() == pass.access_type
+        && pass.sync_type == PassResourceAccessSyncType::SkipSyncIfSameAccessType) {
+        return;
+    }
+
+    set_barrier(commandBuffer, pass);
+    pass.handle->access_type_ = pass.access_type;
 }
 
 void Framegraph::clear() {

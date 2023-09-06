@@ -6,20 +6,23 @@
 
 #pragma once
 
-#include "buffer.h"
-#include "image.h"
+#include "core/command_buffer.h"
 #include <thsvs_simpler_vulkan_synchronization.h>
 
 namespace vox::core {
 struct ImageBarrier {
-    VkImage image{};
+    core::Image& image;
     ThsvsAccessType prev_access{};
     ThsvsAccessType next_access{};
     VkImageAspectFlags aspect_mask{};
     bool discard{false};
 };
 
-void record_image_barrier(Device &device, VkCommandBuffer cb, const ImageBarrier &barrier);
+struct BufferBarrier {
+    core::Buffer& buffer;
+    ThsvsAccessType prev_access{};
+    ThsvsAccessType next_access{};
+};
 
 struct AccessInfo {
     VkPipelineStageFlags stage_mask;
@@ -27,14 +30,14 @@ struct AccessInfo {
     VkImageLayout image_layout;
 };
 
+void record_image_barrier(core::CommandBuffer &cb, const ImageBarrier &barrier);
+
+void record_buffer_barrier(core::CommandBuffer &cb, const BufferBarrier &barrier);
+
 AccessInfo get_access_info(ThsvsAccessType access_type);
 
 VkImageAspectFlags image_aspect_mask_from_format(VkFormat format);
 
 VkImageAspectFlags image_aspect_mask_from_access_type_and_format(ThsvsAccessType access_type, VkFormat format);
-
-VkImageUsageFlags image_access_mask_to_usage_flags(VkAccessFlags access_mask);
-
-VkBufferUsageFlags buffer_access_mask_to_usage_flags(VkAccessFlags access_mask);
 
 }// namespace vox::core

@@ -15,7 +15,7 @@ namespace vox::fg {
 class RenderTaskBuilder;
 
 template<typename data_type_>
-class RenderTask : public RenderTaskBase {
+class RenderTask final : public RenderTaskBase {
 public:
     using data_type = data_type_;
 
@@ -34,7 +34,7 @@ public:
         return data_;
     }
 
-protected:
+private:
     void setup(RenderTaskBuilder &builder) override {
         setup_(data_, builder);
     }
