@@ -5,7 +5,7 @@
 //  property of any third parties.
 
 #include "texture/texture_manager.h"
-
+#include "framework/core/device.h"
 #include "shader/shader_manager.h"
 
 namespace vox {
@@ -161,12 +161,12 @@ std::shared_ptr<Texture> TextureManager::generate_ibl(const std::string &file, r
         target->set_format(source->get_format());
         target->create_vk_image(device_, 0, VK_IMAGE_USAGE_STORAGE_BIT | VK_IMAGE_USAGE_SAMPLED_BIT);
 
-        if (!pipeline_) {
-            pipeline_ = std::make_unique<rendering::PostProcessingPipeline>(render_context, nullptr);
-            ibl_pass_ = &pipeline_->add_pass<rendering::PostProcessingComputePass>(
-                ShaderManager::get_singleton().load_shader("base/ibl.comp", VK_SHADER_STAGE_COMPUTE_BIT));
-            ibl_pass_->attach_shader_data(&shader_data_);
-        }
+//        if (!pipeline_) {
+//            pipeline_ = std::make_unique<rendering::PostProcessingPipeline>(render_context, nullptr);
+//            ibl_pass_ = &pipeline_->add_pass<rendering::PostProcessingComputePass>(
+//                ShaderManager::get_singleton().load_shader("base/ibl.comp", VK_SHADER_STAGE_COMPUTE_BIT));
+//            ibl_pass_->attach_shader_data(&shader_data_);
+//        }
         shader_data_.set_sampled_texture("environmentMap", source->get_vk_image_view(VK_IMAGE_VIEW_TYPE_CUBE),
                                          sampler_.get());
         uint32_t source_width = source->get_extent().width;
@@ -181,8 +181,8 @@ std::shared_ptr<Texture> TextureManager::generate_ibl(const std::string &file, r
 
             shader_data_.set_storage_texture("o_results", target->get_vk_image_view(VK_IMAGE_VIEW_TYPE_CUBE, lod, 0, 1, 0));
 
-            ibl_pass_->set_dispatch_size({(source_width + 8) / 8, (source_width + 8) / 8, 6});
-            pipeline_->draw(command_buffer, render_context.get_active_frame().get_render_target());
+//            ibl_pass_->set_dispatch_size({(source_width + 8) / 8, (source_width + 8) / 8, 6});
+//            pipeline_->draw(command_buffer, render_context.get_active_frame().get_render_target());
         }
         command_buffer.end();
         render_context.submit(command_buffer);

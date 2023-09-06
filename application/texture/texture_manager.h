@@ -8,9 +8,8 @@
 
 #include "base/singleton.h"
 #include "math/spherical_harmonics3.h"
-#include "framework/rendering/postprocessing_computepass.h"
-#include "framework/rendering/postprocessing_pipeline.h"
 #include "framework/shader/shader_data.h"
+#include "framework/rendering/render_context.h"
 #include "texture/texture.h"
 
 namespace vox {
@@ -56,8 +55,6 @@ private:
     std::unique_ptr<core::Sampler> sampler_{nullptr};
 
     ShaderData shader_data_;
-    std::unique_ptr<rendering::PostProcessingPipeline> pipeline_{nullptr};
-    rendering::PostProcessingComputePass *ibl_pass_{nullptr};
 };
 
 template<>

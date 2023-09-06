@@ -6,24 +6,11 @@
 
 #pragma once
 
-#include "common/helpers.h"
-#include "common/vk_common.h"
-#include "core/command_buffer.h"
-#include "core/command_pool.h"
-#include "core/descriptor_set.h"
-#include "core/descriptor_set_layout.h"
-#include "core/pipeline.h"
-#include "core/pipeline_layout.h"
-#include "core/queue.h"
-#include "core/semaphore.h"
-#include "core/render_pass.h"
-#include "core/pipeline_state.h"
-#include "core/resource_cache.h"
 #include "rendering/render_frame.h"
 #include "rendering/render_target.h"
 #include "rendering/swapchain.h"
 #include "rendering/framebuffer.h"
-#include "shader/shader_module.h"
+#include "fg/framegraph.h"
 #include <optional>
 
 namespace vox {
@@ -53,6 +40,8 @@ public:
 
     // The format to use for the RenderTargets if a swapchain isn't created
     static VkFormat DEFAULT_VK_FORMAT;
+
+    fg::Framegraph framegraph;
 
     /**
 	 * @brief Constructor

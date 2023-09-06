@@ -275,6 +275,8 @@ void GraphicsApplication::draw_renderpass(core::CommandBuffer &command_buffer, r
 void GraphicsApplication::render(core::CommandBuffer &command_buffer) {
     if (render_pipeline) {
         render_pipeline->draw(command_buffer, render_context->get_active_frame().get_render_target());
+//        render_context->framegraph.compile();
+//        render_context->framegraph.execute(command_buffer);
     }
 }
 
