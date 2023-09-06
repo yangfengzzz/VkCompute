@@ -199,6 +199,15 @@ void CommandBuffer::bind_pipeline_layout(PipelineLayout &pipeline_layout) {
     pipeline_state.set_pipeline_layout(pipeline_layout);
 }
 
+void CommandBuffer::bind_compute_pipeline_layout(const std::shared_ptr<ShaderModule> &shader) {
+    // Get cache
+    auto &resource_cache = get_device().get_resource_cache();
+
+    // Create pipeline layout and bind it
+    auto &pipeline_layout = resource_cache.request_pipeline_layout({shader.get()});
+    bind_pipeline_layout(pipeline_layout);
+}
+
 void CommandBuffer::set_specialization_constant(uint32_t constant_id, const std::vector<uint8_t> &data) {
     pipeline_state.set_specialization_constant(constant_id, data);
 }

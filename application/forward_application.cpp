@@ -94,11 +94,9 @@ void ForwardApplication::input_event(const vox::InputEvent &input_event) {
 }
 
 void ForwardApplication::render(core::CommandBuffer &command_buffer) {
-    update_gpu_task(command_buffer);
+    framegraph.compile();
+    framegraph.execute(command_buffer);
     GraphicsApplication::render(command_buffer);
-}
-
-void ForwardApplication::update_gpu_task(core::CommandBuffer &command_buffer) {
 }
 
 }// namespace vox

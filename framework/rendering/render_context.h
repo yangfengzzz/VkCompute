@@ -10,7 +10,6 @@
 #include "rendering/render_target.h"
 #include "rendering/swapchain.h"
 #include "rendering/framebuffer.h"
-#include "fg/framegraph.h"
 #include <optional>
 
 namespace vox {
@@ -40,8 +39,6 @@ public:
 
     // The format to use for the RenderTargets if a swapchain isn't created
     static VkFormat DEFAULT_VK_FORMAT;
-
-    fg::Framegraph framegraph;
 
     /**
 	 * @brief Constructor

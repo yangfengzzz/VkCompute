@@ -7,20 +7,15 @@
 #pragma once
 
 #include "application/forward_application.h"
-#include "framework/compute//compute_pass.h"
 
 namespace vox {
 class AtomicComputeApp : public ForwardApplication {
 public:
-    void after_load_scene() override;
-
     Camera *load_scene() override;
-
-    void update_gpu_task(core::CommandBuffer &command_buffer) override;
 
 private:
     std::shared_ptr<Material> material_{nullptr};
-    std::unique_ptr<compute::ComputePass> atomic_pass{nullptr};
+    std::unique_ptr<core::Buffer> atomic_buffer_{nullptr};
 };
 
 }// namespace vox

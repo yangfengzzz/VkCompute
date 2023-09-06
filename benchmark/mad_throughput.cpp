@@ -25,15 +25,15 @@ static void throughput(::benchmark::State &state,
     const size_t src1_size = num_element * get_size(data_type);
     const size_t dst_size = num_element * get_size(data_type);
 
-    auto src0_buffer = core::Buffer(device, src0_size,
-                                    VK_BUFFER_USAGE_TRANSFER_DST_BIT | VK_BUFFER_USAGE_STORAGE_BUFFER_BIT,
-                                    VMA_MEMORY_USAGE_GPU_ONLY);
-    auto src1_buffer = core::Buffer(device, src1_size,
-                                    VK_BUFFER_USAGE_TRANSFER_DST_BIT | VK_BUFFER_USAGE_STORAGE_BUFFER_BIT,
-                                    VMA_MEMORY_USAGE_GPU_ONLY);
-    auto dst_buffer = core::Buffer(device, dst_size,
-                                   VK_BUFFER_USAGE_TRANSFER_SRC_BIT | VK_BUFFER_USAGE_STORAGE_BUFFER_BIT,
-                                   VMA_MEMORY_USAGE_GPU_ONLY);
+    auto src0_buffer = core::Buffer(device, core::BufferDesc{src0_size,
+                                                             VK_BUFFER_USAGE_TRANSFER_DST_BIT | VK_BUFFER_USAGE_STORAGE_BUFFER_BIT,
+                                                             VMA_MEMORY_USAGE_GPU_ONLY});
+    auto src1_buffer = core::Buffer(device, core::BufferDesc{src1_size,
+                                                             VK_BUFFER_USAGE_TRANSFER_DST_BIT | VK_BUFFER_USAGE_STORAGE_BUFFER_BIT,
+                                                             VMA_MEMORY_USAGE_GPU_ONLY});
+    auto dst_buffer = core::Buffer(device, core::BufferDesc{dst_size,
+                                                            VK_BUFFER_USAGE_TRANSFER_SRC_BIT | VK_BUFFER_USAGE_STORAGE_BUFFER_BIT,
+                                                            VMA_MEMORY_USAGE_GPU_ONLY});
 
     //===-------------------------------------------------------------------===/
     // Set source buffer data
@@ -210,7 +210,7 @@ void MADThroughPut::register_vulkan_benchmarks(compute::ComputeResource &resourc
                                        num_element, loop_count, compute::DataType::fp32)
             ->UseManualTime()
             ->Unit(::benchmark::kMicrosecond)
-            ->MinTime(std::numeric_limits<float>::epsilon()); // use cache make calculation fast after warmup
+            ->MinTime(std::numeric_limits<float>::epsilon());// use cache make calculation fast after warmup
     }
 }
 

@@ -62,8 +62,6 @@ set(COMPUTE_FILES
         compute/compute_context.cpp
         compute/compute_resource.h
         compute/compute_resource.cpp
-        compute/compute_pass.h
-        compute/compute_pass.cpp
         compute/status_util.h
         compute/status_util.cpp
         compute/data_type_util.h

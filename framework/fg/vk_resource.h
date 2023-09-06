@@ -19,13 +19,13 @@ template<>
 std::unique_ptr<core::Buffer> realize(TransientResourceCache &cache, const core::BufferDesc &description);
 
 template<>
-void derealize(TransientResourceCache &cache, std::unique_ptr<core::Buffer> actual);
+void derealize(TransientResourceCache &cache, std::unique_ptr<core::Buffer>&& actual);
 
 template<>
 std::unique_ptr<core::Image> realize(TransientResourceCache &cache, const core::ImageDesc &description);
 
 template<>
-void derealize(TransientResourceCache &cache, std::unique_ptr<core::Image> actual);
+void derealize(TransientResourceCache &cache, std::unique_ptr<core::Image>&& actual);
 
 void set_barrier(core::CommandBuffer &cb, PassResource &pass);
 

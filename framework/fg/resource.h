@@ -27,10 +27,9 @@ public:
         // Transient (normal) constructor.
     }
     explicit Resource(const std::string &name, const description_type &description,
-                      ThsvsAccessType access_type, actual_type *actual = nullptr)
+                      ThsvsAccessType access_type, actual_type *actual)
         : ResourceBase(name, nullptr, access_type), description_(description), actual_(actual) {
-        // Retained (import) constructor.
-        if (!actual) actual_ = fg::realize<description_type, actual_type>(description_);
+        assert(actual != nullptr);
     }
     Resource(const Resource &that) = delete;
     Resource(Resource &&temp) = default;
@@ -58,7 +57,7 @@ private:
 
     void derealize(TransientResourceCache &cache) override {
         if (transient()) {
-            fg::derealize(cache, std::get<std::unique_ptr<actual_type>>(actual_));
+            fg::derealize(cache, std::move(std::get<std::unique_ptr<actual_type>>(actual_)));
         }
     }
 

@@ -13,10 +13,14 @@
 #include "ecs/scene_manager.h"
 #include "shader/shader_manager.h"
 #include "texture/texture_manager.h"
+#include "framework/fg/framegraph.h"
+#include "framework/fg/vk_resource.h"
 
 namespace vox {
 class ForwardApplication : public GraphicsApplication {
 public:
+    fg::Framegraph framegraph;
+
     ForwardApplication() = default;
 
     ~ForwardApplication() override;
@@ -44,8 +48,6 @@ public:
     virtual Camera *load_scene() = 0;
 
     virtual void after_load_scene() {}
-
-    virtual void update_gpu_task(core::CommandBuffer &command_buffer);
 
 private:
     Camera *main_camera_{nullptr};

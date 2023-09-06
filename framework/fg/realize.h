@@ -22,6 +22,6 @@ std::unique_ptr<actual_type> realize(TransientResourceCache &cache, const descri
 }
 
 template<typename actual_type>
-void derealize(TransientResourceCache &cache, std::unique_ptr<actual_type> actual) {
+void derealize(TransientResourceCache &cache, std::unique_ptr<actual_type>&& actual) {
 }
 }// namespace vox::fg

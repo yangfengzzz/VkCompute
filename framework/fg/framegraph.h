@@ -44,8 +44,9 @@ public:
     template<typename description_type, typename actual_type>
     Resource<description_type, actual_type> *add_retained_resource(const std::string &name,
                                                                    const description_type &description,
+                                                                   ThsvsAccessType access_type,
                                                                    actual_type *actual = nullptr) {
-        resources_.emplace_back(std::make_unique<Resource<description_type, actual_type>>(name, description, actual));
+        resources_.emplace_back(std::make_unique<Resource<description_type, actual_type>>(name, description, access_type, actual));
         return static_cast<Resource<description_type, actual_type> *>(resources_.back().get());
     }
 

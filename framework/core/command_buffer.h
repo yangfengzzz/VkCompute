@@ -118,6 +118,8 @@ public:
 
     void bind_pipeline_layout(PipelineLayout &pipeline_layout);
 
+    void bind_compute_pipeline_layout(const std::shared_ptr<ShaderModule> &shader);
+
     template<class T>
     void set_specialization_constant(uint32_t constant_id, const T &data);
 
@@ -191,7 +193,7 @@ public:
 
     void draw_indexed_indirect(const Buffer &buffer, VkDeviceSize offset, uint32_t draw_count, uint32_t stride);
 
-    void dispatch(uint32_t group_count_x, uint32_t group_count_y, uint32_t group_count_z);
+    void dispatch(uint32_t group_count_x, uint32_t group_count_y = 1, uint32_t group_count_z = 1);
 
     void dispatch_indirect(const Buffer &buffer, VkDeviceSize offset);
 

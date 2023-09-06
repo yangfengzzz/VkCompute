@@ -15,17 +15,8 @@
 
 namespace vox {
 class AtomicMaterial : public BaseMaterial {
-private:
-    const std::string atomic_prop_;
-    std::unique_ptr<core::Buffer> atomic_buffer_{nullptr};
-
 public:
-    explicit AtomicMaterial(core::Device &device) : BaseMaterial(device, "atomicRender"), atomic_prop_("atomicCounter") {
-        atomic_buffer_ = std::make_unique<core::Buffer>(device, core::BufferDesc{.size = sizeof(uint32_t),
-                                                                                 .buffer_usage = VK_BUFFER_USAGE_STORAGE_BUFFER_BIT,
-                                                                                 .memory_usage = VMA_MEMORY_USAGE_GPU_ONLY});
-        shader_data_.set_buffer_functor(atomic_prop_, [this]() -> core::Buffer * { return atomic_buffer_.get(); });
-
+    explicit AtomicMaterial(core::Device &device) : BaseMaterial(device, "atomicRender") {
         vertex_source_ = ShaderManager::get_singleton().load_shader("base/unlit.vert", VK_SHADER_STAGE_VERTEX_BIT);
         fragment_source_ = ShaderManager::get_singleton().load_shader("base/compute/atomic_counter.frag", VK_SHADER_STAGE_FRAGMENT_BIT);
     }
@@ -54,19 +45,36 @@ Camera *AtomicComputeApp::load_scene() {
     material_ = std::make_shared<AtomicMaterial>(*device);
     renderer->set_material(material_);
 
+    {
+        auto buffer_desc = core::BufferDesc{.size = sizeof(uint32_t),
+                                            .buffer_usage = VK_BUFFER_USAGE_STORAGE_BUFFER_BIT,
+                                            .memory_usage = VMA_MEMORY_USAGE_GPU_ONLY};
+        atomic_buffer_ = std::make_unique<core::Buffer>(*device, buffer_desc);
+        material_->shader_data_.set_buffer_functor("atomicCounter", [this]() -> core::Buffer * { return atomic_buffer_.get(); });
+
+        auto retained_resource = framegraph.add_retained_resource(
+            "Backbuffer",
+            buffer_desc,
+            THSVS_ACCESS_COMPUTE_SHADER_WRITE,
+            atomic_buffer_.get());
+
+        struct ComputeTaskData {
+            fg::BufferResource *output;
+        };
+        framegraph.add_render_task<ComputeTaskData>(
+            "atomic compute",
+            [&](ComputeTaskData &data, fg::RenderTaskBuilder &builder) { data.output = builder.write(retained_resource, THSVS_ACCESS_COMPUTE_SHADER_WRITE); },
+            [&](const ComputeTaskData &data, core::CommandBuffer &commandBuffer) {
+                auto actual = data.output->actual();
+                commandBuffer.bind_compute_pipeline_layout(ShaderManager::get_singleton().load_shader("base/compute/atomic_counter.comp",
+                                                                                                      VK_SHADER_STAGE_COMPUTE_BIT));
+                commandBuffer.bind_buffer(*actual, 0, actual->get_size(), 0, 6, 0);
+                commandBuffer.dispatch(1);
+            });
+    }
+
     scene->play();
     return main_camera;
-}
-
-void AtomicComputeApp::after_load_scene() {
-    atomic_pass = std::make_unique<compute::ComputePass>(
-        ShaderManager::get_singleton().load_shader("base/compute/atomic_counter.comp", VK_SHADER_STAGE_COMPUTE_BIT));
-    atomic_pass->attach_shader_data(&material_->shader_data_);
-}
-
-void AtomicComputeApp::update_gpu_task(core::CommandBuffer &command_buffer) {
-    ForwardApplication::update_gpu_task(command_buffer);
-    atomic_pass->compute(command_buffer, 1);
 }
 
 }// namespace vox

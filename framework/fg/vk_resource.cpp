@@ -15,7 +15,7 @@ std::unique_ptr<core::Buffer> realize(TransientResourceCache &cache, const core:
 }
 
 template<>
-void derealize(TransientResourceCache &cache, std::unique_ptr<core::Buffer> actual) {
+void derealize(TransientResourceCache &cache, std::unique_ptr<core::Buffer>&& actual) {
     cache.insert_buffer(std::move(actual));
 }
 
@@ -25,7 +25,7 @@ std::unique_ptr<core::Image> realize(TransientResourceCache &cache, const core::
 }
 
 template<>
-void derealize(TransientResourceCache &cache, std::unique_ptr<core::Image> actual) {
+void derealize(TransientResourceCache &cache, std::unique_ptr<core::Image>&& actual) {
     cache.insert_image(std::move(actual));
 }
 
