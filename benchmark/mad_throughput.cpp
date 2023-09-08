@@ -14,8 +14,7 @@
 namespace vox::benchmark {
 static void throughput(::benchmark::State &state,
                        compute::ComputeResource *resource,
-                       compute::ComputePass *pass,
-                       ShaderData *shader_data,
+                       std::shared_ptr<ShaderModule> shader,
                        size_t num_element, int loop_count, compute::DataType data_type) {
     auto &device = resource->get_device();
     //===-------------------------------------------------------------------===/
@@ -84,15 +83,15 @@ static void throughput(::benchmark::State &state,
     //===-------------------------------------------------------------------===/
     // Dispatch
     //===-------------------------------------------------------------------===/
-    shader_data->set_buffer_functor("InputA", [&]() -> core::Buffer * { return &src0_buffer; });
-    shader_data->set_buffer_functor("InputB", [&]() -> core::Buffer * { return &src1_buffer; });
-    shader_data->set_buffer_functor("Output", [&]() -> core::Buffer * { return &dst_buffer; });
-
     {
         core::CommandBuffer &cmd = resource->begin();
         cmd.begin(VK_COMMAND_BUFFER_USAGE_ONE_TIME_SUBMIT_BIT);
         cmd.set_specialization_constant(0, loop_count);
-        pass->compute(cmd, (uint32_t)num_element / (4 * 16));
+        cmd.bind_compute_pipeline_layout(shader);
+        cmd.bind_buffer(src0_buffer, 0, src0_size, 0, 0, 0);
+        cmd.bind_buffer(src1_buffer, 0, src1_size, 0, 1, 0);
+        cmd.bind_buffer(dst_buffer, 0, dst_size, 0, 2, 0);
+        cmd.dispatch((uint32_t)num_element / (4 * 16));
         cmd.end();
         resource->submit(cmd);
     }
@@ -149,7 +148,11 @@ static void throughput(::benchmark::State &state,
                 cmd.write_timestamp(VK_PIPELINE_STAGE_TOP_OF_PIPE_BIT, query_pool->get_query_pool(), 0);
             }
             cmd.set_specialization_constant(0, loop_count);
-            pass->compute(cmd, (uint32_t)num_element / (4 * 16));
+            cmd.bind_compute_pipeline_layout(shader);
+            cmd.bind_buffer(src0_buffer, 0, src0_size, 0, 0, 0);
+            cmd.bind_buffer(src1_buffer, 0, src1_size, 0, 1, 0);
+            cmd.bind_buffer(dst_buffer, 0, dst_size, 0, 2, 0);
+            cmd.dispatch((uint32_t)num_element / (4 * 16));
             if (use_timestamp) {
                 cmd.write_timestamp(VK_PIPELINE_STAGE_BOTTOM_OF_PIPE_BIT, query_pool->get_query_pool(), 1);
             }
@@ -193,11 +196,8 @@ void MADThroughPut::register_vulkan_benchmarks(compute::ComputeResource &resourc
     const char *gpu_name = resource.gpu.get_properties().deviceName;
 
     ShaderVariant shader_variant;
-    auto shader = std::make_shared<ShaderModule>(resource.get_device(), VK_SHADER_STAGE_COMPUTE_BIT,
+    shader = std::make_shared<ShaderModule>(resource.get_device(), VK_SHADER_STAGE_COMPUTE_BIT,
                                                  "compute/mad_throughput.glsl", "main", shader_variant);
-    pass = std::make_unique<compute::ComputePass>(shader);
-    shader_data = std::make_unique<ShaderData>(resource.get_device());
-    pass->attach_shader_data(shader_data.get());
 
     const size_t num_element = 1024 * 1024;
     const int min_loop_count = 100000;
@@ -206,7 +206,7 @@ void MADThroughPut::register_vulkan_benchmarks(compute::ComputeResource &resourc
     for (int loop_count = min_loop_count; loop_count <= max_loop_count;
          loop_count += min_loop_count) {
         std::string test_name = fmt::format("{}/{}/{}/{}", gpu_name, "mad_throughput", num_element, loop_count);
-        ::benchmark::RegisterBenchmark(test_name, throughput, &resource, pass.get(), shader_data.get(),
+        ::benchmark::RegisterBenchmark(test_name, throughput, &resource, shader,
                                        num_element, loop_count, compute::DataType::fp32)
             ->UseManualTime()
             ->Unit(::benchmark::kMicrosecond)

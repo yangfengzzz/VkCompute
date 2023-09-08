@@ -171,5 +171,5 @@ endif ()
 add_subdirectory(spdlog)
 
 # openvdb
-set(OPENVDB_BUILD_NANOVDB ON)
-add_subdirectory(openvdb)
+#set(OPENVDB_BUILD_NANOVDB ON)
+#add_subdirectory(openvdb)

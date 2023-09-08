@@ -8,7 +8,6 @@
 
 #include "benchmark_api.h"
 #include "compute/data_type_util.h"
-#include "compute/compute_pass.h"
 
 namespace vox::benchmark {
 class MADThroughPut : public BenchmarkAPI {
@@ -16,8 +15,7 @@ public:
     void register_vulkan_benchmarks(compute::ComputeResource &resource) override;
 
 private:
-    std::unique_ptr<compute::ComputePass> pass{nullptr};
-    std::unique_ptr<ShaderData> shader_data{nullptr};
+    std::shared_ptr<ShaderModule> shader;
 };
 
 }// namespace vox
