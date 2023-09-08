@@ -43,13 +43,18 @@ project(vkCompute LANGUAGES CXX)
 list(APPEND CMAKE_MODULE_PATH
         ${CMAKE_CURRENT_SOURCE_DIR}/bldsys/cmake
         ${CMAKE_CURRENT_SOURCE_DIR}/bldsys/cmake/module
-        ${CMAKE_CURRENT_SOURCE_DIR}/bldsys/android)
+        ${CMAKE_CURRENT_SOURCE_DIR}/bldsys/android
+        ${CMAKE_CURRENT_SOURCE_DIR}/third_party/USDInstall)
 
 include(utils)
 include(global_options)
 include(sample_helper)
 include(check_atomic)
 include(component_helper)
+
+# usd
+include(pxrConfig)
+include_directories(${PXR_INCLUDE_DIRS})
 
 # CUDA
 option(USE_CUDA "Use CUDA features" ON)
@@ -80,6 +85,8 @@ add_subdirectory(framework)
 add_subdirectory(application)
 add_subdirectory(apps)
 add_subdirectory(benchmark)
+
+add_subdirectory(usd)
 
 if (USE_CUDA)
     add_subdirectory(cuda)
